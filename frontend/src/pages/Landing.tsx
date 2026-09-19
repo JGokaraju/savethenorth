@@ -94,15 +94,19 @@ function DatasetsModal({ onClose }: { onClose: () => void }) {
 
 function Hero() {
   return (
-    <section className="relative flex min-h-[calc(100vh-64px)] flex-col items-center justify-center border-b border-rule px-6 text-center">
-      <div className="fade-in"><Logo size={112} /></div>
-      <h1 className="fade-in mt-6 text-5xl font-extrabold tracking-tight text-ink sm:text-6xl" style={{ animationDelay: "0.3s" }}>Save the North</h1>
-      <p className="fade-in mt-3 max-w-xl text-lg text-muted" style={{ animationDelay: "0.7s" }}>
-        Independent satellite verification of methane emissions from industrial facilities.
-      </p>
+    <section className="relative flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden px-6 text-center">
+      <img src="/landing-bg.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-[#0b1a2e]/55" aria-hidden />
+      <div className="relative flex flex-col items-center">
+        <div className="fade-in bg-white/95 p-2"><Logo size={96} /></div>
+        <h1 className="fade-in mt-6 text-5xl font-extrabold tracking-tight text-white sm:text-7xl" style={{ animationDelay: "0.3s" }}>Save the North</h1>
+        <p className="fade-in mt-3 max-w-xl text-lg text-[#e6ebf0]" style={{ animationDelay: "0.7s" }}>
+          Independent satellite verification of methane emissions from industrial facilities.
+        </p>
+      </div>
       <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
-        className="fade-in absolute bottom-8 text-muted hover:text-ink" style={{ animationDelay: "1.2s" }} aria-label="Scroll down">
-        <svg viewBox="0 0 24 24" className="nudge h-7 w-7"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" d="M6 9l6 6 6-6" /></svg>
+        className="fade-in absolute bottom-8 text-white/80 hover:text-white" style={{ animationDelay: "1.2s" }} aria-label="Scroll down">
+        <svg viewBox="0 0 24 24" className="nudge h-8 w-8"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" d="M6 9l6 6 6-6" /></svg>
       </button>
     </section>
   );
