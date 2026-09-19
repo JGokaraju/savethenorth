@@ -249,9 +249,14 @@ def _run_chat(st: RunState, client, model: str) -> None:
             return
 
 
-def run_live(st: RunState) -> None:
+def openai_client():
+    """Factory (tests inject a fake transport here)."""
     from openai import OpenAI
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=120, max_retries=2)
+    return OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=120, max_retries=2)
+
+
+def run_live(st: RunState) -> None:
+    client = openai_client()
     model = os.getenv("OPENAI_MODEL")
     try:
         _run_responses(st, client, model)
