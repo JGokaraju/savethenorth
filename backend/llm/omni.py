@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import base64
+import contextvars
 import hashlib
 import json
 import os
@@ -21,6 +22,8 @@ SYSTEM = ("You are a remote-sensing and regulatory-document analyst. Describe on
           "Do not estimate numeric emission rates. If asked for structured output, return valid JSON only.")
 
 _counter = {"live_calls": 0, "cached": 0, "mock": 0}
+# Per-run override: demo runs never make live OMNI calls (cached answers are still used).
+force_demo: contextvars.ContextVar[bool] = contextvars.ContextVar("omni_force_demo", default=False)
 _stream_mode: dict[str, bool | None] = {"value": None}
 _lock = threading.Lock()
 
@@ -103,11 +106,11 @@ def ask(prompt: str, image_path: Path | None = None, image_bytes: bytes | None =
             _counter["cached"] += 1
         d = json.loads(cache_file.read_text(encoding="utf-8"))
         return {**d, "mode": "cached" if d.get("mode") == "live" else d.get("mode", "cached")}
-    if mock_omni():
+    if mock_omni() or force_demo.get():
         with _lock:
             _counter["mock"] += 1
-        return {"answer": mock_text or "[MOCK OMNI] No live model configured.", "mode": "mock",
-                "model": f"{model_name()} (mock)", "cache_key": key}
+        return {"answer": mock_text or "No live model configured.", "mode": "mock",
+                "model": f"{model_name()} (demo)", "cache_key": key}
     try:
         answer = _call_live(prompt, image_bytes, mime)
     except Exception as e:  # noqa: BLE001 — never fail the run; fall back to the mock text

@@ -15,7 +15,7 @@ from backend.tools.registry import for_model, openai_tools, run_tool
 from backend.tools.state import RunState
 
 PROMPT = Path(__file__).resolve().parent.parent / "prompts" / "system.md"
-SHOW = ["plume_map", "emission_distribution", "flare_timeline", "reporting_timeline", "regulatory_comparison", "annual_scenarios"]
+SHOW = ["plume_map", "emission_distribution", "flare_timeline", "report_comparison", "regulatory_comparison", "annual_scenarios"]
 
 
 # ====================================================================== verdict templating (mock + auto-complete)
@@ -269,6 +269,8 @@ def run_live(st: RunState) -> None:
 
 # ====================================================================== entry point
 def run(st: RunState) -> None:
+    from backend.llm import omni
+    omni.force_demo.set(st.mode != "LIVE")  # demo runs make no live OMNI calls (this thread only)
     st.emit("run_started", {"facility_id": st.facility_id, "date": st.date, "mode": st.mode})
     try:
         if st.mode == "LIVE":
@@ -298,6 +300,13 @@ def run(st: RunState) -> None:
         st.emit("run_finished", {"ok": st.verdict is not None, "n_tool_calls": len(st.tool_calls)})
 
 
-def mode() -> str:
-    return "MOCK" if mock_llm() else "LIVE"
+def live_available() -> bool:
+    return not mock_llm()
+
+
+def mode(requested: str | None = None) -> str:
+    """'live' only when keys are configured; anything else runs the demo (scripted) agent."""
+    if requested is not None:
+        return "LIVE" if requested.lower() == "live" and live_available() else "MOCK"
+    return "LIVE" if live_available() else "MOCK"
 

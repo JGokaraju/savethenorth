@@ -57,7 +57,7 @@ def plume_map(crop, bg, masks: dict, det_by_k: dict, facility: dict, wind, k_def
                        axref="x", ayref="y", showarrow=True, arrowhead=3, arrowsize=1.4, arrowwidth=2.5, arrowcolor=INK,
                        text="")
     fig.add_annotation(x=x0, y=y0, text=f"wind {wind.u10:.1f} m/s from {wind.direction_deg:.0f}°", showarrow=False,
-                       yshift=-18, font=dict(color=INK, size=12), bgcolor="rgba(21,23,28,0.7)")
+                       yshift=-18, font=dict(color=INK, size=12), bgcolor="rgba(255,255,255,0.85)")
     steps = []
     for i, k in enumerate(ks):
         vis = [True] + [kk == k for kk in ks] + [True, True]
@@ -293,3 +293,33 @@ def annual_scenarios(an: dict) -> ChartArtifact:
     stats = {"annual_t_ch4": {k: round(v) for k, v in an["annual_t_ch4"].items()}, "scenario_p": an["scenario_p"],
              "n_overpasses": an["n_overpasses"], "n_detections": an["n_detections"], "synthetic": an["synthetic"]}
     return save("annual_scenarios", "Annual scenarios", fig, stats)
+
+
+# 9 -------------------------------------------------------------------- satellite vs technical report
+def report_comparison(cmp_: dict) -> ChartArtifact:
+    """Methane implied by the satellite vs quantities in the operator's TCEQ emissions-event reports (lb, log)."""
+    rows = []
+    sat = cmp_.get("satellite")
+    if sat:
+        rows.append(("Satellite · CH₄, 1 hour", sat["lb_per_hour"], S1))
+        rows.append(("Satellite · CH₄, if sustained 24 h", sat["lb_if_24h"], S1))
+    for r in cmp_.get("reported_events", []):
+        voc = sum(v for k, v in r["lb_by_contaminant"].items() if "voc" in k.lower() or "natural gas" in k.lower())
+        if voc > 0:
+            rows.append((f"Reported #{r['incident_no']} · VOCs, whole event", voc, S2))
+    fig = go.Figure()
+    for name, v, c in rows:
+        fig.add_trace(go.Bar(y=[name], x=[v], orientation="h", marker=dict(color=c, line=dict(width=0)), showlegend=False,
+                             text=[f"{v:,.0f} lb"], textposition="outside", textfont=dict(color=INK),
+                             hovertemplate=f"{name}<br>%{{x:,.0f}} lb<extra></extra>"))
+    none_txt = ("No emissions-event report filed within ±1 day of " + cmp_["event_date"]) if not cmp_.get("reported_on_event_date") else ""
+    if none_txt:
+        fig.add_annotation(text=none_txt, xref="paper", yref="paper", x=0, y=-0.22, showarrow=False, xanchor="left",
+                           font=dict(color=CRITICAL, size=12))
+    vmax = max([r[1] for r in rows] or [10])
+    fig.update_layout(title="Satellite observation vs the operator's reported emissions", bargap=0.45,
+                      xaxis=dict(type="log", title="Pounds (log scale)", range=[1, np.log10(vmax * 8)]),
+                      yaxis=dict(autorange="reversed", title=""), margin=dict(l=230, b=90))
+    stats = {"rows": {r[0]: round(r[1]) for r in rows}, "reported_on_event_date": len(cmp_.get("reported_on_event_date", [])),
+             "methane_reported_anywhere": cmp_.get("methane_reported_anywhere")}
+    return save("report_comparison", "Satellite vs technical report", fig, stats)

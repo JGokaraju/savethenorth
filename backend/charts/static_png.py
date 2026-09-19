@@ -121,8 +121,9 @@ def _cmap(scale):
 def render(fig_json: dict, out: Path) -> None:
     layout = fig_json.get("layout", {})
     tmpl = layout.get("template", {}).get("layout", {})
-    bg = layout.get("paper_bgcolor") or tmpl.get("paper_bgcolor") or "#15171c"
-    ink, muted, grid = "#f3f4f6", "#b9b8b0", "#34342f"
+    bg = layout.get("paper_bgcolor") or tmpl.get("paper_bgcolor") or "#ffffff"
+    light = sum(to_rgba(_color(bg))[:3]) > 1.5
+    ink, muted, grid = ("#1d2126", "#6b6a66", "#e3e2dc") if light else ("#f3f4f6", "#b9b8b0", "#34342f")
     fig = plt.figure(figsize=(W, H), dpi=DPI, facecolor=_color(bg))
     axes = _axes_for(fig, layout)
     default = next(iter(axes.values()))

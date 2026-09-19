@@ -5,11 +5,15 @@ description: Choose the report charts and assemble a validated verdict with care
 # Verdict report
 
 ## Before submitting
-1. `show_chart` for 4–6 of: `plume_map`, `emission_distribution`, `flare_timeline`, `reporting_timeline`,
-   `regulatory_comparison`, `annual_scenarios`. Use one-line captions that say what the chart shows.
+1. `show_chart` for 4–6 of: `plume_map`, `emission_distribution`, `flare_timeline`, `report_comparison`,
+   `reporting_timeline`, `regulatory_comparison`, `annual_scenarios`. Use one-line captions that say what the chart shows.
 2. `submit_verdict(verdict)`. The backend validates it: medians/p5/p95 must equal `compute_emission_rate` output (±1%),
    regulatory statuses must equal `check_regulations`, and every evidence id must exist in the Evidence Ledger. If it is
    rejected, read the error, fix the listed fields and resubmit.
+
+## Outcome
+The backend attaches a deterministic screening outcome (BUSTED / ACCEPTED / INCONCLUSIVE / NOT_ASSESSED) and the
+satellite-vs-technical-report comparison from `check_regulations`. Do not restate them differently.
 
 ## Headline format
 "Estimated X t/h [p5–p95 A–B t/h] of methane on 2025-08-08: ~N× the 100 kg/h EPA super-emitter threshold; no

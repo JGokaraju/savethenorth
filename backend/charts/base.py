@@ -11,20 +11,20 @@ import plotly.io as pio
 from backend.charts import static_png
 from backend.settings import CHARTS_DIR, ROOT
 
-# Validated dark-mode categorical steps (dataviz reference palette) + reserved status colours.
-SURFACE = "#15171c"
-PAGE = "#0b0d11"
-INK = "#f3f4f6"
-INK2 = "#c3c2b7"
+# Validated light-mode categorical steps (dataviz reference palette) + reserved status colours.
+SURFACE = "#ffffff"
+PAGE = "#eef2f6"
+INK = "#1d2126"
+INK2 = "#52514e"
 MUTED = "#898781"
-GRID = "#2c2c2a"
-AXIS = "#383835"
-S1, S2, S3 = "#3987e5", "#d95926", "#199e70"     # blue, orange, aqua
-S_VIOLET = "#9085e9"
-CRITICAL, WARNING, GOOD = "#d03b3b", "#fab219", "#0ca30c"
-NEUTRAL = "#6b6a66"
-# sequential (single hue: blue), dark surface -> low values recede into the surface
-SEQ_BLUE = [[0.0, "#104281"], [0.25, "#1c5cab"], [0.5, "#3987e5"], [0.75, "#86b6ef"], [1.0, "#e6f0fd"]]
+GRID = "#ebeae4"
+AXIS = "#c3c2b7"
+S1, S2, S3 = "#2a78d6", "#eb6834", "#1baf7a"     # blue, orange, aqua
+S_VIOLET = "#4a3aa7"
+CRITICAL, WARNING, GOOD = "#d03b3b", "#a56a00", "#0ca30c"  # WARNING darkened for text contrast on white
+NEUTRAL = "#a3a29c"
+# sequential (single hue: blue), light surface -> low values recede into the surface
+SEQ_BLUE = [[0.0, "#f3f7fd"], [0.25, "#b7d3f6"], [0.5, "#5598e7"], [0.75, "#1c5cab"], [1.0, "#0d366b"]]
 
 FONT = "system-ui, -apple-system, Segoe UI, sans-serif"
 
@@ -36,7 +36,7 @@ pio.templates["plumewatch"] = go.layout.Template(layout=dict(
     xaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickfont=dict(color=MUTED), title=dict(font=dict(color=INK2))),
     yaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickfont=dict(color=MUTED), title=dict(font=dict(color=INK2))),
     legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=INK2), orientation="h", y=1.0, yanchor="bottom", x=1.0, xanchor="right"),
-    hoverlabel=dict(bgcolor="#22252c", bordercolor=AXIS, font=dict(color=INK, family=FONT)),
+    hoverlabel=dict(bgcolor="#ffffff", bordercolor=AXIS, font=dict(color=INK, family=FONT)),
     margin=dict(l=70, r=30, t=90, b=60),
 ))
 pio.templates.default = "plumewatch"

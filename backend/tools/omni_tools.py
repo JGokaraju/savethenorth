@@ -36,7 +36,7 @@ def _record(st: RunState, tool: str, target: str, question: str, res: dict, sent
 
 # ------------------------------------------------------------------ mock text (deterministic, from stats)
 def _mock_chart(chart_id: str, s: dict) -> str:
-    p = "[MOCK OMNI] "
+    p = ""
     if chart_id == "plume_map":
         d = s.get("wind_from_deg", 0)
         to = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"][int(((d + 180) % 360 + 22.5) // 45) % 8]
@@ -84,7 +84,7 @@ def _mock_chart(chart_id: str, s: dict) -> str:
 
 
 def _mock_image(image_id: str, question: str) -> str:
-    base = ("[MOCK OMNI] The image is a regional-scale Sentinel-2 composite (header date 2026-09-18) covering roughly "
+    base = ("The image is a regional-scale Sentinel-2 composite (header date 2026-09-18) covering roughly "
             "Lamesa to San Angelo, with widespread fair-weather cumulus and cloud shadows. At the marked location near "
             "Stanton the plant footprint spans only a few pixels and individual infrastructure cannot be resolved in "
             "the zoomed inset. ")
@@ -100,10 +100,10 @@ def _mock_doc(doc_id: str, texts: dict[int, str], question: str) -> str:
         cap = re.search(r"combined processing capacity of ([\d,]+ ?MMSCFD)", joined, re.I)
         flares = sorted(set(re.findall(r"FL-\d{4}", joined)))
         rules = sorted(set(m.strip() for m in re.findall(r"(?:40 CFR Part 60,? )?Subpart\s+[A-Z]{1,6}b?", joined)))
-        return "[MOCK OMNI] " + json.dumps({"processing_capacity": cap.group(1) if cap else None, "flare_ids": flares,
+        return json.dumps({"processing_capacity": cap.group(1) if cap else None, "flare_ids": flares,
                                             "federal_rules": rules[:8],
                                             "note": "mock extraction by pattern-matching the rendered pages' text"})
-    return "[MOCK OMNI] " + json.dumps({"note": "mock: see parsed STEERS table"})
+    return json.dumps({"note": "mock: see parsed STEERS table"})
 
 
 # ------------------------------------------------------------------ tools
@@ -242,7 +242,7 @@ def read_document(st: RunState, doc_id: str, question: str, pages: list[int] | N
         name = f"omni_{doc_id}_table.png"
         (st.evidence_dir / name).write_bytes(img)
         sent_refs.append(st.evidence_ref(name))
-        mock = "[MOCK OMNI] " + json.dumps([{"incident_no": str(i), "start": g["START DATE/TIME"].iloc[0],
+        mock = json.dumps([{"incident_no": str(i), "start": g["START DATE/TIME"].iloc[0],
                                               "end": g["END DATE/TIME"].iloc[0], "event_type": g["EVENT TYPE"].iloc[0],
                                               "contaminants": sorted(g["CONTAMINANT"].unique().tolist())}
                                              for i, g in df.groupby("INCIDENT NO.")])
@@ -252,7 +252,7 @@ def read_document(st: RunState, doc_id: str, question: str, pages: list[int] | N
         subset = f"{len(df)} emission-point rows rendered as a table image and sent to OMNI"
         n_units = len(df)
     merged_text = "\n".join(f"[page {a['page']}] {a['answer']}" for a in answers)
-    parsed = [omni.parse_json(a["answer"].replace("[MOCK OMNI]", "")) for a in answers]
+    parsed = [omni.parse_json(a["answer"]) for a in answers]
     mode = answers[0]["mode"] if answers else "mock"
     eid = _record(st, "read_document", doc_id, question, {"answer": merged_text, "mode": mode, "model": answers[0]["model"],
                                                          "cache_key": answers[0].get("cache_key")},

@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from backend.charts import builders
-from backend.science import carbonmapper, emit, flare, ime, mask, physics, regulations, steers, wind
+from backend.science import carbonmapper, emit, flare, ime, mask, physics, regulations, reports, steers, wind
 from backend.science.common import DataGap, finite, slot
 from backend.settings import cfg
 from backend.tools.envelope import data_used, gap, ok
@@ -388,6 +388,19 @@ def check_regulations(st: RunState, facility_id: str) -> dict:
         st.charts[art.chart_id] = art.to_dict(include_figure=False)
         charts.append(art.chart_id)
     st.results["regulations"] = rules
-    s = "; ".join(f"{r['rule_id']}: {r['status']}" for r in rules)
+    st.results["outcome"] = reports.outcome(rules, mc is not None)
+    if st.results.get("annual") is None and mc:
+        try:
+            annualize(st, facility_id)
+        except DataGap:
+            pass
+    rc = reports.comparison(mc, st.results.get("annual"), events, st.date, cfg("regulations", "steers_match_window_days"))
+    st.results["report_comparison"] = rc
+    if rc.get("satellite") or rc.get("reported_events"):
+        art2 = builders.report_comparison(rc)
+        st.charts[art2.chart_id] = art2.to_dict(include_figure=False)
+        charts.append(art2.chart_id)
+    s = f"Screening outcome: {st.results['outcome']['outcome']}. " + "; ".join(f"{r['rule_id']}: {r['status']}" for r in rules)
     ev = sorted({e for r in rules for e in r["evidence_ids"]})
-    return ok(s, {"findings": rules}, charts, ev, [], ["Screening results, not enforcement determinations"], [])
+    return ok(s, {"findings": rules, "outcome": st.results["outcome"], "report_comparison": rc}, charts, ev, [],
+              ["Screening results, not enforcement determinations"], [])

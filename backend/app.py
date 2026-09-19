@@ -1,4 +1,4 @@
-"""Plumewatch FastAPI backend (spec §12)."""
+"""Save the North FastAPI backend (spec §12)."""
 from __future__ import annotations
 
 import asyncio
@@ -28,7 +28,7 @@ from backend.science.common import DataGap, haversine_km, slot
 from backend.settings import CHARTS_DIR, DATA, ROOT, RUNS_DIR, facilities
 from backend.tools.state import RunState, get_state, new_state
 
-app = FastAPI(title="Plumewatch API", version="1.0")
+app = FastAPI(title="Save the North API", version="1.1")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 GAZETTEER = json.loads((DATA / "gazetteer.json").read_text(encoding="utf-8")) if (DATA / "gazetteer.json").exists() else []
@@ -42,6 +42,8 @@ def health() -> dict:
         "mode": {"mock_llm": settings.mock_llm(), "mock_omni": settings.mock_omni(), "demo_replay": settings.demo_replay(),
                  "label": "REPLAY" if settings.demo_replay() else ("MOCK" if settings.mock_llm() else "LIVE")},
         "keys_present": {"openai": bool(os.getenv("OPENAI_API_KEY")), "omni": bool(os.getenv("OMNI_API_KEY"))},
+        "live_available": orchestrator.live_available(),
+        "omni_live_available": not settings.mock_omni(),
         "models": {"openai": os.getenv("OPENAI_MODEL") or None, "omni": omni.model_name()},
         "omni_calls": omni.counters(),
         "assets": {k: {"status": v.get("status"), "quality": v.get("quality", "ok"), "synthetic": bool(v.get("synthetic"))}
@@ -114,6 +116,7 @@ def geocode(q: str = Query(..., min_length=1), limit: int = 8) -> list[dict]:
 class RunRequest(BaseModel):
     facility_id: str
     date: str = "2025-08-08"
+    mode: str | None = None  # "demo" | "live"; default: live when keys are configured
 
 
 def _latest_successful_run(facility_id: str) -> Path | None:
@@ -169,7 +172,9 @@ def create_run(req: RunRequest) -> dict:
             st = new_state(req.facility_id, req.date, mode="REPLAY")
             threading.Thread(target=_replay, args=(st, src), daemon=True).start()
             return {"run_id": st.run_id, "mode": "REPLAY", "replay_of": src.stem}
-    st = new_state(req.facility_id, req.date, mode=orchestrator.mode())
+    if (req.mode or "").lower() == "live" and not orchestrator.live_available():
+        raise HTTPException(400, "Live mode needs OPENAI_API_KEY and OPENAI_MODEL in .env (restart the backend after editing)")
+    st = new_state(req.facility_id, req.date, mode=orchestrator.mode(req.mode))
     threading.Thread(target=orchestrator.run, args=(st,), daemon=True).start()
     return {"run_id": st.run_id, "mode": st.mode}
 
@@ -373,7 +378,7 @@ def evidence_zip(run_id: str):
                 z.write(f, f"evidence/{f.name}")
         z.writestr("manifest.yaml", (DATA / "manifest.yaml").read_text(encoding="utf-8"))
     return Response(buf.getvalue(), media_type="application/zip",
-                    headers={"Content-Disposition": f'attachment; filename="plumewatch_evidence_{run_id}.zip"'})
+                    headers={"Content-Disposition": f'attachment; filename="savethenorth_evidence_{run_id}.zip"'})
 
 
 @app.get("/api/runs/{run_id}/evidence/{file}")
@@ -400,12 +405,12 @@ def report_html(run_id: str):
     charts = "".join(f'<figure><img src="/api/charts/{e(c)}.png" style="max-width:100%"><figcaption>{e(c)}</figcaption></figure>'
                      for c in v.get("charts", []))
     ann = v.get("annual_scenarios_t_ch4") or {}
-    body = f"""<!doctype html><html><head><meta charset="utf-8"><title>Plumewatch report — {e(v['facility_name'])}</title>
+    body = f"""<!doctype html><html><head><meta charset="utf-8"><title>Save the North report — {e(v['facility_name'])}</title>
 <style>body{{font-family:system-ui,Segoe UI,sans-serif;max-width:900px;margin:2em auto;color:#111;line-height:1.45}}
 table{{border-collapse:collapse;width:100%;font-size:13px}}td,th{{border:1px solid #ccc;padding:6px;vertical-align:top}}
 h1{{font-size:22px}}h2{{font-size:16px;margin-top:1.6em;border-bottom:1px solid #ddd}}.disc{{background:#fff7e0;padding:10px;border-left:4px solid #e0a000}}
 @media print{{figure{{page-break-inside:avoid}}}}</style></head><body>
-<p style="color:#666">Plumewatch — Satellite Emissions Verification · run {e(run_id)}</p>
+<p style="color:#666">Save the North — Satellite Emissions Verification · run {e(run_id)}</p>
 <h1>{e(v['facility_name'])} — {e(v['event_date_utc'])}</h1><p><b>{e(v['headline'])}</b></p>
 <p class="disc">{e(v.get('disclaimer', ''))}</p>
 <h2>Methane estimate</h2><p>Median {me.get('median_kg_h') or 0:,.0f} kg/h (p5–p95 {me.get('p5_kg_h') or 0:,.0f}–{me.get('p95_kg_h') or 0:,.0f} kg/h). Method: {e(me.get('method', ''))}.</p>

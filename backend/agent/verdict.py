@@ -69,6 +69,9 @@ class Verdict(BaseModel):
     charts: list[str] = Field(default_factory=list)
     evidence_ids: list[str] = Field(default_factory=list)
     disclaimer: str = DISCLAIMER
+    # filled from run state by submit_verdict (never by the model)
+    outcome: dict | None = None
+    report_comparison: dict | None = None
 
 
 def _close(a, b, tol=0.01) -> bool:

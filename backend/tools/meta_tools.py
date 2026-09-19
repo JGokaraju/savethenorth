@@ -118,6 +118,9 @@ def submit_verdict(st: RunState, verdict: dict) -> dict:
         return {"status": "error", "summary": "Verdict rejected: " + "; ".join(errors)[:900], "data": {"errors": errors},
                 "charts": [], "evidence_ids": [], "assumptions": [], "warnings": [], "data_used": []}
     d = v.model_dump()
+    from backend.science import reports
+    d["outcome"] = st.results.get("outcome") or reports.outcome(st.results.get("regulations", []), bool(st.results.get("emission")))
+    d["report_comparison"] = st.results.get("report_comparison")
     if not d["charts"]:
         d["charts"] = [c["chart_id"] for c in st.shown_charts]
     st.verdict = d
