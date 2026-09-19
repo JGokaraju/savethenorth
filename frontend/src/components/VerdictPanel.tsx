@@ -70,7 +70,9 @@ const conf = (c: string) => <Chip tone={c === "high" ? "emerald" : c === "medium
 function VerdictBody({ v, run }: { v: Verdict; run: RunState }) {
   const me = v.methane_estimate;
   const times = me.median_kg_h ? me.median_kg_h / 100 : null;
-  const list = (xs: string[]) => <ul className="list-disc space-y-1 pl-5 text-xs text-slate-300">{xs.map((x, i) => <li key={i}>{x}</li>)}</ul>;
+  const list = (xs: string[]) => xs.length
+    ? <ul className="list-disc space-y-1 pl-5 text-xs text-slate-300">{xs.map((x, i) => <li key={i}>{x}</li>)}</ul>
+    : <p className="text-xs text-slate-500">None</p>;
   const a = v.annual_scenarios_t_ch4;
   return (
     <div className="space-y-4">
