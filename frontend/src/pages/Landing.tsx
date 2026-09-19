@@ -5,7 +5,7 @@ import { AvailabilityChips, LocationSearch } from "../components/FacilityPanel";
 import { Footer, SiteHeader, useHealth } from "../components/Header";
 import { useToast } from "../components/Toasts";
 import { Logo, ModeToggle, ShortHash, Spinner } from "../components/ui";
-import { api, Dataset, Facility, GeoResult } from "../lib/api";
+import { api, Dataset, Facility, GeoResult, RecentRun } from "../lib/api";
 import { useElementSize, useInView } from "../lib/hooks";
 import { useRunMode } from "../lib/mode";
 
@@ -95,7 +95,7 @@ function DatasetsModal({ onClose }: { onClose: () => void }) {
 function Hero() {
   return (
     <section className="relative flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden px-6 text-center">
-      <img src="/landing-bg.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+      <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-[#0b1a2e]/55" aria-hidden />
       <div className="relative flex flex-col items-center">
         <div className="fade-in"><Logo size={128} speed={30} /></div>
@@ -112,8 +112,32 @@ function Hero() {
   );
 }
 
-function DataSection() {
-  const { ref, inView } = useInView<HTMLDivElement>(0.25);
+const PIPELINE = [
+  { n: 1, t: "Discover", d: "Inventory the data and its gaps" },
+  { n: 2, t: "Quantify", d: "Plume mask, mass, wind, uncertainty" },
+  { n: 3, t: "Explain", d: "Flares, imagery, permit, physics" },
+  { n: 4, t: "Screen", d: "Federal and Texas rules" },
+  { n: 5, t: "Rank", d: "Hybrid search and rerank, then verdict" },
+];
+
+/** Live counts from the manifest, so the landing page shows the real corpus size. */
+function datasetCounts(ds: Dataset[]): { label: string; value: string }[] {
+  const by = Object.fromEntries(ds.map((d) => [d.slot_id, d])) as Record<string, any>;
+  const n = (v: any) => (typeof v === "number" ? v.toLocaleString() : null);
+  const rows: [string, string | null][] = [
+    ["EMIT pixels analysed", n(by.emit_ch4enh?.stats?.valid_pixels)],
+    ["VIIRS detections", n(by.firms?.stats?.rows)],
+    ["Hourly wind records", n(by.wind?.stats?.n_hours)],
+    ["Permit pages", n(by.tceq_sob?.stats?.pages)],
+    ["Emissions-event rows", n(by.tceq_steers?.stats?.rows)],
+    ["Datasets tracked", String(ds.filter((d) => d.status === "present").length)],
+  ];
+  return rows.filter(([, v]) => v).map(([label, value]) => ({ label, value: value as string }));
+}
+
+function DataSection({ datasets }: { datasets: Dataset[] }) {
+  const { ref, inView } = useInView<HTMLDivElement>(0.2);
+  const counts = datasets.length ? datasetCounts(datasets) : [];
   return (
     <section id="data" className="border-b border-rule bg-paper">
       <div ref={ref} className={`reveal mx-auto max-w-6xl px-4 py-12 ${inView ? "in" : ""}`}>
@@ -121,8 +145,69 @@ function DataSection() {
         <ul className="mt-5 grid list-disc gap-x-12 gap-y-2 pl-5 text-[15px] leading-relaxed text-ink sm:grid-cols-2">
           {DATA_BULLETS.map((d) => <li key={d.title}><b>{d.title}:</b> <span className="text-muted">{d.line}</span></li>)}
         </ul>
+        {counts.length > 0 && (
+          <dl className="mt-8 grid grid-cols-2 border-l border-t border-rule sm:grid-cols-3 lg:grid-cols-6">
+            {counts.map((c) => (
+              <div key={c.label} className="border-b border-r border-rule bg-white px-4 py-3">
+                <dd className="font-mono text-2xl font-bold tabular-nums text-ink">{c.value}</dd>
+                <dt className="mt-0.5 text-[11px] uppercase tracking-wide text-muted">{c.label}</dt>
+              </div>
+            ))}
+          </dl>
+        )}
+        <h3 className="mt-10 text-sm font-bold uppercase tracking-wide text-muted">What the agent does with it</h3>
+        <ol className="mt-3 grid gap-px border border-rule bg-rule sm:grid-cols-5">
+          {PIPELINE.map((s) => (
+            <li key={s.n} className="bg-white px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-5 w-5 items-center justify-center bg-primary text-[11px] font-bold text-white">{s.n}</span>
+                <span className="font-bold text-ink">{s.t}</span>
+              </div>
+              <p className="mt-1 text-xs leading-snug text-muted">{s.d}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
+  );
+}
+
+const OUTCOME_CLS: Record<string, string> = {
+  BUSTED: "bg-alert-red text-white", ACCEPTED: "bg-[#008817] text-white",
+  INCONCLUSIVE: "bg-alert-amber text-ink", NOT_ASSESSED: "bg-rule text-ink",
+};
+
+function RecentRuns({ runs }: { runs: RecentRun[] }) {
+  if (!runs.length) return null;
+  return (
+    <div className="mt-10">
+      <h3 className="text-sm font-bold uppercase tracking-wide text-muted">Recent assessments</h3>
+      <table className="mt-3 w-full border border-rule text-sm">
+        <thead className="bg-paper text-left text-xs uppercase tracking-wide text-muted">
+          <tr><th className="px-4 py-2">Facility</th><th className="px-4 py-2">Event date</th><th className="px-4 py-2">Mode</th>
+            <th className="px-4 py-2">Rate</th><th className="px-4 py-2">Outcome</th></tr>
+        </thead>
+        <tbody>
+          {runs.map((r) => (
+            <tr key={r.run_id} className="border-t border-rule hover:bg-paper">
+              <td className="px-4 py-2.5">
+                <a className="font-semibold text-primary hover:underline" href={`/assess/${r.facility_id}?date=${r.date}&run=${r.run_id}`}>
+                  {r.facility_name ?? r.facility_id}
+                </a>
+              </td>
+              <td className="px-4 py-2.5 text-muted">{r.date}</td>
+              <td className="px-4 py-2.5 text-muted">{r.mode === "LIVE" ? "Live" : r.mode === "REPLAY" ? "Replay" : "Demo"}</td>
+              <td className="px-4 py-2.5 font-mono tabular-nums text-ink">{r.median_kg_h ? `${(r.median_kg_h / 1000).toFixed(1)} t/h` : "—"}</td>
+              <td className="px-4 py-2.5">
+                {r.finished && r.outcome
+                  ? <span className={`px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${OUTCOME_CLS[r.outcome] ?? OUTCOME_CLS.NOT_ASSESSED}`}>{r.outcome.replace("_", " ")}</span>
+                  : <span className="text-xs text-muted">in progress</span>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -140,10 +225,14 @@ export default function Landing() {
   const [sel, setSel] = useState<Facility | null>(null);
   const [date, setDate] = useState("2025-08-08");
   const [showDs, setShowDs] = useState(false);
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
+  const [recent, setRecent] = useState<RecentRun[]>([]);
   const resumeTimer = useRef<number>();
   const userLocked = useRef(false); // stop auto-rotation once a location is chosen
 
   useEffect(() => { api.facilities().then(setFacilities).catch((e) => toast(`Backend not reachable: ${e.message}`, "error")); }, [toast]);
+  useEffect(() => { api.datasets().then(setDatasets).catch(() => setDatasets([])); }, []);
+  useEffect(() => { api.recentRuns(5).then(setRecent).catch(() => setRecent([])); }, []);
 
   const setRotate = useCallback((on: boolean) => {
     const c = globe.current?.controls() as any;
@@ -210,7 +299,7 @@ export default function Landing() {
     <div>
       <SiteHeader right={<button onClick={() => setShowDs(true)} className="font-semibold text-white underline underline-offset-2">Data sources</button>} />
       <Hero />
-      <DataSection />
+      <DataSection datasets={datasets} />
 
       <section ref={globeSection} className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="h2">Assess a facility</h2>
@@ -292,6 +381,7 @@ export default function Landing() {
           )}
         </div>
         <p className="mt-2 text-right text-[11px] text-muted">Earth imagery: NASA Blue Marble</p>
+        <RecentRuns runs={recent} />
       </section>
       <Footer />
       {showDs && <DatasetsModal onClose={() => setShowDs(false)} />}

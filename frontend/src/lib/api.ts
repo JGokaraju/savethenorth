@@ -144,6 +144,11 @@ export interface LedgerRecord {
   all_inputs?: string[];
 }
 
+export interface RecentRun {
+  run_id: string; facility_id: string; facility_name: string | null; date: string; mode: string;
+  started: string; finished: boolean; outcome: string | null; median_kg_h: number | null;
+}
+
 export interface Dataset {
   slot_id: string;
   status: string;
@@ -181,6 +186,7 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ facility_id, date, mode }),
     }),
+  recentRuns: (limit = 6) => j<RecentRun[]>(`/api/runs?limit=${limit}`),
   evidence: (runId: string) => j<{ ledger: LedgerRecord[]; omni_calls: LedgerRecord[]; tool_calls: any[] }>(`/api/runs/${runId}/evidence`),
   image: (id: string) => j<{ url: string; bounds: { west: number; south: number; east: number; north: number }; date: string; warnings: string[] }>(`/api/images/${id}`),
 };

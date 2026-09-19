@@ -4,6 +4,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import os
 import threading
 import uuid
 from dataclasses import dataclass, field
@@ -125,7 +126,8 @@ class RunState:
 
 
 def new_state(facility_id: str, date: str, run_id: str | None = None, mode: str = "MOCK") -> RunState:
-    rid = run_id or (dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:6])
+    prefix = "test-" if os.getenv("PYTEST_CURRENT_TEST") else ""  # keep test runs out of the recent-runs listing
+    rid = run_id or (prefix + dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:6])
     st = RunState(rid, facility_id, date, mode=mode)
     with _LOCK:
         _RUNS[rid] = st

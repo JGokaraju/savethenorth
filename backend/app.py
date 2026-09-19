@@ -200,6 +200,33 @@ def _run_or_404(run_id: str) -> RunState | None:
     return st
 
 
+@app.get("/api/runs")
+def recent_runs(limit: int = 8) -> list[dict]:
+    """Recent assessments, newest first (for the landing page and for re-opening a finished report)."""
+    out = []
+    for p in sorted(RUNS_DIR.glob("*.jsonl"), key=lambda x: x.stat().st_mtime, reverse=True):
+        if p.stem == "prep" or p.stem.startswith("test-"):
+            continue
+        try:
+            lines = p.read_text(encoding="utf-8").splitlines()
+            first, last = json.loads(lines[0]), json.loads(lines[-1])
+        except Exception:  # noqa: BLE001 — a partially written run is simply skipped
+            continue
+        if first.get("type") != "run_started":
+            continue
+        vf = RUNS_DIR / p.stem / "verdict.json"
+        v = json.loads(vf.read_text(encoding="utf-8")) if vf.exists() else None
+        f = settings.facility(first.get("facility_id", "")) or {}
+        out.append({"run_id": p.stem, "facility_id": first.get("facility_id"), "facility_name": f.get("name"),
+                    "date": first.get("date"), "mode": first.get("mode"), "started": first.get("ts"),
+                    "finished": last.get("type") == "run_finished",
+                    "outcome": (v or {}).get("outcome", {}).get("outcome"),
+                    "median_kg_h": ((v or {}).get("methane_estimate") or {}).get("median_kg_h")})
+        if len(out) >= max(1, min(limit, 50)):
+            break
+    return out
+
+
 @app.get("/api/runs/{run_id}/events")
 async def run_events(run_id: str):
     st = _run_or_404(run_id)

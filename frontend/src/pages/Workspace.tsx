@@ -4,6 +4,7 @@ import { LocationSearch } from "../components/FacilityPanel";
 import { Footer, TopBar, useHealth } from "../components/Header";
 import { Report } from "../components/Report";
 import { useToast } from "../components/Toasts";
+import { RunProgress } from "../components/RunProgress";
 import { Trajectory } from "../components/Trajectory";
 import { ModeToggle, Spinner } from "../components/ui";
 import { api, Facility } from "../lib/api";
@@ -77,7 +78,7 @@ export default function Workspace() {
           <button className="btn-dark" onClick={assess} disabled={!f || busy}>{busy ? <><Spinner className="border-white/40 border-t-white" /> Assessing</> : "Assess"}</button>
         </TopBar>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+        <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
           <nav className="text-sm text-muted" aria-label="Breadcrumb"><a href="/" className="link">Home</a> <span aria-hidden>›</span> Assessment</nav>
           <div className="mt-2 flex flex-wrap items-end justify-between gap-3 border-b border-rule pb-4">
             <div>
@@ -88,9 +89,14 @@ export default function Workspace() {
               {busy ? "In progress" : run.status === "error" ? "Stopped" : run.status === "finished" ? "Complete" : "Not started"}
             </span>
           </div>
-          <div className="mt-6 max-w-2xl">
+          <div className="mt-6">
             {run.status === "idle" && f && <p className="text-muted">Select <b className="text-ink">Assess</b> to start the verification.</p>}
-            {(busy || run.status === "finished") && <Trajectory run={run} title="Verification steps" />}
+            {(busy || run.status === "finished") && (
+              <div className="space-y-6">
+                <div className="sticky top-[76px] z-10 bg-white pb-1"><RunProgress run={run} /></div>
+                <Trajectory run={run} title="Verification steps" />
+              </div>
+            )}
             {run.status === "error" && (
               <div className="border-l-4 border-alert-red bg-[#f4e3db] px-4 py-3">
                 <p className="font-bold text-ink">The assessment stopped</p>

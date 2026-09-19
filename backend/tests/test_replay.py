@@ -37,3 +37,16 @@ def test_replay_of_recorded_run(monkeypatch):
     assert c.get(f"/api/runs/{r['run_id']}/evidence/firms_subset.csv").status_code == 200
     first = json.loads((app_mod.RUNS_DIR / f"{r['run_id']}.jsonl").read_text(encoding="utf-8").splitlines()[0])
     assert first["mode"] == "REPLAY"
+
+
+def test_recent_runs_listing_hides_test_runs(monkeypatch):
+    monkeypatch.setenv("MOCK_STEP_DELAY", "0")
+    listed = new_state("tx-lenorah-redlake", "2025-08-08", run_id="20990101T000000-listed", mode="MOCK")
+    orchestrator.run(listed)
+    hidden = new_state("tx-lenorah-redlake", "2025-08-08", mode="MOCK")  # auto id is test-prefixed under pytest
+    orchestrator.run(hidden)
+    rows = TestClient(app_mod.app).get("/api/runs?limit=10").json()
+    ids = [r["run_id"] for r in rows]
+    assert listed.run_id in ids and hidden.run_id.startswith("test-") and hidden.run_id not in ids
+    row = next(r for r in rows if r["run_id"] == listed.run_id)
+    assert row["finished"] and row["outcome"] == "BUSTED" and row["facility_name"] == "Lenorah / Red Lake Gas Plants"

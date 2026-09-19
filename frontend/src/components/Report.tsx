@@ -1,5 +1,6 @@
 import { ReactNode, useRef, useState } from "react";
 import { Facility, runFileUrl, Verdict } from "../lib/api";
+import { useCountUp, useInView } from "../lib/hooks";
 import { useTrace } from "../lib/trace";
 import { RunState } from "../lib/useRun";
 import { EvidencePanel } from "./EvidencePanel";
@@ -36,7 +37,7 @@ function Hero({ v, f }: { v: Verdict; f: Facility | null }) {
   const img = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
   return (
     <section className="relative h-[calc(100vh-64px)] w-full overflow-hidden bg-[#3d4551]">
-      {img && <img src={img} alt={`Aerial image of ${v.facility_name}`} className="absolute inset-0 h-full w-full object-cover" />}
+      {img && <img src={img} alt={`Aerial image of ${v.facility_name}`} className="slow-zoom absolute inset-0 h-full w-full object-cover" />}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="stamp select-none bg-white/15 px-10 py-3 text-6xl font-black tracking-[0.12em] sm:px-14 sm:text-8xl lg:text-[8.5rem]"
           style={{ color: s.color, border: `9px solid ${s.color}` }} role="img" aria-label={`Screening outcome: ${s.text}`}>
@@ -60,11 +61,42 @@ function Hero({ v, f }: { v: Verdict; f: Facility | null }) {
 }
 
 function Section({ id, title, children }: { id?: string; title: string; children: ReactNode }) {
+  const { ref, inView } = useInView<HTMLDivElement>(0.12);
   return (
     <section id={id} className="mx-auto max-w-6xl scroll-mt-20 border-t border-rule px-4 py-10 first:border-t-0">
-      <h2 className="h2 mb-5">{title}</h2>
-      {children}
+      <div ref={ref} className={`reveal ${inView ? "in" : ""}`}>
+        <h2 className="h2 mb-5">{title}</h2>
+        {children}
+      </div>
     </section>
+  );
+}
+
+/** Log-scale bar comparing the observed rate with the threshold — the ×N gap at a glance. */
+function ScaleBar({ ratio }: { ratio: number }) {
+  const { ref, inView } = useInView<HTMLDivElement>(0.4);
+  const decades = Math.max(3, Math.ceil(Math.log10(Math.max(ratio, 10))) + 1); // headroom past the value
+  const pct = (Math.log10(Math.max(ratio, 1)) / decades) * 100;
+  return (
+    <div ref={ref} className="mt-6">
+      <div className="flex items-end justify-between text-[11px] font-semibold uppercase tracking-wide">
+        <span className="text-muted">Federal threshold</span>
+        <span className="text-alert-red">{Math.round(ratio).toLocaleString()}× over</span>
+      </div>
+      <div className="relative mt-1 h-7 w-full border border-rule bg-paper">
+        <div className="absolute inset-y-0 left-0 bg-alert-red transition-[width] duration-[1200ms] ease-out" style={{ width: inView ? `${pct}%` : "0%" }} />
+        {Array.from({ length: decades }, (_, i) => i + 1).map((d) => (
+          <span key={d} className="absolute inset-y-0 w-px bg-ink/25" style={{ left: `${(d / decades) * 100}%` }} aria-hidden />
+        ))}
+        <span className="absolute inset-y-0 left-0 w-[3px] bg-ink" aria-hidden />
+      </div>
+      <div className="relative mt-0.5 h-4 text-[10px] text-muted">
+        <span className="absolute left-0">1×</span>
+        {Array.from({ length: decades }, (_, i) => i + 1).map((d) => (
+          <span key={d} className="absolute -translate-x-1/2" style={{ left: `${(d / decades) * 100}%` }}>{`10${"⁰¹²³⁴⁵"[d] ?? ""}×`}</span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -79,6 +111,7 @@ function Figure({ n, caption, children }: { n: number; caption: string; children
 
 function Summary({ v, run, onSources }: { v: Verdict; run: RunState; onSources: () => void }) {
   const core = v.report_comparison?.core;
+  const counted = useCountUp(core?.actual.co2e_t_h, true, 1100);
   const { setSel } = useTrace();
   const overlay = run.ledger.find((r) => r.slot_id === "site_imagery")?.preview_ref;
   const trace = (label: string, ids: string[]) => { setSel({ label, evidenceIds: ids, callIds: [] }); onSources(); };
@@ -96,15 +129,15 @@ function Summary({ v, run, onSources }: { v: Verdict; run: RunState; onSources: 
             <dl className="mt-6 divide-y divide-rule border-y border-rule">
               <button type="button" className="block w-full py-5 text-left hover:bg-paper" title="Show sources"
                 onClick={() => trace("Allowed", ["assumption:regulations.super_emitter_kg_h", "assumption:regulations.gwp100_ch4"])}>
-                <dt className="label">Allowed</dt>
+                <dt className="label">Federal threshold</dt>
                 <dd className="mt-1"><span className="text-6xl font-extrabold tracking-tight text-ink">{fmt(core.allowed.co2e_t_h, 1)}</span>
                   <span className="ml-2 text-lg text-muted">t CO₂e per hour</span></dd>
                 <dd className="text-sm text-muted">EPA super-emitter threshold, {fmt(core.allowed.ch4_kg_h)} kg CH₄ per hour</dd>
               </button>
               <button type="button" className="block w-full py-5 text-left hover:bg-paper" title="Show sources"
                 onClick={() => trace("Actual", [...(me.evidence_ids ?? []), "assumption:regulations.gwp100_ch4", "tceq_steers"])}>
-                <dt className="label">Actual</dt>
-                <dd className="mt-1"><span className="text-6xl font-extrabold tracking-tight text-alert-red">{fmt(core.actual.co2e_t_h)}</span>
+                <dt className="label">Observed</dt>
+                <dd className="mt-1"><span className="text-6xl font-extrabold tracking-tight text-alert-red tabular-nums">{fmt(counted ?? core.actual.co2e_t_h)}</span>
                   <span className="ml-2 text-lg text-muted">t CO₂e per hour</span></dd>
                 <dd className="text-sm text-muted">
                   {fmt(core.actual.ch4_kg_h / 1000, 1)} t CH₄ per hour · {fmt(core.ratio)} times the threshold · reported to TCEQ: {core.reported_same_day ? "yes" : "no"}
@@ -112,6 +145,7 @@ function Summary({ v, run, onSources }: { v: Verdict; run: RunState; onSources: 
               </button>
             </dl>
           ) : <p className="mt-6 text-muted">No satellite observation is available for this facility and date.</p>}
+          {core && <ScaleBar ratio={core.ratio} />}
           <p className="mt-3 text-xs text-muted">CO₂-equivalent uses GWP100 = {core?.gwp100_ch4 ?? 29.8} for methane. {v.disclaimer}</p>
         </div>
         {overlay ? (
@@ -134,6 +168,9 @@ function KeyEvidence({ v }: { v: Verdict }) {
       <ol className="list-decimal space-y-2 pl-6 text-[15px]">
         {ke.map((k: any) => (
           <li key={k.id} className="pl-1">
+            <span className="mb-1 mt-0.5 block h-1 w-24 bg-rule" aria-hidden>
+              <span className="block h-1 bg-primary" style={{ width: `${Math.round((k.importance ?? 0) * 100)}%` }} />
+            </span>
             <b className="text-ink">{k.label || k.text}</b>
             {k.reason && !k.reason.startsWith("hybrid rank") && <span className="text-muted"> — {k.reason}</span>}
             <span className="ml-2 text-xs text-muted">({SOURCE_NAMES[k.source] ?? k.source}{k.flags?.length ? `; ${k.flags.join(", ").replace(/_/g, " ")}` : ""})</span>
