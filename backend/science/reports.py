@@ -1,4 +1,4 @@
-"""Screening outcome (BUSTED / ACCEPTED) and the satellite-vs-technical-report comparison."""
+"""Screening outcome (FAILED / ACCEPTED) and the satellite-vs-technical-report comparison."""
 from __future__ import annotations
 
 import datetime as dt
@@ -7,7 +7,8 @@ LB_PER_KG = 2.2046
 
 
 def outcome(rules: list[dict], has_estimate: bool) -> dict:
-    """Deterministic headline from the regulatory statuses. Screening language, not an enforcement finding."""
+    """Deterministic headline from the regulatory statuses (FAILED / ACCEPTED / INCONCLUSIVE / NOT_ASSESSED).
+    Screening language, not an enforcement finding."""
     st = {r["rule_id"]: r["status"] for r in rules}
     fed, tx, phys = st.get("US_SUPER_EMITTER"), st.get("TX_EMISSIONS_EVENT_REPORTING"), st.get("PLANT_PHYSICS_CEILING")
     if not has_estimate:
@@ -18,7 +19,7 @@ def outcome(rules: list[dict], has_estimate: bool) -> dict:
         why = ("Satellite-observed methane exceeds the federal super-emitter threshold and the Texas reportable quantity, "
                "and no matching emissions-event report was found.") if fed == "EXCEEDS" else (
                "Estimated release exceeds the Texas reportable quantity and no matching emissions-event report was found.")
-        return {"outcome": "BUSTED", "reason": why}
+        return {"outcome": "FAILED", "reason": why}
     if fed == "BELOW" or tx in ("REPORTED", "BELOW_RQ"):
         why = "The release was reported to TCEQ." if tx == "REPORTED" else "Emissions are consistent with reporting obligations."
         return {"outcome": "ACCEPTED", "reason": why}

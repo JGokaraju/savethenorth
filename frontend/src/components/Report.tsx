@@ -11,7 +11,7 @@ import { Trajectory } from "./Trajectory";
 import { Segmented, StatusBadge } from "./ui";
 
 const STAMP: Record<string, { text: string; color: string }> = {
-  BUSTED: { text: "BUSTED", color: "#b50909" },
+  FAILED: { text: "FAILED", color: "#b50909" },
   ACCEPTED: { text: "ACCEPTED", color: "#008817" },
   INCONCLUSIVE: { text: "INCONCLUSIVE", color: "#936f38" },
   NOT_ASSESSED: { text: "NOT ASSESSED", color: "#565c65" },
@@ -31,34 +31,6 @@ const SOURCE_NAMES: Record<string, string> = {
   annualize: "annual projection", get_wind: "ERA5 wind", list_available_data: "data inventory",
 };
 const fmt = (v: number, d = 0) => v.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
-
-function Hero({ v, f }: { v: Verdict; f: Facility | null }) {
-  const s = STAMP[v.outcome?.outcome ?? "NOT_ASSESSED"];
-  const img = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
-  return (
-    <section className="relative h-[calc(100vh-64px)] w-full overflow-hidden bg-[#3d4551]">
-      {img && <img src={img} alt={`Aerial image of ${v.facility_name}`} className="slow-zoom absolute inset-0 h-full w-full object-cover" />}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="stamp select-none bg-white/15 px-10 py-3 text-6xl font-black tracking-[0.12em] sm:px-14 sm:text-8xl lg:text-[8.5rem]"
-          style={{ color: s.color, border: `9px solid ${s.color}` }} role="img" aria-label={`Screening outcome: ${s.text}`}>
-          {s.text}
-        </div>
-      </div>
-      <div className="absolute inset-x-0 bottom-0 bg-black/65 text-white">
-        <div className="mx-auto flex max-w-6xl items-end justify-between gap-4 px-4 py-4">
-          <div>
-            <div className="text-2xl font-bold">{v.facility_name}</div>
-            <div className="text-sm text-[#dfe1e2]">Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}</div>
-          </div>
-          <button onClick={() => document.getElementById("summary")?.scrollIntoView({ behavior: "smooth" })} className="text-sm font-semibold underline underline-offset-2">
-            View findings
-          </button>
-        </div>
-      </div>
-      {img && <div className="absolute right-3 top-2 text-[10px] text-white/80">Imagery: Esri, Maxar, Earthstar Geographics</div>}
-    </section>
-  );
-}
 
 function Section({ id, title, children }: { id?: string; title: string; children: ReactNode }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.12);
@@ -109,22 +81,32 @@ function Figure({ n, caption, children }: { n: number; caption: string; children
   );
 }
 
-function Summary({ v, run, onSources }: { v: Verdict; run: RunState; onSources: () => void }) {
+function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run: RunState; onSources: () => void }) {
   const core = v.report_comparison?.core;
+  const st = STAMP[v.outcome?.outcome ?? "NOT_ASSESSED"];
   const counted = useCountUp(core?.actual.co2e_t_h, true, 1100);
   const { setSel } = useTrace();
   const overlay = run.ledger.find((r) => r.slot_id === "site_imagery")?.preview_ref;
   const trace = (label: string, ids: string[]) => { setSel({ label, evidenceIds: ids, callIds: [] }); onSources(); };
   const me = v.methane_estimate;
   return (
-    <Section id="summary" title="Summary">
+    <Section id="summary" title="Screening result">
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-rule pb-6">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-ink">{v.facility_name}</h1>
+          <p className="mt-1 text-muted">
+            Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
+            {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
+          </p>
+          {v.outcome?.reason && <p className="mt-3 max-w-2xl text-[15px] text-ink">{v.outcome.reason}</p>}
+        </div>
+        <div className="stamp select-none px-6 py-2 text-4xl font-black tracking-[0.12em] sm:text-5xl"
+          style={{ color: st.color, border: `6px solid ${st.color}` }} role="img" aria-label={`Screening outcome: ${st.text}`}>
+          {st.text}
+        </div>
+      </div>
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <div className="flex items-center gap-3">
-            <span className="label">Screening outcome</span>
-            <span className="px-2 py-0.5 text-sm font-bold uppercase tracking-wide text-white"
-              style={{ background: STAMP[v.outcome?.outcome ?? "NOT_ASSESSED"].color }}>{STAMP[v.outcome?.outcome ?? "NOT_ASSESSED"].text}</span>
-          </div>
           {core ? (
             <dl className="mt-6 divide-y divide-rule border-y border-rule">
               <button type="button" className="block w-full py-5 text-left hover:bg-paper" title="Show sources"
@@ -204,9 +186,10 @@ function Findings({ v }: { v: Verdict }) {
   );
 }
 
-function Figures({ run }: { run: RunState }) {
+function Figures({ run, f }: { run: RunState; f: Facility | null }) {
   const ids = FIGURES.filter((c) => run.charts[c]);
-  if (!ids.length) return null;
+  const site = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
+  if (!ids.length && !site) return null;
   return (
     <Section title="Figures">
       <div className="grid gap-6 lg:grid-cols-2">
@@ -215,6 +198,11 @@ function Figures({ run }: { run: RunState }) {
             <Plot figure={run.charts[c].figure_json} height={380} />
           </Figure>
         ))}
+        {site && (
+          <Figure n={ids.length + 2} caption={`${f!.name}, aerial view. Imagery: Esri, Maxar, Earthstar Geographics.`}>
+            <img src={site} alt={`Aerial view of ${f!.name}`} className="block h-[380px] w-full object-cover" />
+          </Figure>
+        )}
       </div>
     </Section>
   );
@@ -244,11 +232,10 @@ export function Report({ run, f }: { run: RunState; f: Facility | null }) {
   return (
     <div>
       <SiteHeader right={<a href="/" className="font-semibold text-white underline underline-offset-2">New assessment</a>} />
-      <Hero v={v} f={f} />
-      <Summary v={v} run={run} onSources={showSources} />
+      <Summary v={v} f={f} run={run} onSources={showSources} />
       <KeyEvidence v={v} />
       <Findings v={v} />
-      <Figures run={run} />
+      <Figures run={run} f={f} />
       <Section title="Records">
         <div className="mb-5 flex flex-wrap gap-3">
           <a className="btn-dark" href={`/api/runs/${run.runId}/report.html`} target="_blank" rel="noreferrer">Export report</a>

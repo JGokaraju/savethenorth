@@ -98,7 +98,7 @@ export interface Verdict {
   charts: string[];
   evidence_ids: string[];
   disclaimer: string;
-  outcome?: { outcome: "BUSTED" | "ACCEPTED" | "INCONCLUSIVE" | "NOT_ASSESSED"; reason: string } | null;
+  outcome?: { outcome: "FAILED" | "ACCEPTED" | "INCONCLUSIVE" | "NOT_ASSESSED"; reason: string } | null;
   report_comparison?: ReportComparison | null;
   key_evidence?: { id: string; importance: number; reason: string; question: string; text: string; label?: string; source: string; flags: string[] }[] | null;
 }

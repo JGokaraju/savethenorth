@@ -16,7 +16,7 @@ description: Choose the report charts and assemble a validated verdict with care
    rejected, read the error, fix the listed fields and resubmit.
 
 ## Outcome
-The backend attaches a deterministic screening outcome (BUSTED / ACCEPTED / INCONCLUSIVE / NOT_ASSESSED) and the
+The backend attaches a deterministic screening outcome (FAILED / ACCEPTED / INCONCLUSIVE / NOT_ASSESSED) and the
 satellite-vs-technical-report comparison from `check_regulations`. Do not restate them differently.
 
 ## Headline format

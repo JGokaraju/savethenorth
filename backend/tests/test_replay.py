@@ -49,4 +49,4 @@ def test_recent_runs_listing_hides_test_runs(monkeypatch):
     ids = [r["run_id"] for r in rows]
     assert listed.run_id in ids and hidden.run_id.startswith("test-") and hidden.run_id not in ids
     row = next(r for r in rows if r["run_id"] == listed.run_id)
-    assert row["finished"] and row["outcome"] == "BUSTED" and row["facility_name"] == "Lenorah / Red Lake Gas Plants"
+    assert row["finished"] and row["outcome"] == "FAILED" and row["facility_name"] == "Lenorah / Red Lake Gas Plants"

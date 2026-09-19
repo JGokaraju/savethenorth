@@ -11,7 +11,7 @@ the exact data, pixels and assumptions it came from.
 > ~14:45 UTC**. Other facilities conclude "no cached observations — cannot assess".
 > **All results are satellite-based screening estimates, not enforcement determinations.**
 
-**Result for the case** (Demo mode, real data): **BUSTED** — ~**23 t/h** CH₄ (p5–p95 15–29 t/h), ~230× the EPA 100 kg/h super-emitter
+**Result for the case** (Demo mode, real data): **FAILED** — ~**23 t/h** CH₄ (p5–p95 15–29 t/h), ~230× the EPA 100 kg/h super-emitter
 threshold, with no matching TCEQ emissions-event report in the records provided. Flare slip from a lit flare is physically
 implausible at this rate, so the likely cause is an uncombusted flare/relief-system release (medium confidence).
 
@@ -54,8 +54,8 @@ demo text for image and chart reading.
 - **While the agent works:** a white card lists each step in plain language (e.g. "Mapping the methane plume · NASA
   EMIT"). Model responses are not shown.
 - **Report:**
-  1. A full-screen aerial image of the plant with a **BUSTED / ACCEPTED** stamp. The outcome is computed
-     deterministically from the rule statuses. BUSTED means the release exceeds reporting thresholds and no matching
+  1. A full-screen aerial image of the plant with a **FAILED / ACCEPTED** stamp. The outcome is computed
+     deterministically from the rule statuses. FAILED means the release exceeds reporting thresholds and no matching
      TCEQ emissions-event report was found.
   2. Core figures: **allowed vs actual** emissions in t CO₂e/h, next to the **EMIT CH₄ enhancement** drawn over the site.
      "Allowed" is the EPA super-emitter threshold (100 kg CH₄/h), because the permit data provided contains no CO₂/CH₄

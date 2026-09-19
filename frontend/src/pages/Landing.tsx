@@ -173,7 +173,7 @@ function DataSection({ datasets }: { datasets: Dataset[] }) {
 }
 
 const OUTCOME_CLS: Record<string, string> = {
-  BUSTED: "bg-alert-red text-white", ACCEPTED: "bg-[#008817] text-white",
+  FAILED: "bg-alert-red text-white", ACCEPTED: "bg-[#008817] text-white",
   INCONCLUSIVE: "bg-alert-amber text-ink", NOT_ASSESSED: "bg-rule text-ink",
 };
 
