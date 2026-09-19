@@ -45,6 +45,56 @@ def _wind(st: RunState, when: str | None = None):
     return st.cache[key]
 
 
+def _write_emit_overlay(st: RunState, crop, bg, m, f: dict) -> tuple[str | None, dict | None]:
+    """EMIT CH4 enhancement drawn over the site basemap (display only). Returns (evidence ref, imagery slot record)."""
+    try:
+        rec = slot("site_imagery")
+        region = rec.get("images", {}).get("region")
+    except DataGap:
+        return None, None
+    if not region or not region.get("bounds"):
+        return None, None
+    from matplotlib import colormaps
+    from PIL import Image, ImageDraw
+    from scipy import ndimage
+    from backend.settings import ROOT
+    base = Image.open(ROOT / region["normalized"]).convert("RGB")
+    W, H = base.size
+    b = region["bounds"]
+    base = Image.blend(base, Image.new("RGB", base.size, (255, 255, 255)), 0.15)  # lift the basemap slightly
+    tr = crop.transform
+    c_w, c_n = tr.c, tr.f
+    c_e, c_s = c_w + tr.a * crop.enh.shape[1], c_n + tr.e * crop.enh.shape[0]
+    px = lambda lon, lat: ((lon - b["west"]) / (b["east"] - b["west"]) * W, (b["north"] - lat) / (b["north"] - b["south"]) * H)  # noqa: E731
+    x0, y0 = px(c_w, c_n); x1, y1 = px(c_e, c_s)
+    excess = np.nan_to_num(crop.enh - bg.mu, nan=0.0)
+    lo, hi = 2.5 * bg.sigma, float(np.nanpercentile(crop.enh[m.mask], 90)) - bg.mu
+    t = np.clip((excess - lo) / max(hi - lo, 1.0), 0, 1)
+    rgba = (colormaps["inferno"](0.35 + 0.6 * t) * 255).astype("uint8")
+    rgba[..., 3] = (np.clip(t * 1.4, 0, 1) * 235).astype("uint8")
+    ov = Image.fromarray(rgba, "RGBA").resize((max(1, round(x1 - x0)), max(1, round(y1 - y0))), Image.BILINEAR)
+    base = base.convert("RGBA")
+    base.alpha_composite(ov, (round(x0), round(y0)))
+    edge = m.mask ^ ndimage.binary_erosion(m.mask)
+    ew = Image.fromarray((edge * 255).astype("uint8")).resize(ov.size, Image.NEAREST)
+    outline = Image.new("RGBA", ov.size, (255, 255, 255, 0))
+    outline.putalpha(ew.point(lambda v: 200 if v else 0))
+    base.alpha_composite(outline, (round(x0), round(y0)))
+    d = ImageDraw.Draw(base)
+    fx, fy = px(f["lon"], f["lat"])
+    d.ellipse([fx - 9, fy - 9, fx + 9, fy + 9], outline=(255, 255, 255, 255), width=3)
+    # crop to the plume (+ ~1.5 km margin), keeping the facility in frame
+    rr, cc = np.nonzero(m.mask)
+    lons = np.r_[crop.lon[cc], f["lon"]]; lats = np.r_[crop.lat[rr], f["lat"]]
+    pad_lon = 1.5 / (111.32 * np.cos(np.radians(f["lat"]))); pad_lat = 1.5 / 110.54
+    (ax0, ay0), (ax1, ay1) = px(lons.min() - pad_lon, lats.max() + pad_lat), px(lons.max() + pad_lon, lats.min() - pad_lat)
+    cx, w_ = (ax0 + ax1) / 2, max(ax1 - ax0, (ay1 - ay0) * 0.8)  # at least 4:5 portrait
+    box = (max(0, round(cx - w_ / 2)), max(0, round(ay0)), min(W, round(cx + w_ / 2)), min(H, round(ay1)))
+    name = "emit_overlay.png"
+    base.crop(box).convert("RGB").save(st.evidence_dir / name)
+    return st.evidence_ref(name), rec
+
+
 def _write_emit_evidence(st: RunState, crop, bg, m) -> tuple[str, list[str]]:
     import rasterio
     from PIL import Image
@@ -85,12 +135,15 @@ def plume_map(st: RunState, facility_id: str, date: str | None = None) -> dict:
     st.cache["plume_chart"] = art
     m = masks[k0]
     preview, extra = _write_emit_evidence(st, crop, bg, m)
+    overlay_ref, img_rec = _write_emit_overlay(st, crop, bg, m, f)
     used = [data_used(crop.files["emit_ch4enh"], f"±{cfg('emit', 'crop_half_width_km')} km crop around plume source "
                       f"hint; {m.n_pixels} mask pixels of {crop.n_valid:,} valid in crop (k={k0})",
                       m.n_pixels, preview, extra)]
     if "emit_ch4uncert" in crop.files:
         used.append(data_used(crop.files["emit_ch4uncert"], "same crop; per-pixel 1σ used for Monte Carlo noise",
                               m.n_pixels, preview))
+    if overlay_ref:
+        used.append(data_used(img_rec, "basemap under the EMIT enhancement overlay (display only)", 1, overlay_ref))
     ev = ["emit_ch4enh"] + (["emit_ch4uncert"] if "emit_ch4uncert" in crop.files else [])
     for key in ("crop_half_width_km",):
         ev.append(st.add_assumption("emit", key, "plume_map"))
@@ -105,7 +158,7 @@ def plume_map(st: RunState, facility_id: str, date: str | None = None) -> dict:
             "background_pixels": bg.n_pixels, "background_excluded_plume_pixels": bg.excluded_plume_pixels,
             "pixel_area_m2": round(crop.pixel_area_m2), "valid_pixels_in_crop": crop.n_valid,
             "plume_extent_downwind_km": ext, "wind_from_deg": round(w.direction_deg),
-            "components_attributed": m.n_components,
+            "components_attributed": m.n_components, "overlay_ref": overlay_ref,
             "mask_by_k": {str(k): {"n_pixels": mm.n_pixels, "q_kg_h": round(det[k].q_kg_h)} for k, mm in masks.items()}}
     s = (f"Plume of {m.n_pixels} pixels ({m.area_m2 / 1e6:.2f} km²) attributed within 1 km of the source; peak "
          f"{m.max_enh:,.0f} ppm·m, extends ~{ext} km downwind (wind from {w.direction_deg:.0f}°).")
@@ -395,6 +448,10 @@ def check_regulations(st: RunState, facility_id: str) -> dict:
         except DataGap:
             pass
     rc = reports.comparison(mc, st.results.get("annual"), events, st.date, cfg("regulations", "steers_match_window_days"))
+    rc["core"] = reports.core_figures(mc, cfg("regulations", "super_emitter_kg_h"), cfg("regulations", "gwp100_ch4"),
+                                      len(rc["reported_on_event_date"]))
+    if mc:
+        st.add_assumption("regulations", "gwp100_ch4", "check_regulations")
     st.results["report_comparison"] = rc
     if rc.get("satellite") or rc.get("reported_events"):
         art2 = builders.report_comparison(rc)

@@ -84,6 +84,20 @@ def get_facility(facility_id: str) -> dict:
     return _fac_public(f)
 
 
+@app.get("/api/facilities/{facility_id}/imagery/{role}")
+def facility_imagery(facility_id: str, role: str):
+    """Site basemap (role 'site' = plant close-up, 'region' = EMIT window). Display only."""
+    if facility_id != "tx-lenorah-redlake":
+        raise HTTPException(404, "no imagery for this facility")
+    try:
+        img = slot("site_imagery").get("images", {}).get(role)
+    except DataGap as e:
+        raise HTTPException(404, str(e))
+    if not img:
+        raise HTTPException(404, "no such image")
+    return FileResponse(ROOT / img["normalized"], headers={"Cache-Control": "max-age=3600"})
+
+
 @app.get("/api/geocode")
 def geocode(q: str = Query(..., min_length=1), limit: int = 8) -> list[dict]:
     ql = q.lower().strip()

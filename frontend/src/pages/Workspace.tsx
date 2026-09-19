@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { AvailabilityChips, LocationSearch } from "../components/FacilityPanel";
+import { LocationSearch } from "../components/FacilityPanel";
 import { Footer, TopBar, useHealth } from "../components/Header";
-import { Summary } from "../components/Summary";
+import { Report } from "../components/Report";
 import { useToast } from "../components/Toasts";
 import { Trajectory } from "../components/Trajectory";
 import { Card, ModeToggle, Spinner } from "../components/ui";
@@ -38,7 +38,17 @@ export default function Workspace() {
   }, [f, health, params, date, mode, start]);
 
   const busy = run.status === "starting" || run.status === "running";
-  const done = run.status === "finished" && run.verdict;
+  const done = run.status === "finished" && !!run.verdict;
+  useEffect(() => { if (done) window.scrollTo(0, 0); }, [done]); // the report opens on its hero image
+
+  if (done) {
+    return (
+      <TraceProvider>
+        <Report run={run} f={f} />
+        <Footer />
+      </TraceProvider>
+    );
+  }
 
   return (
     <TraceProvider>
@@ -50,37 +60,28 @@ export default function Workspace() {
           <button className="btn-dark" onClick={assess} disabled={!f || busy}>{busy ? <><Spinner className="border-slate-500 border-t-white" /> Assessing</> : "Assess"}</button>
         </TopBar>
 
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
-          {done ? (
-            <Summary run={run} f={f} />
-          ) : (
-            <div className="mx-auto max-w-2xl space-y-4">
-              {f && (
-                <Card>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <div className="label">Facility</div>
-                      <div className="mt-1 text-lg font-semibold text-slate-900">{f.name}</div>
-                      <div className="text-sm text-slate-500">{f.county} County, {f.state} · {f.operator?.split(" — ")[0] ?? "Operator unknown"}</div>
-                    </div>
-                    <div className="text-right text-xs text-slate-400">Event date<div className="text-sm font-medium text-slate-700">{date}</div></div>
-                  </div>
-                  <div className="mt-4"><AvailabilityChips f={f} /></div>
-                </Card>
-              )}
-              {run.status === "idle" && f && (
-                <Card><p className="text-sm text-slate-500">Press <b className="text-slate-800">Assess</b> to start the verification agent.</p></Card>
-              )}
-              {(busy || run.status === "finished") && (
-                <Card className="fade-up"><Trajectory run={run} title={f ? `Verifying ${f.name}` : "Verifying"} /></Card>
-              )}
-              {run.status === "error" && (
-                <Card>
-                  <p className="text-sm text-red-700">{run.error ?? "The assessment stopped unexpectedly."}</p>
-                  <button className="btn-dark mt-3" onClick={assess}>Try again</button>
-                </Card>
-              )}
-            </div>
+        <main className="mx-auto w-full max-w-2xl flex-1 space-y-4 px-4 py-6">
+          {f && (
+            <Card>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="label">Facility</div>
+                  <div className="mt-1 text-lg font-semibold text-slate-900">{f.name}</div>
+                  <div className="text-sm text-slate-500">{f.county} County, {f.state}</div>
+                </div>
+                <div className="text-right text-xs text-slate-400">Event date<div className="text-sm font-medium text-slate-700">{date}</div></div>
+              </div>
+            </Card>
+          )}
+          {run.status === "idle" && f && <Card><p className="text-sm text-slate-500">Press <b className="text-slate-800">Assess</b> to start.</p></Card>}
+          {(busy || run.status === "finished") && (
+            <Card className="fade-up"><Trajectory run={run} title={f ? `Verifying ${f.name}` : "Verifying"} /></Card>
+          )}
+          {run.status === "error" && (
+            <Card>
+              <p className="text-sm text-red-700">{run.error ?? "The assessment stopped unexpectedly."}</p>
+              <button className="btn-dark mt-3" onClick={assess}>Try again</button>
+            </Card>
           )}
         </main>
         <Footer />

@@ -31,6 +31,20 @@ def _lb(p: dict) -> float:
     return q if "pound" in u or u in ("lb", "lbs") else q * LB_PER_KG if "kg" in u else q
 
 
+def core_figures(em: dict | None, threshold_kg_h: float, gwp: float, reported_same_day: int) -> dict | None:
+    """Headline numbers in CO2-equivalent. 'Allowed' = the federal super-emitter threshold (no CO2/CH4 permit limit
+    is in the data provided — the NSR MAERT was not ingested)."""
+    if not em:
+        return None
+    to_co2e_t_h = lambda kg_h: kg_h * gwp / 1000  # noqa: E731
+    return {"gwp100_ch4": gwp,
+            "allowed": {"ch4_kg_h": threshold_kg_h, "co2e_t_h": to_co2e_t_h(threshold_kg_h),
+                        "basis": "EPA super-emitter threshold (40 CFR 60.5371a/b)"},
+            "actual": {"ch4_kg_h": em["median_kg_h"], "co2e_t_h": to_co2e_t_h(em["median_kg_h"]),
+                       "co2e_t_h_p5": to_co2e_t_h(em["p5_kg_h"]), "co2e_t_h_p95": to_co2e_t_h(em["p95_kg_h"])},
+            "ratio": em["median_kg_h"] / threshold_kg_h, "reported_same_day": reported_same_day}
+
+
 def comparison(em: dict | None, annual: dict | None, events: list[dict] | None, event_date: str, window_days: int = 1) -> dict:
     """What the satellite implies vs what the operator's technical reports (TCEQ STEERS) contain."""
     events = events or []

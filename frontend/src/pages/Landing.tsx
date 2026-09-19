@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Globe, { GlobeMethods } from "react-globe.gl";
 import { useNavigate } from "react-router-dom";
 import { AvailabilityChips, LocationSearch } from "../components/FacilityPanel";
-import { useHealth } from "../components/Header";
+import { Footer, useHealth } from "../components/Header";
 import { useToast } from "../components/Toasts";
 import { Logo, ModeToggle, ShortHash, Spinner } from "../components/ui";
 import { api, Dataset, Facility, GeoResult } from "../lib/api";
+import { useElementSize, useInView } from "../lib/hooks";
 import { useRunMode } from "../lib/mode";
 
 const DEFAULT_ID = "tx-lenorah-redlake";
@@ -14,13 +15,13 @@ const TEX = "/textures/earth-blue-marble.jpg";
 const BUMP = "/textures/earth-topology.png";
 const RESUME_MS = 5000;
 
-const KEY_DATA: { title: string; detail: string; color: string }[] = [
-  { title: "Methane", detail: "NASA EMIT imaging spectrometer — CH₄ enhancement at 60 m", color: "#2a78d6" },
-  { title: "Heat and flares", detail: "NASA VIIRS thermal detections — fire radiative power and brightness temperature", color: "#eb6834" },
-  { title: "Optical and shortwave-infrared imagery", detail: "Copernicus Sentinel-2 — true colour and SWIR", color: "#1baf7a" },
-  { title: "Weather and wind", detail: "ERA5 reanalysis via Open-Meteo — wind speed and direction, temperature, pressure", color: "#4a3aa7" },
-  { title: "Technical reports", detail: "TCEQ Title V permit (Statement of Basis) and STEERS emissions-event reports", color: "#52514e" },
-  { title: "Independent plume records", detail: "Carbon Mapper — cross-check of the satellite estimate", color: "#a3a29c" },
+const DATA_BULLETS: { title: string; line: string; color: string }[] = [
+  { title: "Methane", line: "NASA EMIT spectrometer, 60 m", color: "#2a78d6" },
+  { title: "Heat and flares", line: "NASA VIIRS fire power and brightness temperature", color: "#eb6834" },
+  { title: "Imagery", line: "Sentinel-2 true colour and shortwave infrared", color: "#1baf7a" },
+  { title: "Weather and wind", line: "ERA5 wind, temperature, pressure", color: "#4a3aa7" },
+  { title: "Technical reports", line: "TCEQ permit and emissions-event reports", color: "#52514e" },
+  { title: "Cross-check", line: "Carbon Mapper plume records", color: "#a3a29c" },
 ];
 
 function useReducedMotion() {
@@ -32,16 +33,6 @@ function useReducedMotion() {
     return () => m?.removeEventListener?.("change", on);
   }, []);
   return r;
-}
-
-function useWindowSize() {
-  const [s, setS] = useState({ w: window.innerWidth, h: window.innerHeight });
-  useEffect(() => {
-    const on = () => setS({ w: window.innerWidth, h: window.innerHeight });
-    window.addEventListener("resize", on);
-    return () => window.removeEventListener("resize", on);
-  }, []);
-  return s;
 }
 
 /** Texture if it loads (bundled by setup, works offline); otherwise a plain sphere with country outlines. */
@@ -101,13 +92,50 @@ function DatasetsModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function Hero() {
+  return (
+    <section className="relative flex h-screen flex-col items-center justify-center px-6 text-center">
+      <div className="fade-in"><Logo size={132} /></div>
+      <h1 className="fade-in mt-8 text-5xl font-semibold tracking-tight text-slate-900 sm:text-7xl" style={{ animationDelay: "0.35s" }}>Save the North</h1>
+      <p className="fade-in mt-4 text-base text-slate-500 sm:text-lg" style={{ animationDelay: "0.8s" }}>Satellite verification of industrial emissions.</p>
+      <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
+        className="fade-in absolute bottom-10 flex flex-col items-center gap-1 text-xs text-slate-400 hover:text-slate-700" style={{ animationDelay: "1.4s" }} aria-label="Scroll down">
+        <svg viewBox="0 0 24 24" className="nudge h-6 w-6"><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" /></svg>
+      </button>
+    </section>
+  );
+}
+
+function DataSection() {
+  const { ref, inView } = useInView<HTMLDivElement>(0.25);
+  return (
+    <section id="data" className="mx-auto max-w-5xl px-6 py-20">
+      <div ref={ref} className={`reveal ${inView ? "in" : ""}`}>
+        <div className="label mb-6 text-center">How the data is collected</div>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {DATA_BULLETS.map((d) => (
+            <li key={d.title} className="glass flex items-center gap-3 px-5 py-4">
+              <span className="h-2.5 w-2.5 flex-none rounded-full" style={{ background: d.color }} />
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-slate-800">{d.title}</div>
+                <div className="truncate text-xs text-slate-500">{d.line}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 export default function Landing() {
   const nav = useNavigate();
   const toast = useToast();
   const health = useHealth(10000);
   const { mode, setMode } = useRunMode(health?.live_available);
   const globe = useRef<GlobeMethods>();
-  const { w, h } = useWindowSize();
+  const box = useElementSize<HTMLDivElement>();
+  const { ref: globeSection, inView: globeVisible } = useInView<HTMLElement>(0.35);
   const reduced = useReducedMotion();
   const tex = useTextures();
   const [facilities, setFacilities] = useState<Facility[]>([]);
@@ -121,7 +149,7 @@ export default function Landing() {
 
   const setRotate = useCallback((on: boolean) => {
     const c = globe.current?.controls() as any;
-    if (c) { c.autoRotate = on && !reduced && !userLocked.current; c.autoRotateSpeed = 2.5; /* ≈0.25–0.3°/frame at 60 fps */ }
+    if (c) { c.autoRotate = on && !reduced && !userLocked.current; c.autoRotateSpeed = 2.5; }
   }, [reduced]);
 
   const pauseThenResume = useCallback(() => {
@@ -130,17 +158,17 @@ export default function Landing() {
     resumeTimer.current = window.setTimeout(() => setRotate(true), RESUME_MS);
   }, [setRotate]);
 
-  const flyTo = useCallback((lat: number, lng: number, altitude = 1.75, ms = 2000) => {
+  const flyTo = useCallback((lat: number, lng: number, altitude = 1.6, ms = 2000) => {
     userLocked.current = true;
     setRotate(false);
-    globe.current?.pointOfView({ lat, lng: lng - 12, altitude }, reduced ? 0 : ms); // offset so the site sits right of the cards
+    globe.current?.pointOfView({ lat, lng, altitude }, reduced ? 0 : ms);
   }, [setRotate, reduced]);
 
-  const selectFacility = useCallback((id: string, fly = true) => {
+  const selectFacility = useCallback((id: string) => {
     const f = facilities.find((x) => x.facility_id === id);
     if (!f) return;
     setSel(f);
-    if (fly) flyTo(f.lat, f.lon);
+    flyTo(f.lat, f.lon);
   }, [facilities, flyTo]);
 
   const onReady = useCallback(() => {
@@ -149,20 +177,23 @@ export default function Landing() {
     g.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     const c = g.controls() as any;
     c.enableDamping = true;
+    c.enableZoom = false; // the page scrolls; the globe must not capture the wheel
     c.addEventListener("start", () => { window.clearTimeout(resumeTimer.current); setRotate(false); });
     c.addEventListener("end", () => { if (!userLocked.current) pauseThenResume(); });
-    g.pointOfView({ lat: 25, lng: -40, altitude: 2.3 }, 0);
+    g.pointOfView({ lat: 25, lng: -40, altitude: 2.2 }, 0);
     setRotate(true);
   }, [setRotate, pauseThenResume]);
 
-  useEffect(() => { // spin ~2 s, then fly to the default case
-    if (!facilities.length) return;
-    const d = facilities.find((f) => f.facility_id === DEFAULT_ID);
-    if (!d) return;
-    setSel(d);
-    const t = window.setTimeout(() => flyTo(d.lat, d.lon, 1.75, 2600), reduced ? 0 : 2000);
+  useEffect(() => { // preselect the default case
+    if (!facilities.length || sel) return;
+    setSel(facilities.find((f) => f.facility_id === DEFAULT_ID) ?? null);
+  }, [facilities, sel]);
+
+  useEffect(() => { // once the globe scrolls into view: spin ~2 s, then fly to the selected site
+    if (!globeVisible || !sel || userLocked.current) return;
+    const t = window.setTimeout(() => flyTo(sel.lat, sel.lon, 1.6, 2600), reduced ? 0 : 2000);
     return () => window.clearTimeout(t);
-  }, [facilities, flyTo, reduced]);
+  }, [globeVisible, sel, flyTo, reduced]);
 
   const points = useMemo(() => facilities.map((f) => ({
     ...f, color: f.data_status === "cached" ? "#dc2626" : "#ffffff", size: 0.012,
@@ -175,121 +206,77 @@ export default function Landing() {
     if (id) selectFacility(id);
     else { setSel(null); flyTo(r.lat, r.lon); toast(`No monitored facility within 25 km of ${r.label}.`, "info"); }
   };
+  const assess = () => sel && nav(`/assess/${sel.facility_id}?date=${date}&mode=${mode}`);
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
-      {/* soften the satellite texture toward the pastel relief look of the design */}
-      <div className="absolute inset-0 [&_canvas]:[filter:brightness(1.18)_saturate(0.8)_contrast(0.92)]" aria-hidden>
-        <Globe
-          ref={globe}
-          width={w}
-          height={h}
-          onGlobeReady={onReady}
-          backgroundColor="rgba(0,0,0,0)"
-          globeImageUrl={tex.earth ?? undefined}
-          bumpImageUrl={tex.bump ?? undefined}
-          showAtmosphere
-          atmosphereColor="#ffffff"
-          atmosphereAltitude={0.22}
-          polygonsData={tex.earth ? [] : tex.countries}
-          polygonCapColor={() => "rgba(214,205,183,0.9)"}
-          polygonSideColor={() => "rgba(0,0,0,0)"}
-          polygonStrokeColor={() => "#b9b1a0"}
-          pointsData={points}
-          pointLat="lat"
-          pointLng="lon"
-          pointColor="color"
-          pointAltitude="size"
-          pointRadius={0.35}
-          pointLabel={(d: any) => `<div style="padding:6px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font:12px Inter,system-ui;color:#1f2937;box-shadow:0 6px 20px rgba(15,23,42,.12)"><b>${d.name}</b><br/><span style="color:#64748b">${d.label}</span></div>`}
-          onPointClick={(d: any) => selectFacility(d.facility_id)}
-          onPointHover={(d: any) => { if (d) { window.clearTimeout(resumeTimer.current); setRotate(false); } else if (!userLocked.current) pauseThenResume(); }}
-          ringsData={rings}
-          ringColor={(d: any) => (t: number) => d.hot ? `rgba(220,38,38,${1 - t})` : `rgba(255,255,255,${0.9 * (1 - t)})`}
-          ringMaxRadius={(d: any) => (d.hot ? 4.5 : 1.8)}
-          ringPropagationSpeed={reduced ? 0 : 1.4}
-          ringRepeatPeriod={(d: any) => (d.hot ? 1100 : 2200)}
-        />
-      </div>
+    <div>
+      <Hero />
+      <DataSection />
 
-      <div className="absolute right-4 top-4 z-10">
-        <div className="glass px-2 py-1.5"><ModeToggle mode={mode} setMode={setMode} liveAvailable={health?.live_available} /></div>
-      </div>
-
-      <div className="absolute inset-x-4 bottom-4 z-10 max-h-[70vh] space-y-3 overflow-y-auto sm:inset-x-auto sm:left-4 sm:top-4 sm:max-h-none sm:w-[400px]">
-        <div className="glass flex items-center gap-3 px-5 py-4">
-          <Logo size={44} />
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">Save the North</h1>
-            <p className="text-[13px] text-slate-500">Satellite verification of industrial emissions for regulators.</p>
+      <section ref={globeSection} className="mx-auto max-w-6xl px-4 pb-10 pt-6">
+        {/* search sits above the globe, never on top of it */}
+        <div className="glass relative z-20 space-y-3 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <LocationSearch className="min-w-[240px] flex-1" initial={DEFAULT_QUERY} onPick={onPick} />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input w-auto" aria-label="Event date (UTC)" />
+            <ModeToggle mode={mode} setMode={setMode} liveAvailable={health?.live_available} />
+            <button disabled={!sel} className="btn-dark" onClick={assess}>Assess facility</button>
           </div>
-        </div>
-
-        <div className="glass space-y-4 p-5">
-          <div className="space-y-2">
-            <span className="label">Location</span>
-            <LocationSearch initial={DEFAULT_QUERY} onPick={onPick} />
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input" aria-label="Event date (UTC)" />
+          <div className="flex flex-wrap items-center gap-2">
+            {facilities.map((f) => (
+              <button key={f.facility_id} onClick={() => selectFacility(f.facility_id)}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition ${sel?.facility_id === f.facility_id ? "bg-[#2b2f33] text-white" : "bg-white/80 text-slate-600 hover:bg-white"}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${f.data_status === "cached" ? "bg-red-500" : "bg-slate-300"}`} />{f.name}
+              </button>
+            ))}
+            <button onClick={() => setShowDs(true)} className="ml-auto text-xs font-medium text-slate-500 hover:text-slate-900">Source datasets</button>
           </div>
           {sel && (
-            <div className="space-y-2 rounded-2xl border border-slate-200/80 bg-white/80 p-4">
-              <div className="text-[15px] font-semibold text-slate-900">{sel.name}</div>
-              <div className="text-xs text-slate-500">{sel.operator ? sel.operator.split(" — ")[0] + " — potentially responsible operator" : "Operator unknown"}</div>
-              <div className="text-[11px] text-slate-400">
-                {sel.lat.toFixed(4)}, {sel.lon.toFixed(4)} · {sel.county} County, {sel.state}
-                {sel.title_v_permit && <> · Title V {sel.title_v_permit}</>}{sel.nsr_authorization && <> · NSR {sel.nsr_authorization}</>}
-              </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/70 pt-3">
+              <div className="text-sm"><span className="font-semibold text-slate-900">{sel.name}</span>
+                <span className="text-slate-400"> · {sel.county} County, {sel.state}{sel.operator ? ` · ${sel.operator.split(" — ")[0]}` : ""}</span></div>
               <AvailabilityChips f={sel} />
             </div>
           )}
-          <div className="flex items-center justify-between gap-3">
-            <button onClick={() => setShowDs(true)} className="text-xs font-medium text-slate-500 hover:text-slate-900">View source datasets</button>
-            <button disabled={!sel} className="btn-dark" onClick={() => sel && nav(`/assess/${sel.facility_id}?date=${date}&mode=${mode}`)}>
-              Assess facility
-            </button>
-          </div>
         </div>
 
-        <div className="glass p-5">
-          <div className="label mb-3">Key data used</div>
-          <ul className="space-y-3">
-            {KEY_DATA.map((k) => (
-              <li key={k.title} className="flex gap-3">
-                <span className="mt-1.5 h-2.5 w-2.5 flex-none rounded-full" style={{ background: k.color }} />
-                <div>
-                  <div className="text-[13px] font-medium text-slate-800">{k.title}</div>
-                  <div className="text-xs leading-snug text-slate-500">{k.detail}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
+        <div ref={box.ref} className="relative mt-4 h-[78vh] min-h-[480px] w-full [&_canvas]:[filter:brightness(1.18)_saturate(0.8)_contrast(0.92)]">
+          {box.w > 0 && (
+            <Globe
+              ref={globe}
+              width={box.w}
+              height={box.h}
+              onGlobeReady={onReady}
+              backgroundColor="rgba(0,0,0,0)"
+              globeImageUrl={tex.earth ?? undefined}
+              bumpImageUrl={tex.bump ?? undefined}
+              showAtmosphere
+              atmosphereColor="#ffffff"
+              atmosphereAltitude={0.2}
+              polygonsData={tex.earth ? [] : tex.countries}
+              polygonCapColor={() => "rgba(214,205,183,0.9)"}
+              polygonSideColor={() => "rgba(0,0,0,0)"}
+              polygonStrokeColor={() => "#b9b1a0"}
+              pointsData={points}
+              pointLat="lat"
+              pointLng="lon"
+              pointColor="color"
+              pointAltitude="size"
+              pointRadius={0.35}
+              pointLabel={(d: any) => `<div style="padding:6px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font:12px Inter,system-ui;color:#1f2937;box-shadow:0 6px 20px rgba(15,23,42,.12)"><b>${d.name}</b><br/><span style="color:#64748b">${d.label}</span></div>`}
+              onPointClick={(d: any) => selectFacility(d.facility_id)}
+              onPointHover={(d: any) => { if (d) { window.clearTimeout(resumeTimer.current); setRotate(false); } else if (!userLocked.current) pauseThenResume(); }}
+              ringsData={rings}
+              ringColor={(d: any) => (t: number) => d.hot ? `rgba(220,38,38,${1 - t})` : `rgba(255,255,255,${0.9 * (1 - t)})`}
+              ringMaxRadius={(d: any) => (d.hot ? 4.5 : 1.8)}
+              ringPropagationSpeed={reduced ? 0 : 1.4}
+              ringRepeatPeriod={(d: any) => (d.hot ? 1100 : 2200)}
+            />
+          )}
         </div>
-      </div>
-
-      <div className="absolute right-4 top-20 z-10 hidden w-[340px] lg:block">
-        <div className="glass p-2">
-          <div className="label px-3 pb-1 pt-3">Monitored facilities</div>
-          <ul>
-            {facilities.map((f) => (
-              <li key={f.facility_id}>
-                <button onClick={() => selectFacility(f.facility_id)}
-                  className={`w-full rounded-2xl px-3 py-3 text-left transition ${sel?.facility_id === f.facility_id ? "bg-white shadow-sm" : "hover:bg-white/60"}`}>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-slate-800">{f.name}</span>
-                    <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-slate-500">
-                      <span className={`h-2 w-2 rounded-full ${f.data_status === "cached" ? "bg-red-500" : "bg-slate-300"}`} />
-                      {f.data_status === "cached" ? "Plume detected" : "No observations"}
-                    </span>
-                  </div>
-                  <div className="mt-0.5 text-xs text-slate-400">{f.county} County, {f.state}</div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute bottom-3 right-4 hidden text-[10px] text-slate-500 sm:block">Earth imagery: NASA Blue Marble · screening estimates only</div>
+        <div className="mt-2 text-right text-[10px] text-slate-400">Earth imagery: NASA Blue Marble</div>
+      </section>
+      <Footer />
       {showDs && <DatasetsModal onClose={() => setShowDs(false)} />}
     </div>
   );

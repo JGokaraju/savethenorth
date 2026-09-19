@@ -55,6 +55,9 @@ SOURCES = {
         source_name="TCEQ Statement of Basis, Federal Operating Permit O4734 (Lenorah Gas Plant)",
         source_url="https://www.tceq.texas.gov/permitting/air/nav/titlev_permit_search.html",
         citation="TCEQ, Statement of Basis of the Federal Operating Permit O4734, ETC North Permian Midstream LLC", provider="TCEQ"),
+    "site_imagery": dict(
+        source_name="Esri World Imagery (high-resolution basemap)", source_url="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9",
+        citation="Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community (display only)", provider="Esri"),
     "tceq_steers": dict(
         source_name="TCEQ STEERS Air Emission Event Report Database", source_url="https://www2.tceq.texas.gov/oce/eer/",
         citation="TCEQ Air Emission Event Report Database (STEERS)", provider="TCEQ"),
@@ -101,6 +104,8 @@ def file_rec(p: Path) -> dict:
 def probe(p: Path) -> dict:
     """Open a file and describe it by content. Returns {kind, ...details}."""
     ext = p.suffix.lower()
+    if p.parent.name == "site_imagery":  # display basemaps fetched by scripts/fetch_site_imagery.py
+        return dict(kind="site_imagery" if ext in (".jpg", ".jpeg", ".png") else "site_imagery_meta")
     try:
         if ext in (".tif", ".tiff"):
             import rasterio
@@ -467,6 +472,26 @@ def s2_slot(slot: str, cands, bounds_files) -> dict:
                          "bounds are approximate (fitted from town labels)"]}
 
 
+def site_imagery_slot(cands) -> dict:
+    rec = {"slot_id": "site_imagery", **SOURCES["site_imagery"], "type": "image"}
+    if not cands:
+        return {**rec, "status": "missing", "reason": "no site imagery (run scripts/fetch_site_imagery.py)"}
+    images = {}
+    for p, _ in cands:
+        role = "site" if p.stem.endswith("_site") else "region" if p.stem.endswith("_region") else p.stem
+        meta = p.with_suffix(".json")
+        bounds = json.loads(meta.read_text(encoding="utf-8")) if meta.exists() else None
+        dst = NORMALIZED / f"site_imagery_{role}{p.suffix.lower()}"
+        shutil.copyfile(p, dst)
+        images[role] = {"file": rel(p), "normalized": rel(dst), "sha256": sha256(p), "bounds": bounds}
+    first = next(iter(images.values()))
+    decisions.append(f"`site_imagery` ← {', '.join('`'+v['file']+'`' for v in images.values())}: Esri World Imagery basemap "
+                     f"exports (plant close-up and the EMIT analysis window). Used for display only (report hero, plume overlay).")
+    return {**rec, "status": "present", "file": first["file"], "sha256": first["sha256"], "normalized": first["normalized"],
+            "images": images, "originals": [file_rec(p) for p, _ in cands], "date_coverage": "basemap (acquisition date varies)",
+            "warnings": ["basemap imagery date is not the event date; display only"]}
+
+
 def haversine_km(lat1, lon1, lat2, lon2):
     R = 6371.0
     p1, p2 = np.radians(lat1), np.radians(lat2)
@@ -496,6 +521,7 @@ def main() -> dict:
     slots["s2_swir"] = s2_slot("s2_swir", by_kind.get("s2_swir", []), by_kind.get("s2_bounds", []))
     slots["tceq_sob"] = sob_slot(by_kind.get("tceq_sob", []))
     slots["tceq_steers"] = steers_slot(by_kind.get("tceq_steers", []))
+    slots["site_imagery"] = site_imagery_slot(by_kind.get("site_imagery", []))
 
     for p, info in by_kind.get("script", []):
         msg = f"`{rel(p)}`: Python helper script (FIRMS download), not data — ignored."

@@ -48,6 +48,13 @@ export interface ReportComparison {
   satellite?: { median_kg_h: number; p5_kg_h: number; p95_kg_h: number; lb_per_hour: number; lb_if_24h: number };
   projection_t_ch4_yr?: { low: number; central: number; high: number; detection_frequency: number | null; caveat: string };
   projection_vs_reported_ratio?: number;
+  core?: {
+    gwp100_ch4: number;
+    allowed: { ch4_kg_h: number; co2e_t_h: number; basis: string };
+    actual: { ch4_kg_h: number; co2e_t_h: number; co2e_t_h_p5: number; co2e_t_h_p95: number };
+    ratio: number;
+    reported_same_day: number;
+  } | null;
 }
 
 export interface RunEvent {

@@ -68,6 +68,7 @@ annualization:
 
 regulations:
   super_emitter_kg_h: {value: 100, unit: "kg/h", rationale: "40 CFR 60.5371a/b super-emitter threshold", verify: false}
+  gwp100_ch4: {value: 29.8, unit: "t CO2e / t CH4", rationale: "IPCC AR6 GWP100 for fossil methane, used to express CH4 as CO2-equivalent (EPA GHGRP uses 28/25 — confirm which convention to display)", verify: true}
   rq_lb: {value: 5000, unit: lb, rationale: "natural gas mixture RQ per 30 TAC 101.1(89)(B)(iv) — confirm", verify: true}
   steers_match_window_days: {value: 1, unit: days, rationale: "STEERS event must start within ±1 day of detection", verify: false}
   min_event_hours: {value: 1, unit: h, rationale: "plausible minimum event duration for RQ test", verify: true}

@@ -49,17 +49,18 @@ Then **restart the backend**. Keys are read at startup, and there is no hot relo
 reports `live_available: true` when GPT is configured. If only the OMNI keys are missing, Live still runs GPT and uses
 demo text for image and chart reading.
 
-## Results screen
-1. While the agent works, a white card lists each step in plain language, e.g. "Mapping the methane plume · NASA EMIT"
-   or "Huawei OMNI · reading the Title V permit". Model responses are not shown.
-2. When it finishes, the step list is replaced by the summary:
-   - the **BUSTED / ACCEPTED** verdict, computed deterministically from the rule statuses. BUSTED means the satellite
-     release exceeds reporting thresholds and no matching TCEQ emissions-event report was found.
-   - the key numbers, the rule checks and the evidence charts
-   - **satellite projection vs the technical report**: the observed rate, and the hourly, daily and annual projection,
-     compared with the operator's TCEQ emissions-event reports
-   - findings, the **Data used** evidence ledger and the **Method**
-   - "Agent steps" re-opens the trajectory.
+## Screens
+- **Landing:** the logo fades in → brief data-collection bullets → search bar → globe (the search is never overlaid on the globe).
+- **While the agent works:** a white card lists each step in plain language (e.g. "Mapping the methane plume · NASA
+  EMIT"). Model responses are not shown.
+- **Report:**
+  1. A full-screen aerial image of the plant with a **BUSTED / ACCEPTED** stamp. The outcome is computed
+     deterministically from the rule statuses. BUSTED means the release exceeds reporting thresholds and no matching
+     TCEQ emissions-event report was found.
+  2. Core figures: **allowed vs actual** emissions in t CO₂e/h, next to the **EMIT CH₄ enhancement** drawn over the site.
+     "Allowed" is the EPA super-emitter threshold (100 kg CH₄/h), because the permit data provided contains no CO₂/CH₄
+     limit (the MAERT was not ingested). CO₂e uses GWP100 = 29.8 (IPCC AR6, `verify: true`).
+  3. Selected figures, then export, evidence, sources/method and agent-steps buttons.
 
 ## Environment variables (`.env`, see `.env.example`)
 
@@ -143,6 +144,7 @@ extends ~4.8 km downwind. The background annulus **excludes the dilated plume**,
 | Statement of Basis, FOP O4734 | TCEQ | real |
 | STEERS emissions-event reports | TCEQ Air Emission Event Report Database | real exports for incidents 441788, 452092 |
 | Globe imagery | NASA Blue Marble / Black Marble (public domain, via three-globe) | downloaded by `setup`; country-outline fallback bundled |
+| Site imagery (report hero, plume overlay) | Esri World Imagery (Esri, Maxar, Earthstar Geographics) | display only; `scripts/fetch_site_imagery.py`; attribution shown in the UI |
 | Method | Varon, D. J. et al. (2018), *Atmos. Meas. Tech.* 11, 5673–5686 | — |
 | Rules | 40 CFR 60.5371a/b; 30 TAC 101.201; 30 TAC 101.1(89) | — |
 

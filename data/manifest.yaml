@@ -1,4 +1,4 @@
-generated_utc: '2026-09-19T19:14:16+00:00'
+generated_utc: '2026-09-19T19:46:33+00:00'
 facility_id: tx-lenorah-redlake
 slots:
   emit_ch4enh:
@@ -342,6 +342,50 @@ slots:
     date_coverage: prepared March 6, 2026
     stats:
       pages: 18
+  site_imagery:
+    slot_id: site_imagery
+    source_name: Esri World Imagery (high-resolution basemap)
+    source_url: https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9
+    citation: 'Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community (display only)'
+    provider: Esri
+    type: image
+    status: present
+    file: assets/site_imagery/tx-lenorah-redlake_region.jpg
+    sha256: 760d2b5eb6f034a5486eb136a5c319ecca90e4fd78861431809e95662e177df7
+    normalized: data/normalized/site_imagery_region.jpg
+    images:
+      region:
+        file: assets/site_imagery/tx-lenorah-redlake_region.jpg
+        normalized: data/normalized/site_imagery_region.jpg
+        sha256: 760d2b5eb6f034a5486eb136a5c319ecca90e4fd78861431809e95662e177df7
+        bounds:
+          west: -101.89283388424508
+          south: 32.27162100597069
+          east: -101.76526611575491
+          north: 32.38017899402931
+          source: Esri World Imagery
+          attribution: Esri, Maxar, Earthstar Geographics, and the GIS User Community
+      site:
+        file: assets/site_imagery/tx-lenorah-redlake_site.jpg
+        normalized: data/normalized/site_imagery_site.jpg
+        sha256: 3a0393569ef88ebf53e772a91d0b231533fb101f2240b2a65b852b85ea340e24
+        bounds:
+          west: -101.8439091297285
+          south: 32.31735350099511
+          east: -101.80989087027149
+          north: 32.33544649900489
+          source: Esri World Imagery
+          attribution: Esri, Maxar, Earthstar Geographics, and the GIS User Community
+    originals:
+    - file: assets/site_imagery/tx-lenorah-redlake_region.jpg
+      sha256: 760d2b5eb6f034a5486eb136a5c319ecca90e4fd78861431809e95662e177df7
+      size_bytes: 409692
+    - file: assets/site_imagery/tx-lenorah-redlake_site.jpg
+      sha256: 3a0393569ef88ebf53e772a91d0b231533fb101f2240b2a65b852b85ea340e24
+      size_bytes: 456718
+    date_coverage: basemap (acquisition date varies)
+    warnings:
+    - basemap imagery date is not the event date; display only
   tceq_steers:
     slot_id: tceq_steers
     source_name: TCEQ STEERS Air Emission Event Report Database
@@ -646,6 +690,26 @@ inventory:
     - 154.8
     - 137.1
     green_gt_red: false
+- file: assets/site_imagery/tx-lenorah-redlake_region.jpg
+  size_bytes: 409692
+  sha256: 760d2b5eb6f034a5486eb136a5c319ecca90e4fd78861431809e95662e177df7
+  detected:
+    kind: site_imagery
+- file: assets/site_imagery/tx-lenorah-redlake_region.json
+  size_bytes: 242
+  sha256: ff2c46de45ff0b0c42b5fd8625680104237d196d31b0dbcdcf5697d7556cbd8e
+  detected:
+    kind: site_imagery_meta
+- file: assets/site_imagery/tx-lenorah-redlake_site.jpg
+  size_bytes: 456718
+  sha256: 3a0393569ef88ebf53e772a91d0b231533fb101f2240b2a65b852b85ea340e24
+  detected:
+    kind: site_imagery
+- file: assets/site_imagery/tx-lenorah-redlake_site.json
+  size_bytes: 241
+  sha256: 7b687b5648af5ce2a19056eb2f14e2838926f4fa3422b9b44b18e916c3d2d978
+  detected:
+    kind: site_imagery_meta
 - file: assets/tceq_sob_lenorah.pdf
   size_bytes: 307628
   sha256: 6c5fc20a7764c037934e86ccd1850da60c6af20310da3b6bbfe900eeb1375ae2

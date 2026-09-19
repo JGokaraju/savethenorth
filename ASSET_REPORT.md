@@ -1,6 +1,6 @@
 # Asset Report
 
-Generated 2026-09-19T19:14:16+00:00 by `python -m backend.scripts.inventory`. Originals in `assets/` are never modified; normalized copies live in `data/normalized/`. Machine-readable version: `data/manifest.yaml`.
+Generated 2026-09-19T19:46:33+00:00 by `python -m backend.scripts.inventory`. Originals in `assets/` are never modified; normalized copies live in `data/normalized/`. Machine-readable version: `data/manifest.yaml`.
 
 ## Slot summary
 
@@ -15,6 +15,7 @@ Generated 2026-09-19T19:14:16+00:00 by `python -m backend.scripts.inventory`. Or
 | `s2_truecolor` | PRESENT (low quality) | `assets/s2_truecolor.jpg` | `data/normalized/s2_truecolor.jpg` | image date 2026-09-18 does not match the 2025-08-08 event; regional (~200 km) screenshot; the plant spans only ~1–3 px |
 | `s2_swir` | PRESENT (low quality) | `assets/s2_swir.jpg` | `data/normalized/s2_swir.jpg` | image date 2026-09-18 does not match the 2025-08-08 event; regional (~200 km) screenshot; the plant spans only ~1–3 px |
 | `tceq_sob` | PRESENT | `assets/tceq_sob_lenorah.pdf` | `data/normalized/tceq_sob.pdf` | prepared March 6, 2026 |
+| `site_imagery` | PRESENT | `assets/site_imagery/tx-lenorah-redlake_region.jpg` | `data/normalized/site_imagery_region.jpg` | basemap imagery date is not the event date; display only |
 | `tceq_steers` | PRESENT | `assets/Air Emission Event Report Database Incident 441788.xls` | `data/normalized/steers_emission_points.csv` | 2025-06-08 .. 2026-01-24 |
 
 ## Decisions
@@ -35,6 +36,7 @@ Generated 2026-09-19T19:14:16+00:00 by `python -m backend.scripts.inventory`. Or
 - `tceq_steers` ← 2 legacy Excel (.xls/BIFF) exports of the TCEQ Air Emission Event Report Database, one per incident (441788, 452092); concatenated to `data/normalized/steers_emission_points.csv` (6 emission-point rows). Format differs from the expected PDF/HTML printout — parsed as tables instead of regex over text.
 - `tceq_steers`: incident(s) 452090 mentioned in the brief (Red Lake plant) are **not** in the provided files. Only what is in assets/ is used.
 - `tceq_steers`: extra incident(s) 441788 found (not in the brief) and kept.
+- `site_imagery` ← `assets/site_imagery/tx-lenorah-redlake_region.jpg`, `assets/site_imagery/tx-lenorah-redlake_site.jpg`: Esri World Imagery basemap exports (plant close-up and the EMIT analysis window). Used for display only (report hero, plume overlay).
 - `assets/datacollection.py`: Python helper script (FIRMS download), not data — ignored. ⚠️ It contains a hard-coded FIRMS MAP_KEY; excluded from git via .gitignore.
 
 ## Data gaps (reported by the agent, never blockers)
@@ -69,6 +71,10 @@ Generated 2026-09-19T19:14:16+00:00 by `python -m backend.scripts.inventory`. Or
 | `assets/firms_viirs.csv` | 34 | `17cdb7699e3fa6a6` | unparseable_csv |
 | `assets/s2_swir.jpg` | 412,915 | `d5b402099af091c2` | s2_swir |
 | `assets/s2_truecolor.jpg` | 354,742 | `a56c6b0c3922626f` | s2_truecolor |
+| `assets/site_imagery/tx-lenorah-redlake_region.jpg` | 409,692 | `760d2b5eb6f034a5` | site_imagery |
+| `assets/site_imagery/tx-lenorah-redlake_region.json` | 242 | `ff2c46de45ff0b0c` | site_imagery_meta |
+| `assets/site_imagery/tx-lenorah-redlake_site.jpg` | 456,718 | `3a0393569ef88ebf` | site_imagery |
+| `assets/site_imagery/tx-lenorah-redlake_site.json` | 241 | `7b687b5648af5ce2` | site_imagery_meta |
 | `assets/tceq_sob_lenorah.pdf` | 307,628 | `6c5fc20a7764c037` | tceq_sob |
 | `assets/wind.json` | 1,683 | `aae801de6a1f42e5` | wind |
 

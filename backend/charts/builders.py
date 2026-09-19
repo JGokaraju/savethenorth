@@ -173,8 +173,7 @@ def wind_timeseries(hourly: pd.DataFrame, wind) -> ChartArtifact:
 def flare_timeline(fa: dict, facility: dict, overpass_utc: str) -> ChartArtifact:
     near, allw = fa["_near"], fa["_all"]
     fig = make_subplots(rows=1, cols=2, column_widths=[0.6, 0.4], horizontal_spacing=0.1,
-                        subplot_titles=("(a) FRP of detections ≤ %.1f km, Aug 1–15" % fa["radius_km"],
-                                        "(b) All detections in the search box"))
+                        subplot_titles=("(a) Fire power ≤ %.1f km" % fa["radius_km"], "(b) Detections"))
     for dn, name, color in (("N", "Night", S1), ("D", "Day", S2)):
         d = near[near["daynight"] == dn]
         fig.add_trace(go.Scatter(x=d["time_utc"], y=d["frp"], mode="markers", name=f"{name} detection",
@@ -184,8 +183,8 @@ def flare_timeline(fa: dict, facility: dict, overpass_utc: str) -> ChartArtifact
                                                "%{customdata[1]:.2f} km from facility<extra></extra>"), row=1, col=1)
     ov = pd.Timestamp(overpass_utc)
     fig.add_vline(x=ov, line=dict(color=CRITICAL, dash="dash", width=2), row=1, col=1)
-    fig.add_annotation(x=ov, y=1.0, yref="y domain", xref="x", text="EMIT overpass", showarrow=False, yanchor="bottom",
-                       font=dict(color=INK2, size=11), row=1, col=1)
+    fig.add_annotation(x=ov, y=0.98, yref="y domain", xref="x", text="EMIT overpass", showarrow=False, yanchor="top",
+                       xanchor="left", font=dict(color=INK2, size=11), bgcolor=SURFACE, row=1, col=1)
     far = allw[allw["dist_km"] > fa["radius_km"]]
     fig.add_trace(go.Scatter(x=far["longitude"], y=far["latitude"], mode="markers", name="Other detections",
                              marker=dict(size=8, color=NEUTRAL, line=dict(color=SURFACE, width=1)),
@@ -206,7 +205,8 @@ def flare_timeline(fa: dict, facility: dict, overpass_utc: str) -> ChartArtifact
     fig.update_yaxes(title_text="Fire radiative power (MW)", rangemode="tozero", row=1, col=1)
     fig.update_xaxes(title_text="Longitude (°E)", row=1, col=2)
     fig.update_yaxes(title_text="Latitude (°N)", scaleanchor="x2", scaleratio=1 / coslat, row=1, col=2)
-    fig.update_layout(title="VIIRS active-fire detections near the plant (NASA FIRMS)")
+    fig.update_layout(title="VIIRS active-fire detections near the plant (NASA FIRMS)", margin=dict(t=100, b=150),
+                      legend=dict(orientation="h", y=-0.3, yanchor="top", x=0, xanchor="left"))
     for a in fig.layout.annotations[:2]:
         a.font = dict(color=INK2, size=12)
     stats = {k: fa[k] for k in ("n_near_facility", "n_day", "n_night", "frp_max_mw", "flare_observed_near_overpass",
@@ -269,7 +269,7 @@ def regulatory_comparison(mc: dict, cm: dict | None, phys: dict | None) -> Chart
             hovertemplate=f"{name}<br>%{{x:,.0f}} kg/h" + (f"<br>p5–p95 {_fmt_kgh(mc['p5_kg_h'])}–{_fmt_kgh(mc['p95_kg_h'])}" if lo else "")
                           + "<extra></extra>"))
     fig.update_layout(title="Estimate vs. regulatory threshold and plant capacity", bargap=0.45,
-                      xaxis=dict(type="log", title="Methane rate (kg/h, log scale)", range=[1.5, np.log10(max(r[1] for r in rows) * 6)]),
+                      xaxis=dict(type="log", title="Methane rate (kg/h, log scale)", range=[1.5, np.log10(max(r[1] for r in rows) * 40)]),
                       yaxis=dict(autorange="reversed", title=""), margin=dict(l=240))
     stats = {r[0]: round(r[1]) for r in rows}
     stats["times_threshold"] = round(mc["median_kg_h"] / THRESHOLD, 1)
@@ -314,11 +314,11 @@ def report_comparison(cmp_: dict) -> ChartArtifact:
                              hovertemplate=f"{name}<br>%{{x:,.0f}} lb<extra></extra>"))
     none_txt = ("No emissions-event report filed within ±1 day of " + cmp_["event_date"]) if not cmp_.get("reported_on_event_date") else ""
     if none_txt:
-        fig.add_annotation(text=none_txt, xref="paper", yref="paper", x=0, y=-0.22, showarrow=False, xanchor="left",
-                           font=dict(color=CRITICAL, size=12))
+        fig.add_annotation(text=f"No report filed ±1 day of {cmp_['event_date']}", xref="paper", yref="paper", x=0, y=1.0,
+                           yanchor="bottom", showarrow=False, xanchor="left", font=dict(color=CRITICAL, size=12))
     vmax = max([r[1] for r in rows] or [10])
     fig.update_layout(title="Satellite observation vs the operator's reported emissions", bargap=0.45,
-                      xaxis=dict(type="log", title="Pounds (log scale)", range=[1, np.log10(vmax * 8)]),
+                      xaxis=dict(type="log", title="Pounds (log scale)", range=[1, np.log10(vmax * 60)]),
                       yaxis=dict(autorange="reversed", title=""), margin=dict(l=230, b=90))
     stats = {"rows": {r[0]: round(r[1]) for r in rows}, "reported_on_event_date": len(cmp_.get("reported_on_event_date", [])),
              "methane_reported_anywhere": cmp_.get("methane_reported_anywhere")}
