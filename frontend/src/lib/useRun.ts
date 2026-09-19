@@ -80,13 +80,13 @@ export function useRun(onToast?: (msg: string, kind?: "error" | "info") => void)
     };
   }, [onToast, refreshEvidence]);
 
-  const start = useCallback(async (facilityId: string, date: string) => {
+  const start = useCallback(async (facilityId: string, date: string, mode: "demo" | "live" = "demo") => {
     esRef.current?.close();
     setState({ ...empty, status: "starting" });
     try {
-      const { run_id, mode } = await api.startRun(facilityId, date);
-      setState({ ...empty, runId: run_id, mode, status: "starting" });
-      subscribe(run_id);
+      const r = await api.startRun(facilityId, date, mode);
+      setState({ ...empty, runId: r.run_id, mode: r.mode, status: "starting" });
+      subscribe(r.run_id);
     } catch (e: any) {
       setState({ ...empty, status: "error", error: String(e.message ?? e) });
       onToast?.(`Could not start the run: ${e.message ?? e}`, "error");

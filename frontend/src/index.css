@@ -3,3 +3,22 @@
 @tailwind utilities;
 
 html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  color: #1f2937;
+  background: radial-gradient(1200px 700px at 60% 30%, #f3f6f9 0%, #e5eaf0 55%, #d9e0e8 100%) fixed;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .glass { @apply rounded-3xl border border-white/80 bg-white/75 shadow-[0_12px_40px_-16px_rgba(30,41,59,0.25)] backdrop-blur-xl; }
+  .btn-dark { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-[#2b2f33] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-40; }
+  .btn-light { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50; }
+  .input { @apply w-full rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200; }
+  .label { @apply text-[11px] font-medium uppercase tracking-wider text-slate-400; }
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fadeUp 0.35s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }

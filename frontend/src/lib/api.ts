@@ -32,6 +32,22 @@ export interface Health {
   keys_present: { openai: boolean; omni: boolean };
   models: { openai: string | null; omni: string };
   omni_calls: { live_calls: number; cached: number; mock: number };
+  live_available: boolean;
+  omni_live_available: boolean;
+}
+
+export interface ReportComparison {
+  event_date: string;
+  reported_events: { incident_no: string; start: string | null; end: string | null; duration_h: number | null; event_type: string;
+    emission_points: string[]; lb_by_contaminant: Record<string, number>; methane_reported: boolean }[];
+  reported_on_event_date: any[];
+  reported_voc_total_lb: number;
+  reported_voc_total_t: number;
+  methane_reported_anywhere: boolean;
+  note: string;
+  satellite?: { median_kg_h: number; p5_kg_h: number; p95_kg_h: number; lb_per_hour: number; lb_if_24h: number };
+  projection_t_ch4_yr?: { low: number; central: number; high: number; detection_frequency: number | null; caveat: string };
+  projection_vs_reported_ratio?: number;
 }
 
 export interface RunEvent {
@@ -75,6 +91,8 @@ export interface Verdict {
   charts: string[];
   evidence_ids: string[];
   disclaimer: string;
+  outcome?: { outcome: "BUSTED" | "ACCEPTED" | "INCONCLUSIVE" | "NOT_ASSESSED"; reason: string } | null;
+  report_comparison?: ReportComparison | null;
 }
 
 export interface LedgerRecord {
@@ -149,11 +167,11 @@ export const api = {
   geocode: (q: string) => j<GeoResult[]>(`/api/geocode?q=${encodeURIComponent(q)}`),
   datasets: () => j<Dataset[]>("/api/datasets"),
   preview: (slot: string) => j<any>(`/api/datasets/${slot}/preview`),
-  startRun: (facility_id: string, date: string) =>
+  startRun: (facility_id: string, date: string, mode: "demo" | "live") =>
     j<{ run_id: string; mode: string }>("/api/runs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ facility_id, date }),
+      body: JSON.stringify({ facility_id, date, mode }),
     }),
   evidence: (runId: string) => j<{ ledger: LedgerRecord[]; omni_calls: LedgerRecord[]; tool_calls: any[] }>(`/api/runs/${runId}/evidence`),
   image: (id: string) => j<{ url: string; bounds: { west: number; south: number; east: number; north: number }; date: string; warnings: string[] }>(`/api/images/${id}`),

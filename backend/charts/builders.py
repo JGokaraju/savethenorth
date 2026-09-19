@@ -285,8 +285,8 @@ def annual_scenarios(an: dict) -> ChartArtifact:
     fig = go.Figure(go.Bar(x=[n.title() for n in names], y=vals, marker=dict(color=[S1, S1, S1], line=dict(width=0)),
                            text=[f"{v:,.0f} t" for v in vals], textposition="outside", textfont=dict(color=INK),
                            customdata=hover, hovertemplate="%{customdata}<extra></extra>", width=0.5))
-    fig.add_annotation(text=an["caveat"], xref="paper", yref="paper", x=0, y=-0.2, showarrow=False, align="left",
-                       font=dict(color=WARNING, size=11), xanchor="left")
+    fig.add_annotation(text=f"Illustrative only — {an['n_overpasses']} overpasses, {an['n_detections']} detections", xref="paper",
+                       yref="paper", x=0, y=-0.2, showarrow=False, xanchor="left", font=dict(color=WARNING, size=11))
     fig.update_layout(title="Annualized emission scenarios (illustrative)",
                       yaxis=dict(title="Methane (t CH₄ / year)", rangemode="tozero", range=[0, max(vals) * 1.2]),
                       xaxis=dict(title="Scenario"), margin=dict(b=110))

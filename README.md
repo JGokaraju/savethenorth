@@ -1,4 +1,4 @@
-# Plumewatch: Satellite Emissions Verification Agent
+# Save the North: Satellite Emissions Verification Agent
 
 A web app for environmental regulators. Search an industrial facility and click **Assess**, and an AI agent investigates it.
 The agent discovers the cached data, loads skill playbooks and calls deterministic science tools. It uses Huawei OMNI to
@@ -11,7 +11,7 @@ the exact data, pixels and assumptions it came from.
 > ~14:45 UTC**. Other facilities conclude "no cached observations — cannot assess".
 > **All results are satellite-based screening estimates, not enforcement determinations.**
 
-**Result for the case** (mock mode, real data): ~**23 t/h** CH₄ (p5–p95 15–29 t/h), ~230× the EPA 100 kg/h super-emitter
+**Result for the case** (Demo mode, real data): **BUSTED** — ~**23 t/h** CH₄ (p5–p95 15–29 t/h), ~230× the EPA 100 kg/h super-emitter
 threshold, with no matching TCEQ emissions-event report in the records provided. Flare slip from a lit flare is physically
 implausible at this rate, so the likely cause is an uncombusted flare/relief-system release (medium confidence).
 
@@ -28,6 +28,39 @@ make demo      # or: python tasks.py demo     (DEMO_REPLAY=1: replays the last r
 `make` is optional. `tasks.py` is a cross-platform runner, and the Makefile just calls it. The app runs end to end
 **without API keys**: the scripted agent and mock OMNI switch on automatically. Requires Python 3.11 and Node 18+.
 
+## Demo vs Live, and where the API keys go
+
+The app has a small **Demo | Live** toggle (top right). **Demo** runs a scripted agent through the same real tools and
+data, with no API calls. It works with no keys. **Live** runs the OpenAI GPT orchestrator and real Huawei OMNI calls. The
+toggle is disabled until keys are configured.
+
+To enable Live, put your keys in **`.env` in the project root** (`SkyFall/.env`, created from `.env.example` by
+`setup`; it is git-ignored):
+
+```ini
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-...                         # the model your key can use
+OMNI_API_KEY=...                             # Huawei OMNI (Qwen3.5-Omni) sponsor key
+OMNI_BASE_URL=https://.../v1                 # OpenAI-compatible base URL that comes with the key
+OMNI_MODEL=qwen3.5-omni-flash
+```
+
+Then **restart the backend**. Keys are read at startup, and there is no hot reload in OneDrive folders. `GET /api/health`
+reports `live_available: true` when GPT is configured. If only the OMNI keys are missing, Live still runs GPT and uses
+demo text for image and chart reading.
+
+## Results screen
+1. While the agent works, a white card lists each step in plain language, e.g. "Mapping the methane plume · NASA EMIT"
+   or "Huawei OMNI · reading the Title V permit". Model responses are not shown.
+2. When it finishes, the step list is replaced by the summary:
+   - the **BUSTED / ACCEPTED** verdict, computed deterministically from the rule statuses. BUSTED means the satellite
+     release exceeds reporting thresholds and no matching TCEQ emissions-event report was found.
+   - the key numbers, the rule checks and the evidence charts
+   - **satellite projection vs the technical report**: the observed rate, and the hourly, daily and annual projection,
+     compared with the operator's TCEQ emissions-event reports
+   - findings, the **Data used** evidence ledger and the **Method**
+   - "Agent steps" re-opens the trajectory.
+
 ## Environment variables (`.env`, see `.env.example`)
 
 | Variable | Purpose |
@@ -35,7 +68,7 @@ make demo      # or: python tasks.py demo     (DEMO_REPLAY=1: replays the last r
 | `OPENAI_API_KEY`, `OPENAI_MODEL` | GPT orchestrator (Responses API; falls back to Chat Completions). Both required for LIVE mode. |
 | `OMNI_API_KEY`, `OMNI_BASE_URL`, `OMNI_MODEL` | Huawei OMNI (Qwen3.5-Omni) via its OpenAI-compatible endpoint. Default model `qwen3.5-omni-flash`. |
 | `OMNI_FORCE_STREAM` | `auto` (try non-streaming, retry with `stream=True` on a stream error and remember), `true`, `false`. |
-| `MOCK_LLM`, `MOCK_OMNI` | `auto` (on when the key is empty), `1`, `0`. |
+| `MOCK_LLM`, `MOCK_OMNI` | `auto` (on when the key is empty), `1`, `0`. These force Demo behaviour globally. |
 | `DEMO_REPLAY` | `1` = replay the most recent successful run (LIVE recordings preferred) with realistic delays. |
 | `MAX_AGENT_STEPS` | Orchestrator loop cap (default 30). |
 | `FIRMS_MAP_KEY` | Only for `scripts/fetch_firms.py`. |

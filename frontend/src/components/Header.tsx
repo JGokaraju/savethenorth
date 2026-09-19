@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, Health } from "../lib/api";
-import { ModeBadge } from "./ui";
+import { Logo } from "./ui";
 
-export function useHealth(pollMs = 5000) {
+export function useHealth(pollMs = 8000) {
   const [h, setH] = useState<Health | null>(null);
   useEffect(() => {
     let alive = true;
@@ -15,19 +15,22 @@ export function useHealth(pollMs = 5000) {
   return h;
 }
 
-export function Header({ runMode }: { runMode?: string | null }) {
-  const h = useHealth();
-  const oc = h?.omni_calls;
+export function Brand({ compact = false }: { compact?: boolean }) {
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-950/90 px-4 py-2.5 backdrop-blur">
-      <Link to="/" className="flex items-center gap-2">
-        <span className="text-lg" aria-hidden>🛰️</span>
-        <span className="font-semibold text-slate-100">Plumewatch</span>
-        <span className="hidden text-sm text-slate-400 sm:inline">— Satellite Emissions Verification</span>
-      </Link>
-      <div className="flex items-center gap-3 text-xs text-slate-400">
-        <ModeBadge mode={runMode ?? h?.mode.label} />
-        {oc && <span title="Huawei OMNI calls: live / cached / mock (sponsor credit is limited)">OMNI calls: <b className="text-slate-200">{oc.live_calls}</b> live · {oc.cached} cached · {oc.mock} mock</span>}
+    <Link to="/" className="flex items-center gap-2.5">
+      <Logo size={compact ? 28 : 34} />
+      <span className={`font-semibold tracking-tight text-slate-900 ${compact ? "text-base" : "text-lg"}`}>Save the North</span>
+    </Link>
+  );
+}
+
+export function TopBar({ children, right }: { children?: ReactNode; right?: ReactNode }) {
+  return (
+    <header className="sticky top-0 z-30 px-4 pt-4">
+      <div className="glass flex flex-wrap items-center gap-3 px-4 py-3">
+        <Brand compact />
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">{children}</div>
+        <div className="flex items-center gap-2">{right}</div>
       </div>
     </header>
   );
@@ -35,11 +38,11 @@ export function Header({ runMode }: { runMode?: string | null }) {
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-800 px-4 py-3 text-[11px] leading-relaxed text-slate-500">
-      Data: NASA EMIT L2B Methane Enhancement v002 (Green et al., NASA LP DAAC, doi:10.5067/EMIT/EMITL2BCH4ENH.002) · Carbon Mapper
-      (data.carbonmapper.org; <b className="text-violet-300">this demo uses a SYNTHETIC placeholder</b>) · NASA FIRMS VIIRS active fire · Contains modified
-      Copernicus Sentinel data 2026 · Open-Meteo historical weather (ERA5) · TCEQ Statement of Basis FOP O4734 and STEERS emissions-event reports ·
-      Method: Varon et al. (2018), AMT · Rules: 40 CFR 60.5371a/b; 30 TAC 101.201, 101.1. Screening estimates only — not enforcement determinations.
+    <footer className="px-6 pb-6 pt-2 text-[11px] leading-relaxed text-slate-400">
+      Data: NASA EMIT L2B Methane Enhancement v002 (doi:10.5067/EMIT/EMITL2BCH4ENH.002) · NASA FIRMS VIIRS active fire ·
+      Copernicus Sentinel-2 (modified Copernicus Sentinel data 2026) · Open-Meteo / ERA5 weather · TCEQ Statement of Basis FOP O4734 and
+      STEERS emissions-event reports · Carbon Mapper (placeholder values in this build) · Method: Varon et al. (2018) · Rules: 40 CFR 60.5371a/b;
+      30 TAC 101.201, 101.1. Screening estimates only — not enforcement determinations.
     </footer>
   );
 }
