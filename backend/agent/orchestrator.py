@@ -173,7 +173,8 @@ def _canonical(st: RunState) -> list[tuple]:
         ("read_document", {"doc_id": "tceq_steers", "question": "List all incidents with dates as JSON"}, None),
         ("reporting_timeline", {"facility_id": fid}, None),
         ("check_regulations", {"facility_id": fid}, None),
-        ("load_skill", {"name": "verdict-report"}, "Assembling the report and verdict."),
+        ("load_skill", {"name": "verdict-report"}, "Ranking the evidence before writing the verdict."),
+        ("rank_evidence", {"facility_id": fid}, None),
         *[("show_chart", {"chart_id": c, "caption": ""}, None) for c in SHOW],
         ("submit_verdict", {}, None),
     ]

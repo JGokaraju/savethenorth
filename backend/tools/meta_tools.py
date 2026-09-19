@@ -121,6 +121,7 @@ def submit_verdict(st: RunState, verdict: dict) -> dict:
     from backend.science import reports
     d["outcome"] = st.results.get("outcome") or reports.outcome(st.results.get("regulations", []), bool(st.results.get("emission")))
     d["report_comparison"] = st.results.get("report_comparison")
+    d["key_evidence"] = (st.results.get("evidence_ranking") or {}).get("key_evidence")
     if not d["charts"]:
         d["charts"] = [c["chart_id"] for c in st.shown_charts]
     st.verdict = d

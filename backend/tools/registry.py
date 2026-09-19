@@ -111,6 +111,10 @@ TOOLS: dict[str, Tool] = {t.name: t for t in [
     Tool("annualize", science_tools.annualize, FacilityId, "Annualized emission scenarios from detection frequency + chart."),
     Tool("reporting_timeline", science_tools.reporting_timeline, FacilityId, "Parse STEERS events; timeline of detections vs reports."),
     Tool("check_regulations", science_tools.check_regulations, FacilityId, "Evaluate regulatory screening rules from this run's results + chart."),
+    Tool("rank_evidence", science_tools.rank_evidence, FacilityId,
+         "Rank all evidence gathered in this run by importance for each verdict question: hybrid search (BM25 + dense "
+         "vectors, reciprocal-rank fusion) then an LLM rerank. Call after check_regulations and before submit_verdict; "
+         "cite the top-ranked evidence ids in the verdict."),
     Tool("analyze_chart", omni_tools.analyze_chart, ChartQuestion, "Huawei OMNI: interpret a chart image qualitatively."),
     Tool("analyze_image", omni_tools.analyze_image, ImageQuestion, "Huawei OMNI: interpret a Sentinel-2 image around the facility."),
     Tool("read_document", omni_tools.read_document, DocQuestion, "Huawei OMNI: read rendered document pages (TCEQ permit / STEERS)."),

@@ -5,6 +5,10 @@ description: Choose the report charts and assemble a validated verdict with care
 # Verdict report
 
 ## Before submitting
+0. `rank_evidence(facility_id)`: hybrid search (BM25 + dense vectors) over everything gathered in this run, then an
+   LLM rerank per verdict question (threshold, reporting, attribution, cause, reliability). Base the attribution and
+   likely-cause evidence lists on the top-ranked items and cite their ids. Items flagged `synthetic`, `demo_text` or
+   `low_quality` must be described as limitations, never as support.
 1. `show_chart` for 4–6 of: `plume_map`, `emission_distribution`, `flare_timeline`, `report_comparison`,
    `reporting_timeline`, `regulatory_comparison`, `annual_scenarios`. Use one-line captions that say what the chart shows.
 2. `submit_verdict(verdict)`. The backend validates it: medians/p5/p95 must equal `compute_emission_rate` output (±1%),

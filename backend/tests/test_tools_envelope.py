@@ -14,7 +14,7 @@ MINIMAL_ARGS = {
     "annualize": {"facility_id": "{f}"}, "reporting_timeline": {"facility_id": "{f}"}, "check_regulations": {"facility_id": "{f}"},
     "analyze_chart": {"chart_id": "plume_map", "question": "?"}, "analyze_image": {"image_id": "s2_swir", "question": "?"},
     "read_document": {"doc_id": "tceq_sob", "question": "capacity?"}, "show_chart": {"chart_id": "plume_map"},
-    "submit_verdict": {"verdict": {}},
+    "submit_verdict": {"verdict": {}}, "rank_evidence": {"facility_id": "{f}"},
 }
 
 

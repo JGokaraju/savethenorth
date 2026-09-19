@@ -31,6 +31,7 @@ export function stepLabel(name: string, args: any = {}): string {
     case "annualize": return "Projecting annual emissions";
     case "reporting_timeline": return "Matching against TCEQ emissions-event reports";
     case "check_regulations": return "Screening against federal and Texas rules";
+    case "rank_evidence": return "Ranking evidence · hybrid search and LLM rerank";
     case "analyze_chart": return `Huawei OMNI · reading the ${CHART_NAMES[args.chart_id] ?? args.chart_id}`;
     case "analyze_image": return `Huawei OMNI · inspecting the ${IMAGES[args.image_id] ?? args.image_id}`;
     case "read_document": return `Huawei OMNI · reading ${DOCS[args.doc_id] ?? args.doc_id}`;

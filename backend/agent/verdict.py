@@ -72,6 +72,7 @@ class Verdict(BaseModel):
     # filled from run state by submit_verdict (never by the model)
     outcome: dict | None = None
     report_comparison: dict | None = None
+    key_evidence: list | None = None
 
 
 def _close(a, b, tol=0.01) -> bool:
@@ -114,6 +115,8 @@ def validate(raw: dict, st) -> tuple[Verdict | None, list[str]]:
             errors.append(f"regulatory finding {f.rule_id} status must be {regs[f.rule_id]} (from check_regulations)")
     if st.results.get("emission") and not regs:
         errors.append("call check_regulations before submit_verdict")
+    if st.results.get("emission") and regs and not st.results.get("evidence_ranking"):
+        errors.append("call rank_evidence before submit_verdict")
     known = set(st.ledger)
     all_ids = set(v.evidence_ids) | set(v.methane_estimate.evidence_ids) | set(v.cross_check.evidence_ids) \
         | set(v.attribution.evidence_ids) | set(v.likely_cause.evidence_ids) | set(v.annual_scenarios_t_ch4.evidence_ids) \

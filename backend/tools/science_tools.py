@@ -461,3 +461,33 @@ def check_regulations(st: RunState, facility_id: str) -> dict:
     ev = sorted({e for r in rules for e in r["evidence_ids"]})
     return ok(s, {"findings": rules, "outcome": st.results["outcome"], "report_comparison": rc}, charts, ev, [],
               ["Screening results, not enforcement determinations"], [])
+
+
+def rank_evidence(st: RunState, facility_id: str) -> dict:
+    """Hybrid retrieval (BM25 + dense vectors, RRF) over this run's evidence, then LLM rerank by importance."""
+    import json as _json
+    from backend.science import evidence_rank
+    _require_case(st, facility_id)
+    if not st.results.get("regulations"):
+        raise DataGap("run check_regulations first — ranking needs the regulatory findings")
+    r = evidence_rank.rank(st, live=st.mode == "LIVE")
+    (st.evidence_dir / "evidence_ranking.json").write_text(_json.dumps(r, indent=1, default=str), encoding="utf-8")
+    st.results["evidence_ranking"] = r
+    for q in r["questions"].values():  # make ranked findings citable (verdict evidence_ids must resolve to the ledger)
+        for x in q["ranking"]:
+            if x["id"] not in st.ledger:
+                st.add_derived_note(x["id"], {"type": "derived", "name": x["id"].split(":", 1)[-1], "text": x["text"],
+                                              "source": x["source"]}, "rank_evidence")
+    eid = st.add_derived_note("result:evidence_ranking", {
+        "type": "derived", "name": "Evidence ranking (hybrid search + LLM rerank)", "source": "rank_evidence",
+        "preview_ref": st.evidence_ref("evidence_ranking.json"), "record_count": r["items"],
+        "backends": r["backends"]}, "rank_evidence")
+    top = r["key_evidence"][:3]
+    s = (f"Ranked {r['items']} evidence items for {len(r['questions'])} verdict questions "
+         f"({r['backends'].get('dense')}; reranker {r['backends'].get('reranker')}). Top: "
+         + "; ".join(f"{k['id']} ({k['importance']})" for k in top))
+    data = {"key_evidence": [{k: v for k, v in e.items() if k in ("id", "importance", "reason", "question", "source", "flags")}
+                             for e in r["key_evidence"]],
+            "per_question_top3": {q: [x["id"] for x in v["ranking"][:3]] for q, v in r["questions"].items()},
+            "backends": r["backends"]}
+    return ok(s, data, [], [eid] + [k["id"] for k in top if k["id"] in st.ledger], [], [], [])
