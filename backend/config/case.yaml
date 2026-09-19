@@ -11,7 +11,7 @@ case:
 
 emit:
   nodata_threshold: {value: -9990, unit: "ppm·m", rationale: "EMIT L2B uses -9999 fill; mask anything <= -9990", verify: false}
-  crop_half_width_km: {value: 4.0, unit: km, rationale: "±4 km window around plume source hint (spec §6.1)", verify: false}
+  crop_half_width_km: {value: 6.0, unit: km, rationale: "DEVIATION from spec ±4 km: the 2025-08-08 plume extends ~4.8 km downwind (N), so a ±4 km crop truncates it and biases IME low", verify: true}
   pixel_area_min_m2: {value: 2000, unit: "m²", rationale: "sanity bound on per-pixel area (~3600 m² expected at 60 m)", verify: false}
   pixel_area_max_m2: {value: 5500, unit: "m²", rationale: "sanity bound on per-pixel area", verify: false}
   fallback_uncert_frac: {value: 0.15, unit: "fraction", rationale: "if no uncertainty layer: 15% of |enhancement| + background std", verify: true}
@@ -19,6 +19,7 @@ emit:
 mask:
   bg_annulus_inner_km: {value: 2.5, unit: km, rationale: "background annulus inner radius", verify: false}
   bg_annulus_outer_km: {value: 4.0, unit: km, rationale: "background annulus outer radius", verify: false}
+  bg_exclude_plume: {value: true, unit: "-", rationale: "two-pass background: pixels of the dilated first-pass plume mask are excluded from the annulus (the plume crosses the annulus downwind)", verify: false}
   k_values: {value: [1.5, 2.0, 2.5, 3.0, 4.0], unit: "σ", rationale: "threshold multipliers (slider frames)", verify: false}
   k_default: {value: 2.5, unit: "σ", rationale: "default threshold multiplier", verify: false}
   attribution_radius_km: {value: 1.0, unit: km, rationale: "component must have a pixel within this distance of the source hint", verify: false}
