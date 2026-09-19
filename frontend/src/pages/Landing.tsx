@@ -98,7 +98,7 @@ function Hero() {
       <img src="/landing-bg.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-[#0b1a2e]/55" aria-hidden />
       <div className="relative flex flex-col items-center">
-        <div className="fade-in bg-white/95 p-2"><Logo size={96} /></div>
+        <div className="fade-in"><Logo size={128} speed={30} /></div>
         <h1 className="fade-in mt-6 text-5xl font-extrabold tracking-tight text-white sm:text-7xl" style={{ animationDelay: "0.3s" }}>Save the North</h1>
         <p className="fade-in mt-3 max-w-xl text-lg text-[#e6ebf0]" style={{ animationDelay: "0.7s" }}>
           Independent satellite verification of methane emissions from industrial facilities.

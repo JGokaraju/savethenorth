@@ -20,11 +20,15 @@ export function SiteHeader({ right }: { right?: ReactNode }) {
   return (
     <header className="sticky top-0 z-30 bg-primary-darker text-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link to="/" className="flex items-center gap-3">
-          <span className="bg-white p-0.5"><Logo size={30} /></span>
-          <span>
-            <span className="block text-lg font-bold leading-tight">Save the North</span>
-            <span className="block text-xs text-[#d9e8f6]">Satellite emissions verification</span>
+        <Link to="/" className="group flex items-center gap-3" aria-label="Save the North — home">
+          <Logo size={36} />
+          <span className="leading-none">
+            <span className="wordmark block text-[19px] font-extrabold uppercase">Save the North</span>
+            <span className="mt-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
+              <span className="tagline-accent">Methane watch from orbit</span>
+              <span className="hidden h-3 w-px bg-white/30 sm:block" aria-hidden />
+              <span className="hidden text-[#a9c7e3] sm:block">EMIT · VIIRS · ERA5</span>
+            </span>
           </span>
         </Link>
         {right && <div className="flex items-center gap-4 text-sm">{right}</div>}
@@ -67,6 +71,7 @@ export function Footer() {
         </ul>
         <p>Method: Varon et al. (2018). Rules: 40 CFR 60.5371a/b; 30 TAC 101.201, 101.1.</p>
         <p className="font-semibold text-ink">Screening estimates only — not enforcement determinations. This is an independent prototype, not an official government service.</p>
+        <p className="flex items-center gap-2 pt-1"><img src="/logo.png" alt="" width={18} height={18} /> Built at Hack the North.</p>
       </div>
     </footer>
   );

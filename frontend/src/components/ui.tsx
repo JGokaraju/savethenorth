@@ -68,8 +68,12 @@ export function ModeToggle({ mode, setMode, liveAvailable }: { mode: RunMode; se
   );
 }
 
-export function Logo({ size = 32 }: { size?: number }) {
-  return <img src="/logo.png" alt="" width={size} height={size} className="select-none" style={{ width: size, height: size }} />;
+/** Brand mark: a small spinning globe (CSS only — the texture scrolls behind a shaded circular mask). */
+export function Logo({ size = 32, speed = 18 }: { size?: number; speed?: number }) {
+  return (
+    <span aria-hidden className="globe-mark inline-block shrink-0 select-none rounded-full"
+      style={{ width: size, height: size, ["--globe-w" as string]: `${size * 2}px`, animationDuration: `${speed}s` }} />
+  );
 }
 
 export function Skeleton({ className = "" }: { className?: string }) {

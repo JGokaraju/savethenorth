@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#0b1220"/><circle cx="32" cy="32" r="18" fill="#1d4ed8"/><path d="M26 44c0-8 12-10 8-20 6 4 8 10 6 16-2 5-12 8-14 4z" fill="#d95926"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="g" cx="38%" cy="34%" r="70%"><stop offset="0" stop-color="#4aa3e8"/><stop offset="0.6" stop-color="#1a4480"/><stop offset="1" stop-color="#0b1a2e"/></radialGradient>
+    <clipPath id="c"><circle cx="32" cy="32" r="28"/></clipPath>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="#0b1a2e"/>
+  <circle cx="32" cy="32" r="28" fill="url(#g)"/>
+  <g clip-path="url(#c)" fill="#3f8f5a" opacity="0.9">
+    <path d="M14 20c6-6 14-5 16 0s-3 8-8 9-6 7-11 5-3-9 3-14z"/>
+    <path d="M36 30c5-3 12-1 14 5s-2 13-7 14-6-4-7-8-5-8 0-11z"/>
+  </g>
+  <g fill="none" stroke="#bfe0ff" stroke-opacity="0.45" stroke-width="1.2" clip-path="url(#c)">
+    <ellipse cx="32" cy="32" rx="12" ry="28"/><path d="M4 32h56M8 20h48M8 44h48"/>
+  </g>
+  <circle cx="44" cy="18" r="3.2" fill="#d83933"/>
+</svg>
