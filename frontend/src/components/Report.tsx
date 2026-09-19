@@ -26,14 +26,35 @@ const SOURCE_NAMES: Record<string, string> = {
 };
 const fmt = (v: number, d = 0) => v.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
 
-function Section({ id, title, children }: { id?: string; title: string; children: ReactNode }) {
+function Section({ id, title, children, flush = false }: { id?: string; title?: string; children: ReactNode; flush?: boolean }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.12);
   return (
-    <section id={id} className="mx-auto max-w-6xl scroll-mt-20 border-t border-rule px-4 py-10 first:border-t-0">
+    <section id={id} className={`mx-auto max-w-6xl scroll-mt-20 px-4 py-10 ${flush ? "" : "border-t border-rule"}`}>
       <div ref={ref} className={`reveal ${inView ? "in" : ""}`}>
-        <h2 className="h2 mb-5">{title}</h2>
+        {title && <h2 className="h2 mb-5">{title}</h2>}
         {children}
       </div>
+    </section>
+  );
+}
+
+/** Result banner: the facility and the one-line reason set in white over the site imagery. */
+function ResultBanner({ v, f }: { v: Verdict; f: Facility | null }) {
+  const img = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
+  return (
+    <section className="relative overflow-hidden bg-primary-darker">
+      {img && <img src={img} alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0b1a2e]/90 via-[#0b1a2e]/75 to-[#0b1a2e]/45" aria-hidden />
+      <div className="relative mx-auto max-w-6xl px-4 py-14">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9fc7ee]">Screening result</p>
+        <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{v.facility_name}</h1>
+        <p className="mt-2 text-[15px] text-[#dbe5ef]">
+          Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
+          {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
+        </p>
+        {v.outcome?.reason && <p className="mt-4 max-w-3xl text-lg leading-snug text-white">{v.outcome.reason}</p>}
+      </div>
+      {img && <span className="absolute bottom-1 right-3 text-[10px] text-white/60">Imagery: Esri, Maxar, Earthstar Geographics</span>}
     </section>
   );
 }
@@ -83,19 +104,13 @@ function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run
   const trace = (label: string, ids: string[]) => { setSel({ label, evidenceIds: ids, callIds: [] }); onSources(); };
   const me = v.methane_estimate;
   return (
-    <Section id="summary" title="Screening result">
-      <div className="mb-8 border-b border-rule pb-6">
-        <h1 className="text-3xl font-extrabold tracking-tight text-ink">{v.facility_name}</h1>
-        <p className="mt-1 text-muted">
-          Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
-          {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
-        </p>
-        {v.outcome?.reason && <p className="mt-3 max-w-3xl text-[15px] text-ink">{v.outcome.reason}</p>}
-      </div>
+    <>
+    <ResultBanner v={v} f={f} />
+    <Section id="summary" flush>
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
           {core ? (
-            <dl className="mt-6 divide-y divide-rule border-y border-rule">
+            <dl className="divide-y divide-rule border-y border-rule">
               <button type="button" className="block w-full py-5 text-left hover:bg-paper" title="Show sources"
                 onClick={() => trace("Allowed", ["assumption:regulations.super_emitter_kg_h", "assumption:regulations.gwp100_ch4"])}>
                 <dt className="label">Federal threshold</dt>
@@ -113,7 +128,7 @@ function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run
                 </dd>
               </button>
             </dl>
-          ) : <p className="mt-6 text-muted">No satellite observation is available for this facility and date.</p>}
+          ) : <p className="text-muted">No satellite observation is available for this facility and date.</p>}
           {core && <ScaleBar ratio={core.ratio} />}
           <p className="mt-3 text-xs text-muted">CO₂-equivalent uses GWP100 = {core?.gwp100_ch4 ?? 29.8} for methane. {v.disclaimer}</p>
         </div>
@@ -126,6 +141,7 @@ function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run
         )}
       </div>
     </Section>
+    </>
   );
 }
 
@@ -173,10 +189,9 @@ function Findings({ v }: { v: Verdict }) {
   );
 }
 
-function Figures({ run, f }: { run: RunState; f: Facility | null }) {
+function Figures({ run }: { run: RunState }) {
   const ids = FIGURES.filter((c) => run.charts[c]);
-  const site = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
-  if (!ids.length && !site) return null;
+  if (!ids.length) return null;
   return (
     <Section title="Figures">
       <div className="grid gap-6 lg:grid-cols-2">
@@ -185,11 +200,6 @@ function Figures({ run, f }: { run: RunState; f: Facility | null }) {
             <Plot figure={run.charts[c].figure_json} height={380} />
           </Figure>
         ))}
-        {site && (
-          <Figure n={ids.length + 2} caption={`${f!.name}, aerial view. Imagery: Esri, Maxar, Earthstar Geographics.`}>
-            <img src={site} alt={`Aerial view of ${f!.name}`} className="block h-[380px] w-full object-cover" />
-          </Figure>
-        )}
       </div>
     </Section>
   );
@@ -222,7 +232,7 @@ export function Report({ run, f }: { run: RunState; f: Facility | null }) {
       <Summary v={v} f={f} run={run} onSources={showSources} />
       <KeyEvidence v={v} />
       <Findings v={v} />
-      <Figures run={run} f={f} />
+      <Figures run={run} />
       <Section title="Records">
         <div className="mb-5 flex flex-wrap gap-3">
           <a className="btn-dark" href={`/api/runs/${run.runId}/report.html`} target="_blank" rel="noreferrer">Export report</a>
