@@ -201,8 +201,8 @@ def render(fig_json: dict, out: Path) -> None:
                 sym = {"square": "s", "x": "x", "diamond": "D"}.get(mk.get("symbol"), "o")
                 col = mk.get("color")
                 h = ax.scatter(x, y, s=s, c=[_color(c) for c in col] if isinstance(col, list) else _color(col),
-                               marker=sym, edgecolors=_color(mk.get("line", {}).get("color"), "none"), zorder=5,
-                               linewidths=1)
+                               marker=sym, zorder=5, linewidths=1 if sym != "x" else 2,
+                               **({} if sym == "x" else {"edgecolors": _color(mk.get("line", {}).get("color"), "none")}))
             if "text" in mode and tr.get("text"):
                 for xi, yi, ti in zip(x, y, tr["text"]):
                     ax.annotate(ti, (xi, yi), textcoords="offset points", xytext=(0, -16), ha="center", color=ink, fontsize=10)

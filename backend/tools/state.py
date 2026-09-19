@@ -54,7 +54,7 @@ class RunState:
         return p
 
     def evidence_ref(self, name: str) -> str:
-        return f"evidence/{self.run_id}/{name}"
+        return f"evidence/{name}"  # relative to the run: served at /api/runs/{run_id}/evidence/{name}
 
     @property
     def facility(self) -> dict | None:

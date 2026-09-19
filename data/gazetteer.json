@@ -1,0 +1,1598 @@
+[
+{
+"name": "Stanton",
+"state": "TX",
+"lat": 32.1293,
+"lon": -101.7885,
+"kind": "place"
+},
+{
+"name": "Lenorah",
+"state": "TX",
+"lat": 32.3043,
+"lon": -101.8807,
+"kind": "place"
+},
+{
+"name": "Midland",
+"state": "TX",
+"lat": 31.9973,
+"lon": -102.0779,
+"kind": "place"
+},
+{
+"name": "Odessa",
+"state": "TX",
+"lat": 31.8457,
+"lon": -102.3676,
+"kind": "place"
+},
+{
+"name": "Big Spring",
+"state": "TX",
+"lat": 32.2504,
+"lon": -101.4787,
+"kind": "place"
+},
+{
+"name": "Lamesa",
+"state": "TX",
+"lat": 32.7376,
+"lon": -101.951,
+"kind": "place"
+},
+{
+"name": "Andrews",
+"state": "TX",
+"lat": 32.3187,
+"lon": -102.5457,
+"kind": "place"
+},
+{
+"name": "Seminole",
+"state": "TX",
+"lat": 32.719,
+"lon": -102.6449,
+"kind": "place"
+},
+{
+"name": "Denver City",
+"state": "TX",
+"lat": 32.9645,
+"lon": -102.8291,
+"kind": "place"
+},
+{
+"name": "Kermit",
+"state": "TX",
+"lat": 31.8576,
+"lon": -103.0927,
+"kind": "place"
+},
+{
+"name": "Monahans",
+"state": "TX",
+"lat": 31.5943,
+"lon": -102.8927,
+"kind": "place"
+},
+{
+"name": "Pecos",
+"state": "TX",
+"lat": 31.4229,
+"lon": -103.4932,
+"kind": "place"
+},
+{
+"name": "Fort Stockton",
+"state": "TX",
+"lat": 30.894,
+"lon": -102.8793,
+"kind": "place"
+},
+{
+"name": "Crane",
+"state": "TX",
+"lat": 31.3974,
+"lon": -102.3501,
+"kind": "place"
+},
+{
+"name": "McCamey",
+"state": "TX",
+"lat": 31.1343,
+"lon": -102.2213,
+"kind": "place"
+},
+{
+"name": "Rankin",
+"state": "TX",
+"lat": 31.2226,
+"lon": -101.9379,
+"kind": "place"
+},
+{
+"name": "Big Lake",
+"state": "TX",
+"lat": 31.1915,
+"lon": -101.4604,
+"kind": "place"
+},
+{
+"name": "Garden City",
+"state": "TX",
+"lat": 31.864,
+"lon": -101.4812,
+"kind": "place"
+},
+{
+"name": "Sterling City",
+"state": "TX",
+"lat": 31.836,
+"lon": -100.9848,
+"kind": "place"
+},
+{
+"name": "Colorado City",
+"state": "TX",
+"lat": 32.3882,
+"lon": -100.8645,
+"kind": "place"
+},
+{
+"name": "Snyder",
+"state": "TX",
+"lat": 32.7179,
+"lon": -100.9176,
+"kind": "place"
+},
+{
+"name": "Post",
+"state": "TX",
+"lat": 33.1912,
+"lon": -101.379,
+"kind": "place"
+},
+{
+"name": "Tahoka",
+"state": "TX",
+"lat": 33.1668,
+"lon": -101.7963,
+"kind": "place"
+},
+{
+"name": "Brownfield",
+"state": "TX",
+"lat": 33.1812,
+"lon": -102.2744,
+"kind": "place"
+},
+{
+"name": "Lubbock",
+"state": "TX",
+"lat": 33.5779,
+"lon": -101.8552,
+"kind": "place"
+},
+{
+"name": "Levelland",
+"state": "TX",
+"lat": 33.5873,
+"lon": -102.378,
+"kind": "place"
+},
+{
+"name": "Plainview",
+"state": "TX",
+"lat": 34.1848,
+"lon": -101.7068,
+"kind": "place"
+},
+{
+"name": "Amarillo",
+"state": "TX",
+"lat": 35.222,
+"lon": -101.8313,
+"kind": "place"
+},
+{
+"name": "Sweetwater",
+"state": "TX",
+"lat": 32.4709,
+"lon": -100.4059,
+"kind": "place"
+},
+{
+"name": "Abilene",
+"state": "TX",
+"lat": 32.4487,
+"lon": -99.7331,
+"kind": "place"
+},
+{
+"name": "San Angelo",
+"state": "TX",
+"lat": 31.4638,
+"lon": -100.437,
+"kind": "place"
+},
+{
+"name": "Robert Lee",
+"state": "TX",
+"lat": 31.8926,
+"lon": -100.4848,
+"kind": "place"
+},
+{
+"name": "Bronte",
+"state": "TX",
+"lat": 31.8829,
+"lon": -100.2945,
+"kind": "place"
+},
+{
+"name": "Merkel",
+"state": "TX",
+"lat": 32.4712,
+"lon": -100.0126,
+"kind": "place"
+},
+{
+"name": "Winters",
+"state": "TX",
+"lat": 31.9588,
+"lon": -99.962,
+"kind": "place"
+},
+{
+"name": "Ballinger",
+"state": "TX",
+"lat": 31.7382,
+"lon": -99.9473,
+"kind": "place"
+},
+{
+"name": "Ozona",
+"state": "TX",
+"lat": 30.7102,
+"lon": -101.2007,
+"kind": "place"
+},
+{
+"name": "Sonora",
+"state": "TX",
+"lat": 30.5669,
+"lon": -100.6434,
+"kind": "place"
+},
+{
+"name": "Iraan",
+"state": "TX",
+"lat": 30.9141,
+"lon": -101.8979,
+"kind": "place"
+},
+{
+"name": "Mentone",
+"state": "TX",
+"lat": 31.7049,
+"lon": -103.5991,
+"kind": "place"
+},
+{
+"name": "Orla",
+"state": "TX",
+"lat": 31.8254,
+"lon": -103.9102,
+"kind": "place"
+},
+{
+"name": "Toyah",
+"state": "TX",
+"lat": 31.3132,
+"lon": -103.7944,
+"kind": "place"
+},
+{
+"name": "Balmorhea",
+"state": "TX",
+"lat": 30.9843,
+"lon": -103.7446,
+"kind": "place"
+},
+{
+"name": "Alpine",
+"state": "TX",
+"lat": 30.3585,
+"lon": -103.661,
+"kind": "place"
+},
+{
+"name": "Fort Davis",
+"state": "TX",
+"lat": 30.5882,
+"lon": -103.8946,
+"kind": "place"
+},
+{
+"name": "Marfa",
+"state": "TX",
+"lat": 30.3094,
+"lon": -104.0206,
+"kind": "place"
+},
+{
+"name": "Van Horn",
+"state": "TX",
+"lat": 31.0399,
+"lon": -104.8308,
+"kind": "place"
+},
+{
+"name": "El Paso",
+"state": "TX",
+"lat": 31.7619,
+"lon": -106.485,
+"kind": "place"
+},
+{
+"name": "Wink",
+"state": "TX",
+"lat": 31.7521,
+"lon": -103.1582,
+"kind": "place"
+},
+{
+"name": "Goldsmith",
+"state": "TX",
+"lat": 31.9829,
+"lon": -102.6149,
+"kind": "place"
+},
+{
+"name": "Gardendale",
+"state": "TX",
+"lat": 32.0299,
+"lon": -102.3801,
+"kind": "place"
+},
+{
+"name": "Greenwood",
+"state": "TX",
+"lat": 31.9951,
+"lon": -101.9471,
+"kind": "place"
+},
+{
+"name": "Ackerly",
+"state": "TX",
+"lat": 32.5273,
+"lon": -101.7163,
+"kind": "place"
+},
+{
+"name": "Knott",
+"state": "TX",
+"lat": 32.4012,
+"lon": -101.6385,
+"kind": "place"
+},
+{
+"name": "Coahoma",
+"state": "TX",
+"lat": 32.2946,
+"lon": -101.3048,
+"kind": "place"
+},
+{
+"name": "Forsan",
+"state": "TX",
+"lat": 32.1082,
+"lon": -101.3668,
+"kind": "place"
+},
+{
+"name": "Westbrook",
+"state": "TX",
+"lat": 32.3562,
+"lon": -101.0137,
+"kind": "place"
+},
+{
+"name": "Loraine",
+"state": "TX",
+"lat": 32.4082,
+"lon": -100.7137,
+"kind": "place"
+},
+{
+"name": "Roscoe",
+"state": "TX",
+"lat": 32.4459,
+"lon": -100.5387,
+"kind": "place"
+},
+{
+"name": "Gail",
+"state": "TX",
+"lat": 32.7701,
+"lon": -101.446,
+"kind": "place"
+},
+{
+"name": "O'Donnell",
+"state": "TX",
+"lat": 32.9637,
+"lon": -101.8316,
+"kind": "place"
+},
+{
+"name": "Welch",
+"state": "TX",
+"lat": 32.9287,
+"lon": -102.1249,
+"kind": "place"
+},
+{
+"name": "Seagraves",
+"state": "TX",
+"lat": 32.9443,
+"lon": -102.5649,
+"kind": "place"
+},
+{
+"name": "Plains",
+"state": "TX",
+"lat": 33.1887,
+"lon": -102.8285,
+"kind": "place"
+},
+{
+"name": "Tatum",
+"state": "NM",
+"lat": 33.2573,
+"lon": -103.3177,
+"kind": "place"
+},
+{
+"name": "Hobbs",
+"state": "NM",
+"lat": 32.7026,
+"lon": -103.136,
+"kind": "place"
+},
+{
+"name": "Lovington",
+"state": "NM",
+"lat": 32.944,
+"lon": -103.3486,
+"kind": "place"
+},
+{
+"name": "Eunice",
+"state": "NM",
+"lat": 32.4368,
+"lon": -103.1591,
+"kind": "place"
+},
+{
+"name": "Jal",
+"state": "NM",
+"lat": 32.1132,
+"lon": -103.1936,
+"kind": "place"
+},
+{
+"name": "Carlsbad",
+"state": "NM",
+"lat": 32.4207,
+"lon": -104.2288,
+"kind": "place"
+},
+{
+"name": "Artesia",
+"state": "NM",
+"lat": 32.8423,
+"lon": -104.4033,
+"kind": "place"
+},
+{
+"name": "Loving",
+"state": "NM",
+"lat": 32.2865,
+"lon": -104.0955,
+"kind": "place"
+},
+{
+"name": "Roswell",
+"state": "NM",
+"lat": 33.3943,
+"lon": -104.523,
+"kind": "place"
+},
+{
+"name": "Dallas",
+"state": "TX",
+"lat": 32.7767,
+"lon": -96.797,
+"kind": "place"
+},
+{
+"name": "Fort Worth",
+"state": "TX",
+"lat": 32.7555,
+"lon": -97.3308,
+"kind": "place"
+},
+{
+"name": "Houston",
+"state": "TX",
+"lat": 29.7604,
+"lon": -95.3698,
+"kind": "place"
+},
+{
+"name": "San Antonio",
+"state": "TX",
+"lat": 29.4241,
+"lon": -98.4936,
+"kind": "place"
+},
+{
+"name": "Austin",
+"state": "TX",
+"lat": 30.2672,
+"lon": -97.7431,
+"kind": "place"
+},
+{
+"name": "Corpus Christi",
+"state": "TX",
+"lat": 27.8006,
+"lon": -97.3964,
+"kind": "place"
+},
+{
+"name": "Laredo",
+"state": "TX",
+"lat": 27.5306,
+"lon": -99.4803,
+"kind": "place"
+},
+{
+"name": "Brownsville",
+"state": "TX",
+"lat": 25.9017,
+"lon": -97.4975,
+"kind": "place"
+},
+{
+"name": "McAllen",
+"state": "TX",
+"lat": 26.2034,
+"lon": -98.23,
+"kind": "place"
+},
+{
+"name": "Beaumont",
+"state": "TX",
+"lat": 30.0802,
+"lon": -94.1266,
+"kind": "place"
+},
+{
+"name": "Port Arthur",
+"state": "TX",
+"lat": 29.885,
+"lon": -93.9399,
+"kind": "place"
+},
+{
+"name": "Baytown",
+"state": "TX",
+"lat": 29.7355,
+"lon": -94.9774,
+"kind": "place"
+},
+{
+"name": "Pasadena",
+"state": "TX",
+"lat": 29.6911,
+"lon": -95.2091,
+"kind": "place"
+},
+{
+"name": "Texas City",
+"state": "TX",
+"lat": 29.3838,
+"lon": -94.9027,
+"kind": "place"
+},
+{
+"name": "Freeport",
+"state": "TX",
+"lat": 28.9541,
+"lon": -95.3597,
+"kind": "place"
+},
+{
+"name": "Victoria",
+"state": "TX",
+"lat": 28.8053,
+"lon": -97.0036,
+"kind": "place"
+},
+{
+"name": "Waco",
+"state": "TX",
+"lat": 31.5493,
+"lon": -97.1467,
+"kind": "place"
+},
+{
+"name": "Killeen",
+"state": "TX",
+"lat": 31.1171,
+"lon": -97.7278,
+"kind": "place"
+},
+{
+"name": "Temple",
+"state": "TX",
+"lat": 31.0982,
+"lon": -97.3428,
+"kind": "place"
+},
+{
+"name": "Bryan",
+"state": "TX",
+"lat": 30.6744,
+"lon": -96.3698,
+"kind": "place"
+},
+{
+"name": "College Station",
+"state": "TX",
+"lat": 30.628,
+"lon": -96.3344,
+"kind": "place"
+},
+{
+"name": "Tyler",
+"state": "TX",
+"lat": 32.3513,
+"lon": -95.3011,
+"kind": "place"
+},
+{
+"name": "Longview",
+"state": "TX",
+"lat": 32.5007,
+"lon": -94.7405,
+"kind": "place"
+},
+{
+"name": "Texarkana",
+"state": "TX",
+"lat": 33.4251,
+"lon": -94.0477,
+"kind": "place"
+},
+{
+"name": "Wichita Falls",
+"state": "TX",
+"lat": 33.9137,
+"lon": -98.4934,
+"kind": "place"
+},
+{
+"name": "Denton",
+"state": "TX",
+"lat": 33.2148,
+"lon": -97.1331,
+"kind": "place"
+},
+{
+"name": "Arlington",
+"state": "TX",
+"lat": 32.7357,
+"lon": -97.1081,
+"kind": "place"
+},
+{
+"name": "Plano",
+"state": "TX",
+"lat": 33.0198,
+"lon": -96.6989,
+"kind": "place"
+},
+{
+"name": "Irving",
+"state": "TX",
+"lat": 32.814,
+"lon": -96.9489,
+"kind": "place"
+},
+{
+"name": "Garland",
+"state": "TX",
+"lat": 32.9126,
+"lon": -96.6389,
+"kind": "place"
+},
+{
+"name": "Sherman",
+"state": "TX",
+"lat": 33.6357,
+"lon": -96.6089,
+"kind": "place"
+},
+{
+"name": "Kilgore",
+"state": "TX",
+"lat": 32.3863,
+"lon": -94.8758,
+"kind": "place"
+},
+{
+"name": "Nacogdoches",
+"state": "TX",
+"lat": 31.6035,
+"lon": -94.6555,
+"kind": "place"
+},
+{
+"name": "Lufkin",
+"state": "TX",
+"lat": 31.3382,
+"lon": -94.7291,
+"kind": "place"
+},
+{
+"name": "Huntsville",
+"state": "TX",
+"lat": 30.7235,
+"lon": -95.5508,
+"kind": "place"
+},
+{
+"name": "Conroe",
+"state": "TX",
+"lat": 30.3119,
+"lon": -95.4561,
+"kind": "place"
+},
+{
+"name": "The Woodlands",
+"state": "TX",
+"lat": 30.1658,
+"lon": -95.4613,
+"kind": "place"
+},
+{
+"name": "Sugar Land",
+"state": "TX",
+"lat": 29.6197,
+"lon": -95.6349,
+"kind": "place"
+},
+{
+"name": "Katy",
+"state": "TX",
+"lat": 29.7858,
+"lon": -95.8245,
+"kind": "place"
+},
+{
+"name": "Galveston",
+"state": "TX",
+"lat": 29.3013,
+"lon": -94.7977,
+"kind": "place"
+},
+{
+"name": "Del Rio",
+"state": "TX",
+"lat": 29.3627,
+"lon": -100.8968,
+"kind": "place"
+},
+{
+"name": "Eagle Pass",
+"state": "TX",
+"lat": 28.7091,
+"lon": -100.4995,
+"kind": "place"
+},
+{
+"name": "Uvalde",
+"state": "TX",
+"lat": 29.2097,
+"lon": -99.7862,
+"kind": "place"
+},
+{
+"name": "Kerrville",
+"state": "TX",
+"lat": 30.0474,
+"lon": -99.1403,
+"kind": "place"
+},
+{
+"name": "Fredericksburg",
+"state": "TX",
+"lat": 30.2752,
+"lon": -98.872,
+"kind": "place"
+},
+{
+"name": "New Braunfels",
+"state": "TX",
+"lat": 29.703,
+"lon": -98.1245,
+"kind": "place"
+},
+{
+"name": "San Marcos",
+"state": "TX",
+"lat": 29.8833,
+"lon": -97.9414,
+"kind": "place"
+},
+{
+"name": "Seguin",
+"state": "TX",
+"lat": 29.5688,
+"lon": -97.9647,
+"kind": "place"
+},
+{
+"name": "Cotulla",
+"state": "TX",
+"lat": 28.4369,
+"lon": -99.235,
+"kind": "place"
+},
+{
+"name": "Carrizo Springs",
+"state": "TX",
+"lat": 28.5219,
+"lon": -99.8606,
+"kind": "place"
+},
+{
+"name": "Pleasanton",
+"state": "TX",
+"lat": 28.9672,
+"lon": -98.4786,
+"kind": "place"
+},
+{
+"name": "Karnes City",
+"state": "TX",
+"lat": 28.885,
+"lon": -97.9008,
+"kind": "place"
+},
+{
+"name": "Kenedy",
+"state": "TX",
+"lat": 28.8191,
+"lon": -97.8486,
+"kind": "place"
+},
+{
+"name": "Beeville",
+"state": "TX",
+"lat": 28.4009,
+"lon": -97.7483,
+"kind": "place"
+},
+{
+"name": "Alice",
+"state": "TX",
+"lat": 27.7523,
+"lon": -98.0697,
+"kind": "place"
+},
+{
+"name": "Kingsville",
+"state": "TX",
+"lat": 27.5159,
+"lon": -97.8561,
+"kind": "place"
+},
+{
+"name": "Three Rivers",
+"state": "TX",
+"lat": 28.4602,
+"lon": -98.1825,
+"kind": "place"
+},
+{
+"name": "Tilden",
+"state": "TX",
+"lat": 28.4619,
+"lon": -98.5486,
+"kind": "place"
+},
+{
+"name": "Pearsall",
+"state": "TX",
+"lat": 28.8922,
+"lon": -99.095,
+"kind": "place"
+},
+{
+"name": "Dilley",
+"state": "TX",
+"lat": 28.6675,
+"lon": -99.1706,
+"kind": "place"
+},
+{
+"name": "Brenham",
+"state": "TX",
+"lat": 30.1669,
+"lon": -96.3977,
+"kind": "place"
+},
+{
+"name": "Navasota",
+"state": "TX",
+"lat": 30.388,
+"lon": -96.0878,
+"kind": "place"
+},
+{
+"name": "Palestine",
+"state": "TX",
+"lat": 31.7621,
+"lon": -95.6308,
+"kind": "place"
+},
+{
+"name": "Corsicana",
+"state": "TX",
+"lat": 32.0954,
+"lon": -96.4689,
+"kind": "place"
+},
+{
+"name": "Mineral Wells",
+"state": "TX",
+"lat": 32.8085,
+"lon": -98.1128,
+"kind": "place"
+},
+{
+"name": "Weatherford",
+"state": "TX",
+"lat": 32.7593,
+"lon": -97.7973,
+"kind": "place"
+},
+{
+"name": "Stephenville",
+"state": "TX",
+"lat": 32.2207,
+"lon": -98.2023,
+"kind": "place"
+},
+{
+"name": "Brownwood",
+"state": "TX",
+"lat": 31.7093,
+"lon": -98.9912,
+"kind": "place"
+},
+{
+"name": "Graham",
+"state": "TX",
+"lat": 33.1071,
+"lon": -98.5892,
+"kind": "place"
+},
+{
+"name": "Breckenridge",
+"state": "TX",
+"lat": 32.7557,
+"lon": -98.9023,
+"kind": "place"
+},
+{
+"name": "Childress",
+"state": "TX",
+"lat": 34.4265,
+"lon": -100.204,
+"kind": "place"
+},
+{
+"name": "Pampa",
+"state": "TX",
+"lat": 35.5362,
+"lon": -100.9599,
+"kind": "place"
+},
+{
+"name": "Borger",
+"state": "TX",
+"lat": 35.6678,
+"lon": -101.3974,
+"kind": "place"
+},
+{
+"name": "Dumas",
+"state": "TX",
+"lat": 35.8656,
+"lon": -101.9732,
+"kind": "place"
+},
+{
+"name": "Perryton",
+"state": "TX",
+"lat": 36.4,
+"lon": -100.8026,
+"kind": "place"
+},
+{
+"name": "Hereford",
+"state": "TX",
+"lat": 34.8153,
+"lon": -102.3977,
+"kind": "place"
+},
+{
+"name": "Canyon",
+"state": "TX",
+"lat": 34.9803,
+"lon": -101.9188,
+"kind": "place"
+},
+{
+"name": "Dalhart",
+"state": "TX",
+"lat": 36.0595,
+"lon": -102.5132,
+"kind": "place"
+},
+{
+"name": "Guthrie",
+"state": "TX",
+"lat": 33.6206,
+"lon": -100.3226,
+"kind": "place"
+},
+{
+"name": "Jayton",
+"state": "TX",
+"lat": 33.2484,
+"lon": -100.5743,
+"kind": "place"
+},
+{
+"name": "Aspermont",
+"state": "TX",
+"lat": 33.1337,
+"lon": -100.2276,
+"kind": "place"
+},
+{
+"name": "Rotan",
+"state": "TX",
+"lat": 32.8515,
+"lon": -100.4648,
+"kind": "place"
+},
+{
+"name": "Hermleigh",
+"state": "TX",
+"lat": 32.6357,
+"lon": -100.7657,
+"kind": "place"
+},
+{
+"name": "Ira",
+"state": "TX",
+"lat": 32.584,
+"lon": -101.0032,
+"kind": "place"
+},
+{
+"name": "Cuthbert",
+"state": "TX",
+"lat": 32.6107,
+"lon": -101.2076,
+"kind": "place"
+},
+{
+"name": "Oklahoma City",
+"state": "OK",
+"lat": 35.4676,
+"lon": -97.5164,
+"kind": "place"
+},
+{
+"name": "Tulsa",
+"state": "OK",
+"lat": 36.154,
+"lon": -95.9928,
+"kind": "place"
+},
+{
+"name": "Albuquerque",
+"state": "NM",
+"lat": 35.0844,
+"lon": -106.6504,
+"kind": "place"
+},
+{
+"name": "Santa Fe",
+"state": "NM",
+"lat": 35.687,
+"lon": -105.9378,
+"kind": "place"
+},
+{
+"name": "Denver",
+"state": "CO",
+"lat": 39.7392,
+"lon": -104.9903,
+"kind": "place"
+},
+{
+"name": "Bismarck",
+"state": "ND",
+"lat": 46.8083,
+"lon": -100.7837,
+"kind": "place"
+},
+{
+"name": "Williston",
+"state": "ND",
+"lat": 48.147,
+"lon": -103.618,
+"kind": "place"
+},
+{
+"name": "Watford City",
+"state": "ND",
+"lat": 47.8022,
+"lon": -103.2833,
+"kind": "place"
+},
+{
+"name": "Cheyenne",
+"state": "WY",
+"lat": 41.14,
+"lon": -104.8202,
+"kind": "place"
+},
+{
+"name": "Casper",
+"state": "WY",
+"lat": 42.8666,
+"lon": -106.3131,
+"kind": "place"
+},
+{
+"name": "Salt Lake City",
+"state": "UT",
+"lat": 40.7608,
+"lon": -111.891,
+"kind": "place"
+},
+{
+"name": "Vernal",
+"state": "UT",
+"lat": 40.4555,
+"lon": -109.5287,
+"kind": "place"
+},
+{
+"name": "Phoenix",
+"state": "AZ",
+"lat": 33.4484,
+"lon": -112.074,
+"kind": "place"
+},
+{
+"name": "Los Angeles",
+"state": "CA",
+"lat": 34.0522,
+"lon": -118.2437,
+"kind": "place"
+},
+{
+"name": "Bakersfield",
+"state": "CA",
+"lat": 35.3733,
+"lon": -119.0187,
+"kind": "place"
+},
+{
+"name": "San Francisco",
+"state": "CA",
+"lat": 37.7749,
+"lon": -122.4194,
+"kind": "place"
+},
+{
+"name": "Sacramento",
+"state": "CA",
+"lat": 38.5816,
+"lon": -121.4944,
+"kind": "place"
+},
+{
+"name": "Seattle",
+"state": "WA",
+"lat": 47.6062,
+"lon": -122.3321,
+"kind": "place"
+},
+{
+"name": "Portland",
+"state": "OR",
+"lat": 45.5152,
+"lon": -122.6784,
+"kind": "place"
+},
+{
+"name": "Boise",
+"state": "ID",
+"lat": 43.615,
+"lon": -116.2023,
+"kind": "place"
+},
+{
+"name": "Las Vegas",
+"state": "NV",
+"lat": 36.1699,
+"lon": -115.1398,
+"kind": "place"
+},
+{
+"name": "Kansas City",
+"state": "MO",
+"lat": 39.0997,
+"lon": -94.5786,
+"kind": "place"
+},
+{
+"name": "St. Louis",
+"state": "MO",
+"lat": 38.627,
+"lon": -90.1994,
+"kind": "place"
+},
+{
+"name": "Wichita",
+"state": "KS",
+"lat": 37.6872,
+"lon": -97.3301,
+"kind": "place"
+},
+{
+"name": "Omaha",
+"state": "NE",
+"lat": 41.2565,
+"lon": -95.9345,
+"kind": "place"
+},
+{
+"name": "Minneapolis",
+"state": "MN",
+"lat": 44.9778,
+"lon": -93.265,
+"kind": "place"
+},
+{
+"name": "Chicago",
+"state": "IL",
+"lat": 41.8781,
+"lon": -87.6298,
+"kind": "place"
+},
+{
+"name": "Detroit",
+"state": "MI",
+"lat": 42.3314,
+"lon": -83.0458,
+"kind": "place"
+},
+{
+"name": "Indianapolis",
+"state": "IN",
+"lat": 39.7684,
+"lon": -86.1581,
+"kind": "place"
+},
+{
+"name": "Columbus",
+"state": "OH",
+"lat": 39.9612,
+"lon": -82.9988,
+"kind": "place"
+},
+{
+"name": "Pittsburgh",
+"state": "PA",
+"lat": 40.4406,
+"lon": -79.9959,
+"kind": "place"
+},
+{
+"name": "Philadelphia",
+"state": "PA",
+"lat": 39.9526,
+"lon": -75.1652,
+"kind": "place"
+},
+{
+"name": "New York",
+"state": "NY",
+"lat": 40.7128,
+"lon": -74.006,
+"kind": "place"
+},
+{
+"name": "Boston",
+"state": "MA",
+"lat": 42.3601,
+"lon": -71.0589,
+"kind": "place"
+},
+{
+"name": "Washington",
+"state": "DC",
+"lat": 38.9072,
+"lon": -77.0369,
+"kind": "place"
+},
+{
+"name": "Baltimore",
+"state": "MD",
+"lat": 39.2904,
+"lon": -76.6122,
+"kind": "place"
+},
+{
+"name": "Charleston",
+"state": "WV",
+"lat": 38.3498,
+"lon": -81.6326,
+"kind": "place"
+},
+{
+"name": "Atlanta",
+"state": "GA",
+"lat": 33.749,
+"lon": -84.388,
+"kind": "place"
+},
+{
+"name": "Nashville",
+"state": "TN",
+"lat": 36.1627,
+"lon": -86.7816,
+"kind": "place"
+},
+{
+"name": "Memphis",
+"state": "TN",
+"lat": 35.1495,
+"lon": -90.049,
+"kind": "place"
+},
+{
+"name": "Birmingham",
+"state": "AL",
+"lat": 33.5186,
+"lon": -86.8104,
+"kind": "place"
+},
+{
+"name": "Jackson",
+"state": "MS",
+"lat": 32.2988,
+"lon": -90.1848,
+"kind": "place"
+},
+{
+"name": "New Orleans",
+"state": "LA",
+"lat": 29.9511,
+"lon": -90.0715,
+"kind": "place"
+},
+{
+"name": "Baton Rouge",
+"state": "LA",
+"lat": 30.4515,
+"lon": -91.1871,
+"kind": "place"
+},
+{
+"name": "Lake Charles",
+"state": "LA",
+"lat": 30.2266,
+"lon": -93.2174,
+"kind": "place"
+},
+{
+"name": "Shreveport",
+"state": "LA",
+"lat": 32.5252,
+"lon": -93.7502,
+"kind": "place"
+},
+{
+"name": "Little Rock",
+"state": "AR",
+"lat": 34.7465,
+"lon": -92.2896,
+"kind": "place"
+},
+{
+"name": "Miami",
+"state": "FL",
+"lat": 25.7617,
+"lon": -80.1918,
+"kind": "place"
+},
+{
+"name": "Tampa",
+"state": "FL",
+"lat": 27.9506,
+"lon": -82.4572,
+"kind": "place"
+},
+{
+"name": "Orlando",
+"state": "FL",
+"lat": 28.5383,
+"lon": -81.3792,
+"kind": "place"
+},
+{
+"name": "Charlotte",
+"state": "NC",
+"lat": 35.2271,
+"lon": -80.8431,
+"kind": "place"
+},
+{
+"name": "Raleigh",
+"state": "NC",
+"lat": 35.7796,
+"lon": -78.6382,
+"kind": "place"
+},
+{
+"name": "Martin County",
+"state": "TX",
+"lat": 32.306,
+"lon": -101.951,
+"kind": "county"
+},
+{
+"name": "Midland County",
+"state": "TX",
+"lat": 31.869,
+"lon": -102.031,
+"kind": "county"
+},
+{
+"name": "Ector County",
+"state": "TX",
+"lat": 31.869,
+"lon": -102.543,
+"kind": "county"
+},
+{
+"name": "Howard County",
+"state": "TX",
+"lat": 32.306,
+"lon": -101.435,
+"kind": "county"
+},
+{
+"name": "Reeves County",
+"state": "TX",
+"lat": 31.323,
+"lon": -103.693,
+"kind": "county"
+},
+{
+"name": "Coke County",
+"state": "TX",
+"lat": 31.888,
+"lon": -100.53,
+"kind": "county"
+},
+{
+"name": "Loving County",
+"state": "TX",
+"lat": 31.849,
+"lon": -103.58,
+"kind": "county"
+},
+{
+"name": "Ward County",
+"state": "TX",
+"lat": 31.509,
+"lon": -103.102,
+"kind": "county"
+},
+{
+"name": "Winkler County",
+"state": "TX",
+"lat": 31.85,
+"lon": -103.048,
+"kind": "county"
+},
+{
+"name": "Andrews County",
+"state": "TX",
+"lat": 32.305,
+"lon": -102.638,
+"kind": "county"
+},
+{
+"name": "Upton County",
+"state": "TX",
+"lat": 31.369,
+"lon": -102.043,
+"kind": "county"
+},
+{
+"name": "Reagan County",
+"state": "TX",
+"lat": 31.366,
+"lon": -101.523,
+"kind": "county"
+},
+{
+"name": "Glasscock County",
+"state": "TX",
+"lat": 31.87,
+"lon": -101.521,
+"kind": "county"
+},
+{
+"name": "Dawson County",
+"state": "TX",
+"lat": 32.743,
+"lon": -101.948,
+"kind": "county"
+},
+{
+"name": "Pecos County",
+"state": "TX",
+"lat": 30.781,
+"lon": -102.724,
+"kind": "county"
+},
+{
+"name": "Culberson County",
+"state": "TX",
+"lat": 31.447,
+"lon": -104.527,
+"kind": "county"
+},
+{
+"name": "Lea County",
+"state": "NM",
+"lat": 32.792,
+"lon": -103.413,
+"kind": "county"
+},
+{
+"name": "Eddy County",
+"state": "NM",
+"lat": 32.472,
+"lon": -104.304,
+"kind": "county"
+}
+]

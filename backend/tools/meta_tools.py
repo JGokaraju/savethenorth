@@ -66,7 +66,7 @@ def list_available_data(st: RunState, facility_id: str) -> dict:
     if not f:
         raise DataGap(f"unknown facility '{facility_id}'")
     if f.get("data_status") != "cached":
-        raise DataGap("no cached observations for this facility", data={"facility": f["name"]})
+        raise DataGap(f"no cached observations for this facility ({f['name']})")
     m = load_manifest()["slots"]
     rows = []
     for sid, r in m.items():

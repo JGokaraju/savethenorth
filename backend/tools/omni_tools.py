@@ -59,13 +59,21 @@ def _mock_chart(chart_id: str, s: dict) -> str:
         return (p + "Winds are light-to-moderate and steady through the day, with speeds changing little around the "
                 "overpass line and direction consistently from the south to south-south-west.")
     if chart_id == "flare_timeline":
-        return (p + f"Panel (a) shows sporadic low-FRP detections through the period, mostly at night; there is a detection "
-                f"within about a day before the overpass line and another a few hours after it, so a flare appears to have "
-                f"been burning around the overpass. Panel (b) shows the attributed detections clustered inside the 1.5 km "
-                f"circle around the facility, with other detections scattered elsewhere in the box.")
+        b, a = s.get("nearest_before_overpass") or {}, s.get("nearest_after_overpass") or {}
+        timing = (f"the closest detections are about {abs(b['gap_hours']):.0f} h before" if b else "no detection precedes") +                  (f" and {a['gap_hours']:.0f} h after the overpass line" if a else " the overpass, and none follows it")
+        verdict = ("a flare appears to have been burning around the overpass" if s.get("flare_observed_near_overpass")
+                   else "no flare activity is visible close to the overpass")
+        return (p + f"Panel (a) shows {s.get('n_near_facility', 0)} low-FRP detections ({s.get('n_night', 0)} at night); "
+                f"{timing}, so {verdict}. Panel (b) shows the attributed detections clustered inside the 1.5 km circle "
+                f"around the facility marker, with other detections scattered elsewhere in the box.")
     if chart_id == "reporting_timeline":
-        return (p + "The red satellite detection in August 2025 has no blue STEERS reported-event bar at or near the same "
-                "date; the reported events on the chart fall months earlier and later.")
+        dets = [d for d, _ in s.get("detections", [])]
+        incs = s.get("steers_incidents", [])
+        near = [i for i, sd in incs for d in dets if abs((pd.Timestamp(sd[:10]) - pd.Timestamp(d)).days) <= 1]
+        return (p + f"The red satellite detection markers ({', '.join(dets) or 'none'}) "
+                + (f"coincide with blue STEERS event(s) {', '.join(near)}." if near else
+                   f"have no blue STEERS reported-event bar at or near the same dates; the reported events "
+                   f"({', '.join(i for i, _ in incs)}) fall at other times."))
     if chart_id == "regulatory_comparison":
         return (p + "On the log axis, the estimate bar (with its error bar) extends far beyond the red threshold bar, and "
                 "remains well short of the grey plant-capacity ceiling bar.")
@@ -104,7 +112,7 @@ def analyze_chart(st: RunState, chart_id: str, question: str) -> dict:
     if art is None or chart_id not in st.charts:
         raise DataGap(f"chart '{chart_id}' has not been produced in this run yet")
     if not art.png_path:
-        raise DataGap(f"chart '{chart_id}' has no PNG export (kaleido unavailable)")
+        raise DataGap(f"chart '{chart_id}' has no PNG export (PNG snapshot failed)")
     png = ROOT / art.png_path
     sent = st.evidence_dir / f"omni_{chart_id}.png"
     sent.write_bytes(png.read_bytes())
@@ -165,29 +173,40 @@ def analyze_image(st: RunState, image_id: str, question: str) -> dict:
                "bounds_method": bounds.get("method")}, [], [image_id, eid], [], warnings, used)
 
 
-_DEFAULT_KEYWORDS = {"tceq_sob": ["capacity", "MMSCF", "flare", "FL-35", "Subpart", "OOOO", "KKKK"]}
+# keyword -> weight; rare decisive terms (the capacity statement) outweigh frequent ones
+_DEFAULT_KEYWORDS = {"tceq_sob": {"MMSCF": 10, "capacity": 1, "flare": 1, "FL-35": 2, "Subpart": 1, "OOOO": 1, "KKKK": 1}}
 
 
 def _pick_pages(texts: list[str], question: str, doc_id: str, n: int = 3) -> list[int]:
     words = [w for w in re.findall(r"[A-Za-z0-9\-]{4,}", question) if w.lower() not in
              {"extract", "list", "with", "json", "from", "that", "this", "applicable", "dates", "rules", "federal"}]
-    kws = list(dict.fromkeys(_DEFAULT_KEYWORDS.get(doc_id, []) + words))
-    scores = [sum(len(re.findall(re.escape(k), t, re.I)) for k in kws) for t in texts]
+    kws = {**{w: 1 for w in words}, **_DEFAULT_KEYWORDS.get(doc_id, {})}
+    scores = [sum(wt * len(re.findall(re.escape(k), t, re.I)) for k, wt in kws.items()) for t in texts]
     order = sorted(range(len(texts)), key=lambda i: (-scores[i], i))
     return sorted(i + 1 for i in order[:n] if scores[i] > 0) or [1]
 
 
 def _steers_table_png(st: RunState) -> tuple[bytes, pd.DataFrame]:
-    import plotly.graph_objects as go
+    """Render the STEERS rows as a table image (matplotlib; no browser needed)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
     rec = slot("tceq_steers")
     df = pd.read_csv(rec["path"])
     cols = ["INCIDENT NO.", "RE NAME", "START DATE/TIME", "END DATE/TIME", "EVENT TYPE", "EPN", "CONTAMINANT",
             "EST QUANTITY/OPACITY", "UNITS"]
     df = df[[c for c in cols if c in df]]
-    fig = go.Figure(go.Table(header=dict(values=list(df.columns), fill_color="#dddddd", font=dict(size=12)),
-                             cells=dict(values=[df[c].astype(str) for c in df.columns], font=dict(size=12), height=26)))
-    fig.update_layout(width=1400, height=160 + 30 * len(df), margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="white")
-    return fig.to_image(format="png"), df
+    fig, ax = plt.subplots(figsize=(14, 1.2 + 0.4 * len(df)), dpi=100)
+    ax.axis("off")
+    tbl = ax.table(cellText=df.astype(str).values, colLabels=list(df.columns), loc="center", cellLoc="left")
+    tbl.auto_set_font_size(False); tbl.set_fontsize(10); tbl.scale(1, 1.6)
+    for (r, _), cell in tbl.get_celld().items():
+        if r == 0:
+            cell.set_facecolor("#dddddd"); cell.set_text_props(weight="bold")
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    return buf.getvalue(), df
 
 
 def read_document(st: RunState, doc_id: str, question: str, pages: list[int] | None = None) -> dict:
@@ -211,7 +230,7 @@ def read_document(st: RunState, doc_id: str, question: str, pages: list[int] | N
                       "return an empty JSON object {}.")
             res = omni.ask(prompt, image_bytes=img, mock_text=_mock_doc(doc_id, {pno: texts[pno - 1]}, question))
             answers.append({"page": pno, **res})
-        kw = _DEFAULT_KEYWORDS.get(doc_id, [])
+        kw = list(_DEFAULT_KEYWORDS.get(doc_id, {}))
         snip = {p: [ln.strip() for ln in t.splitlines() if any(k.lower() in ln.lower() for k in kw) and ln.strip()][:8]
                 for p, t in snippets.items()}
         pd.DataFrame([{"page": p, "snippet": s} for p, ss in snip.items() for s in ss]).to_csv(
