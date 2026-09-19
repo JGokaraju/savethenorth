@@ -1,16 +1,19 @@
 import { ReactNode } from "react";
 import { RunMode } from "../lib/mode";
 
-/** Solid rectangular status tags (government-service style); never colour alone — the text carries the meaning. */
+/** Status tags: tinted, uppercase, never colour alone (the text carries the meaning). */
 const STATUS: Record<string, string> = {
-  EXCEEDS: "bg-alert-red text-white", IMPLAUSIBLE: "bg-alert-red text-white",
-  NO_MATCHING_REPORT_FOUND: "bg-alert-amber text-ink", INCONCLUSIVE: "bg-alert-amber text-ink",
-  NOT_ASSESSED: "bg-[#dfe1e2] text-ink", BELOW: "bg-[#008817] text-white", BELOW_RQ: "bg-[#008817] text-white",
-  CONSISTENT: "bg-[#008817] text-white", REPORTED: "bg-primary text-white",
+  EXCEEDS: "border-alert-red/60 bg-alert-red/15 text-alert-red", IMPLAUSIBLE: "border-alert-red/60 bg-alert-red/15 text-alert-red",
+  NO_MATCHING_REPORT_FOUND: "border-alert-amber/60 bg-alert-amber/15 text-alert-amber",
+  INCONCLUSIVE: "border-alert-amber/60 bg-alert-amber/15 text-alert-amber",
+  NOT_ASSESSED: "border-rule bg-panel2 text-muted",
+  BELOW: "border-alert-green/60 bg-alert-green/15 text-alert-green", BELOW_RQ: "border-alert-green/60 bg-alert-green/15 text-alert-green",
+  CONSISTENT: "border-alert-green/60 bg-alert-green/15 text-alert-green", REPORTED: "border-primary/60 bg-primary/15 text-primary",
 };
+
 export function StatusBadge({ status }: { status: string }) {
   return (
-    <span className={`inline-block whitespace-nowrap rounded-sm px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${STATUS[status] ?? STATUS.NOT_ASSESSED}`}>
+    <span className={`inline-block whitespace-nowrap border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${STATUS[status] ?? STATUS.NOT_ASSESSED}`}>
       {status.replace(/_/g, " ")}
     </span>
   );
@@ -18,11 +21,17 @@ export function StatusBadge({ status }: { status: string }) {
 
 type Tone = "slate" | "amber" | "red" | "sky" | "emerald" | "violet";
 const TONES: Record<Tone, string> = {
-  slate: "border-rule text-muted", amber: "border-[#c2850c] text-[#936f38]", red: "border-alert-red text-alert-red",
-  sky: "border-primary text-primary", emerald: "border-[#008817] text-[#008817]", violet: "border-[#54278f] text-[#54278f]",
+  slate: "border-rule text-muted", amber: "border-alert-amber/50 text-alert-amber", red: "border-alert-red/50 text-alert-red",
+  sky: "border-primary/50 text-primary", emerald: "border-alert-green/50 text-alert-green", violet: "border-gold/50 text-gold",
 };
+
 export function Chip({ children, tone = "slate", title }: { children: ReactNode; tone?: Tone; title?: string }) {
-  return <span title={title} className={`inline-flex items-center gap-1 rounded-sm border bg-white px-1.5 py-px text-[11px] font-semibold ${TONES[tone]}`}>{children}</span>;
+  return <span title={title} className={`inline-flex items-center gap-1 border bg-transparent px-1.5 py-px text-[11px] ${TONES[tone]}`}>{children}</span>;
+}
+
+/** Gold small-caps label with a rule, as in the template. */
+export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <p className={`eyebrow ${className}`}>{children}</p>;
 }
 
 export function Card({ title, children, right, className = "", pad = true }: {
@@ -31,8 +40,8 @@ export function Card({ title, children, right, className = "", pad = true }: {
   return (
     <section className={`panel ${className}`}>
       {title && (
-        <header className="flex items-center justify-between border-b border-rule bg-paper px-5 py-3">
-          <h3 className="text-base font-bold text-ink">{title}</h3>{right}
+        <header className="flex items-center justify-between border-b border-rule px-5 py-3">
+          <h3 className="font-display text-lg text-ink">{title}</h3>{right}
         </header>
       )}
       <div className={pad ? "p-5" : ""}>{children}</div>
@@ -44,10 +53,11 @@ export function Segmented<T extends string>({ value, options, onChange, size = "
   value: T; options: { value: T; label: ReactNode; disabled?: boolean; title?: string }[]; onChange: (v: T) => void; size?: "sm" | "md";
 }) {
   return (
-    <div className="inline-flex border border-primary" role="tablist">
+    <div className="inline-flex border border-rule" role="tablist">
       {options.map((o, i) => (
         <button key={o.value} role="tab" aria-selected={value === o.value} disabled={o.disabled} title={o.title} onClick={() => onChange(o.value)}
-          className={`font-bold transition-colors ${size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-1.5 text-sm"} ${i ? "border-l border-primary" : ""} ${value === o.value ? "bg-primary text-white" : "bg-white text-primary hover:bg-[#e7f2f8]"} disabled:cursor-not-allowed disabled:border-rule disabled:text-[#a9aeb1]`}>
+          className={`font-semibold uppercase tracking-[0.12em] transition-colors ${size === "sm" ? "px-3 py-1.5 text-[11px]" : "px-4 py-2 text-xs"} ${i ? "border-l border-rule" : ""} ${
+            value === o.value ? "bg-gold text-page" : "text-muted hover:text-ink"} disabled:cursor-not-allowed disabled:text-muted/40`}>
           {o.label}
         </button>
       ))}
@@ -68,7 +78,6 @@ export function ModeToggle({ mode, setMode, liveAvailable }: { mode: RunMode; se
   );
 }
 
-/** Brand mark: a small spinning globe (CSS only — the texture scrolls behind a shaded circular mask). */
 export function Logo({ size = 32, speed = 18 }: { size?: number; speed?: number }) {
   return (
     <span aria-hidden className="globe-mark inline-block shrink-0 select-none rounded-full"
@@ -77,11 +86,11 @@ export function Logo({ size = 32, speed = 18 }: { size?: number; speed?: number 
 }
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse bg-paper ${className}`} />;
+  return <div className={`animate-pulse bg-panel2 ${className}`} />;
 }
 
 export function Spinner({ className = "" }: { className?: string }) {
-  return <span className={`inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-rule border-t-primary ${className}`} aria-label="loading" />;
+  return <span className={`inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-rule border-t-gold ${className}`} aria-label="loading" />;
 }
 
 export function ShortHash({ hash }: { hash?: string }) {

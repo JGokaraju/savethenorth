@@ -91,7 +91,7 @@ function buildSteps(events: RunEvent[]): Step[] {
 function Icon({ status }: { status: Step["status"] }) {
   if (status === "running") return <Spinner />;
   if (status === "ok") return (
-    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-[#008817]" aria-label="done"><path fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="square" d="M3.5 8.5l3 3 6-7" /></svg>
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-alert-green" aria-label="done"><path fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="square" d="M3.5 8.5l3 3 6-7" /></svg>
   );
   if (status === "data_gap") return <span className="block h-2 w-2 bg-alert-amber" aria-label="data gap" />;
   return <span className="block h-2 w-2 bg-alert-red" aria-label="error" />;
@@ -103,10 +103,10 @@ function MediaStrip({ media, onOpen }: { media: Media[]; onOpen: (m: Media) => v
     <div className="mt-2 flex flex-wrap gap-2">
       {media.map((m) => (
         <figure key={m.src} className="fade-up">
-          <button type="button" onClick={() => onOpen(m)} className="block border border-rule bg-white p-0.5 hover:border-primary"
+          <button type="button" onClick={() => onOpen(m)} className="block border border-rule bg-panel2 p-0.5 hover:border-gold"
             aria-label={`Enlarge: ${m.caption}`}>
             <img src={m.src} alt={m.caption} loading="lazy"
-              className={`${m.kind === "page" ? "h-36 w-auto" : "h-28 w-auto max-w-[220px] object-cover"} block bg-white`} />
+              className={`${m.kind === "page" ? "h-36 w-auto" : "h-28 w-auto max-w-[220px] object-cover"} block bg-panel`} />
           </button>
           <figcaption className="mt-0.5 max-w-[220px] truncate text-[11px] text-muted">{m.caption}</figcaption>
         </figure>
@@ -135,7 +135,7 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
         <div className="flex items-center gap-3">
           {running && <Spinner className="h-4 w-4" />}
           <div>
-            <div className="text-lg font-bold text-ink">{title}</div>
+            <div className="font-display text-xl text-ink">{title}</div>
             <div className="text-sm text-muted">{running ? "The agent is working" : "Finished"} · {steps.length} steps</div>
           </div>
         </div>
@@ -145,15 +145,15 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
           const hl = !!sel?.callIds.some((c) => st.callIds.includes(c));
           const tag = SOURCE_TAG[st.name];
           return (
-            <li key={st.id} className={`fade-up relative py-1.5 pr-2 text-sm ${hl ? "bg-[#e7f2f8]" : ""}`}
+            <li key={st.id} className={`fade-up relative py-1.5 pr-2 text-sm ${hl ? "bg-panel2" : ""}`}
               style={{ animationDelay: `${Math.min(i * 10, 80)}ms` }}>
-              <span className="absolute -left-[27px] top-2 flex h-4 w-4 items-center justify-center bg-white">
+              <span className="absolute -left-[27px] top-2 flex h-4 w-4 items-center justify-center bg-page">
                 <Icon status={st.status} />
               </span>
               <div className="flex flex-wrap items-baseline gap-x-2">
                 <span className={st.status === "running" ? "font-bold text-ink" : "text-ink"}>{st.label}</span>
                 {tag && <span className="text-[10px] font-bold uppercase tracking-wide text-muted">{tag}</span>}
-                {st.status === "data_gap" && <span className="text-[11px] font-semibold text-[#936f38]">data gap</span>}
+                {st.status === "data_gap" && <span className="text-[11px] font-semibold text-alert-amber">data gap</span>}
               </div>
               <MediaStrip media={st.media} onOpen={setZoom} />
             </li>
@@ -165,8 +165,8 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
       {zoom && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-2 bg-black/80 p-6" onClick={() => setZoom(null)}
           role="dialog" aria-modal="true" aria-label={zoom.caption}>
-          <img src={zoom.src} alt={zoom.caption} className="max-h-[85vh] max-w-full border border-white bg-white" />
-          <div className="text-sm text-white">{zoom.caption} · click or press Esc to close</div>
+          <img src={zoom.src} alt={zoom.caption} className="max-h-[85vh] max-w-full border border-rule bg-panel" />
+          <div className="text-sm text-ink">{zoom.caption} · click or press Esc to close</div>
         </div>
       )}
     </div>

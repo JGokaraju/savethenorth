@@ -74,18 +74,18 @@ export default function Workspace() {
         <TopBar right={<ModeToggle mode={mode} setMode={setMode} liveAvailable={health?.live_available} />}>
           <LocationSearch className="w-full max-w-sm" initial={f?.name}
             onPick={(r) => { const id = r.facility_id ?? r.nearest_facility?.facility_id; if (id) nav(`/assess/${id}?date=${date}&autostart=0`); }} />
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input w-auto" aria-label="Event date (UTC)" />
-          <button className="btn-dark" onClick={assess} disabled={!f || busy}>{busy ? <><Spinner className="border-white/40 border-t-white" /> Assessing</> : "Assess"}</button>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input w-auto [color-scheme:dark]" aria-label="Event date (UTC)" />
+          <button className="btn-dark" onClick={assess} disabled={!f || busy}>{busy ? <><Spinner className="border-page/30 border-t-page" /> Assessing</> : "Assess"}</button>
         </TopBar>
 
         <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
           <nav className="text-sm text-muted" aria-label="Breadcrumb"><a href="/" className="link">Home</a> <span aria-hidden>›</span> Assessment</nav>
           <div className="mt-2 flex flex-wrap items-end justify-between gap-3 border-b border-rule pb-4">
             <div>
-              <h1 className="text-3xl font-extrabold text-ink">{f?.name ?? "Loading…"}</h1>
+              <h1 className="h1">{f?.name ?? "Loading…"}</h1>
               {f && <p className="mt-1 text-muted">{f.county} County, {f.state} · event date {date}</p>}
             </div>
-            <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${busy ? "bg-primary text-white" : run.status === "error" ? "bg-alert-red text-white" : "bg-rule text-ink"}`}>
+            <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${busy ? "bg-gold text-page" : run.status === "error" ? "bg-alert-red text-page" : "border border-rule text-muted"}`}>
               {busy ? "In progress" : run.status === "error" ? "Stopped" : run.status === "finished" ? "Complete" : "Not started"}
             </span>
           </div>
@@ -93,13 +93,13 @@ export default function Workspace() {
             {run.status === "idle" && f && <p className="text-muted">Select <b className="text-ink">Assess</b> to start the verification.</p>}
             {(busy || run.status === "finished") && (
               <div className="space-y-6">
-                <div className="sticky top-[76px] z-10 bg-white pb-1"><RunProgress run={run} /></div>
+                <div className="sticky top-[76px] z-10 bg-page pb-1"><RunProgress run={run} /></div>
                 <Trajectory run={run} title="Verification steps" />
               </div>
             )}
             {run.status === "error" && (
-              <div className="border-l-4 border-alert-red bg-[#f4e3db] px-4 py-3">
-                <p className="font-bold text-ink">The assessment stopped</p>
+              <div className="border-l-2 border-alert-red bg-alert-red/10 px-4 py-3">
+                <p className="font-display text-lg text-ink">The assessment stopped</p>
                 <p className="text-sm text-ink">{run.error ?? "An unexpected error occurred."}</p>
                 <button className="btn-dark mt-3" onClick={assess}>Try again</button>
               </div>

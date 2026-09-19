@@ -15,36 +15,32 @@ export function useHealth(pollMs = 8000) {
   return h;
 }
 
-/** Site header: solid navy bar with the service name. */
-export function SiteHeader({ right }: { right?: ReactNode }) {
+/** Site header. `overlay` floats it above a hero image; otherwise it sits on the page background. */
+export function SiteHeader({ right, overlay = false }: { right?: ReactNode; overlay?: boolean }) {
   return (
-    <header className="sticky top-0 z-30 bg-primary-darker text-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link to="/" className="group flex items-center gap-3" aria-label="Save the North — home">
-          <Logo size={36} />
+    <header className={overlay ? "absolute inset-x-0 top-0 z-30" : "sticky top-0 z-30 border-b border-rule bg-page/95 backdrop-blur"}>
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-5">
+        <Link to="/" className="flex items-center gap-3" aria-label="Save the North — home">
+          <Logo size={30} />
           <span className="leading-none">
-            <span className="wordmark block text-[19px] font-extrabold uppercase">Save the North</span>
-            <span className="mt-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
-              <span className="tagline-accent">Methane watch from orbit</span>
-              <span className="hidden h-3 w-px bg-white/30 sm:block" aria-hidden />
-              <span className="hidden text-[#a9c7e3] sm:block">EMIT · VIIRS · ERA5</span>
-            </span>
+            <span className="block font-display text-xl tracking-wide text-ink">Save the North</span>
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.24em] text-gold">Methane watch from orbit</span>
           </span>
         </Link>
-        {right && <div className="flex items-center gap-4 text-sm">{right}</div>}
+        <div className="flex items-center gap-5 text-[12px] font-semibold uppercase tracking-[0.16em] text-muted">{right}</div>
       </div>
     </header>
   );
 }
 
-/** Kept for existing imports: a compact bar with inline controls under the site header. */
+/** Compact controls bar under the header (assessment workspace). */
 export function TopBar({ children, right }: { children?: ReactNode; right?: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <div className="border-b border-rule bg-paper">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">{children}</div>
+      <div className="border-b border-rule bg-panel">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-6 py-4">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">{children}</div>
           {right}
         </div>
       </div>
@@ -52,27 +48,40 @@ export function TopBar({ children, right }: { children?: ReactNode; right?: Reac
   );
 }
 
-export function Brand() {
-  return <Link to="/" className="font-bold text-ink">Save the North</Link>;
-}
-
 export function Footer() {
   return (
-    <footer className="mt-10 border-t border-rule bg-paper">
-      <div className="mx-auto max-w-6xl space-y-2 px-4 py-6 text-xs leading-relaxed text-muted">
-        <p className="font-bold text-ink">Data sources</p>
-        <ul className="list-disc space-y-0.5 pl-5">
-          <li>NASA EMIT L2B Methane Enhancement v002 (doi:10.5067/EMIT/EMITL2BCH4ENH.002)</li>
-          <li>NASA FIRMS VIIRS active fire detections</li>
-          <li>Copernicus Sentinel-2 (modified Copernicus Sentinel data 2026); site imagery: Esri, Maxar, Earthstar Geographics</li>
-          <li>Open-Meteo historical weather (ERA5)</li>
-          <li>TCEQ Statement of Basis FOP O4734 and STEERS emissions-event reports</li>
-          <li>Carbon Mapper plume records (placeholder values in this build)</li>
-        </ul>
-        <p>Method: Varon et al. (2018). Rules: 40 CFR 60.5371a/b; 30 TAC 101.201, 101.1.</p>
-        <p className="font-semibold text-ink">Screening estimates only — not enforcement determinations. This is an independent prototype, not an official government service.</p>
-        <p className="flex items-center gap-2 pt-1"><img src="/logo.png" alt="" width={18} height={18} /> Built at Hack the North.</p>
+    <footer className="mt-16 border-t border-rule bg-page">
+      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 text-xs leading-relaxed text-muted sm:grid-cols-3">
+        <div>
+          <p className="label mb-3 text-gold">Data sources</p>
+          <ul className="space-y-1">
+            <li>NASA EMIT L2B methane enhancement v002</li>
+            <li>NASA FIRMS VIIRS active fire</li>
+            <li>Copernicus Sentinel-2; site imagery by Esri, Maxar</li>
+            <li>Open-Meteo / ERA5 weather</li>
+            <li>TCEQ permit and emissions-event reports</li>
+            <li>Carbon Mapper (placeholder values in this build)</li>
+          </ul>
+        </div>
+        <div>
+          <p className="label mb-3 text-gold">Method and rules</p>
+          <ul className="space-y-1">
+            <li>Varon et al. (2018), integrated mass enhancement</li>
+            <li>40 CFR 60.5371a/b — super-emitter programme</li>
+            <li>30 TAC 101.201 and 101.1 — emissions events</li>
+            <li>doi:10.5067/EMIT/EMITL2BCH4ENH.002</li>
+          </ul>
+        </div>
+        <div>
+          <p className="label mb-3 text-gold">About</p>
+          <p>Screening estimates only — not enforcement determinations. An independent prototype, not an official government service.</p>
+          <p className="mt-3 flex items-center gap-2"><img src="/logo.png" alt="" width={18} height={18} /> Built at Hack the North.</p>
+        </div>
       </div>
     </footer>
   );
+}
+
+export function Brand() {
+  return <Link to="/" className="font-display text-ink">Save the North</Link>;
 }

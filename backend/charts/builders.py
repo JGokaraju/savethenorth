@@ -57,7 +57,7 @@ def plume_map(crop, bg, masks: dict, det_by_k: dict, facility: dict, wind, k_def
                        axref="x", ayref="y", showarrow=True, arrowhead=3, arrowsize=1.4, arrowwidth=2.5, arrowcolor=INK,
                        text="")
     fig.add_annotation(x=x0, y=y0, text=f"wind {wind.u10:.1f} m/s from {wind.direction_deg:.0f}°", showarrow=False,
-                       yshift=-18, font=dict(color=INK, size=12), bgcolor="rgba(255,255,255,0.85)")
+                       yshift=-18, font=dict(color=INK, size=12), bgcolor="rgba(16,33,36,0.85)")
     steps = []
     for i, k in enumerate(ks):
         vis = [True] + [kk == k for kk in ks] + [True, True]
@@ -268,7 +268,7 @@ def regulatory_comparison(mc: dict, cm: dict | None, phys: dict | None) -> Chart
                           + "<extra></extra>"))
     fig.update_layout(title="Estimate vs. regulatory threshold and plant capacity", bargap=0.45,
                       xaxis=dict(type="log", title="Methane rate (kg/h, log scale)", range=[1.5, np.log10(max(r[1] for r in rows) * 40)]),
-                      yaxis=dict(autorange="reversed", title=""), margin=dict(l=240))
+                      yaxis=dict(autorange="reversed", title="", automargin=True), margin=dict(l=250, r=80))
     stats = {r[0]: round(r[1]) for r in rows}
     stats["times_threshold"] = round(mc["median_kg_h"] / THRESHOLD, 1)
     return save("regulatory_comparison", "Regulatory comparison", fig, stats)
@@ -317,7 +317,7 @@ def report_comparison(cmp_: dict) -> ChartArtifact:
     vmax = max([r[1] for r in rows] or [10])
     fig.update_layout(title="Satellite observation vs the operator's reported emissions", bargap=0.45,
                       xaxis=dict(type="log", title="Pounds (log scale)", range=[1, np.log10(vmax * 60)]),
-                      yaxis=dict(autorange="reversed", title=""), margin=dict(l=230, b=90))
+                      yaxis=dict(autorange="reversed", title="", automargin=True), margin=dict(l=250, r=90, b=90))
     stats = {"rows": {r[0]: round(r[1]) for r in rows}, "reported_on_event_date": len(cmp_.get("reported_on_event_date", [])),
              "methane_reported_anywhere": cmp_.get("methane_reported_anywhere")}
     return save("report_comparison", "Satellite vs technical report", fig, stats)

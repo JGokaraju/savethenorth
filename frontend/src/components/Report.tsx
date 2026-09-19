@@ -8,7 +8,7 @@ import { SiteHeader } from "./Header";
 import { MethodTab } from "./MethodTab";
 import { Plot } from "./Plot";
 import { Trajectory } from "./Trajectory";
-import { Segmented, StatusBadge } from "./ui";
+import { Eyebrow, Segmented, StatusBadge } from "./ui";
 
 const FIGURES = ["emission_distribution", "report_comparison", "flare_timeline", "regulatory_comparison"];
 const FIGURE_HEIGHT: Record<string, number> = { flare_timeline: 470 };
@@ -27,12 +27,15 @@ const SOURCE_NAMES: Record<string, string> = {
 };
 const fmt = (v: number, d = 0) => v.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
 
-function Section({ id, title, children, flush = false }: { id?: string; title?: string; children: ReactNode; flush?: boolean }) {
+function Section({ id, title, eyebrow, children, flush = false }: {
+  id?: string; title?: string; eyebrow?: string; children: ReactNode; flush?: boolean;
+}) {
   const { ref, inView } = useInView<HTMLDivElement>(0.12);
   return (
-    <section id={id} className={`mx-auto max-w-6xl scroll-mt-20 px-4 py-10 ${flush ? "" : "border-t border-rule"}`}>
+    <section id={id} className={`mx-auto max-w-6xl scroll-mt-20 px-6 py-14 ${flush ? "" : "border-t border-rule"}`}>
       <div ref={ref} className={`reveal ${inView ? "in" : ""}`}>
-        {title && <h2 className="h2 mb-5">{title}</h2>}
+        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+        {title && <h2 className="h2 mb-6 mt-3">{title}</h2>}
         {children}
       </div>
     </section>
@@ -43,19 +46,19 @@ function Section({ id, title, children, flush = false }: { id?: string; title?: 
 function ResultBanner({ v, f }: { v: Verdict; f: Facility | null }) {
   const img = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
   return (
-    <section className="relative overflow-hidden bg-primary-darker">
+    <section className="relative overflow-hidden border-b border-rule bg-page">
       {img && <img src={img} alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0b1a2e]/90 via-[#0b1a2e]/75 to-[#0b1a2e]/45" aria-hidden />
-      <div className="relative mx-auto max-w-6xl px-4 py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9fc7ee]">Screening result</p>
-        <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{v.facility_name}</h1>
-        <p className="mt-2 text-[15px] text-[#dbe5ef]">
+      <div className="absolute inset-0 bg-gradient-to-r from-page via-page/85 to-page/45" aria-hidden />
+      <div className="relative mx-auto max-w-6xl px-6 py-20">
+        <Eyebrow>Screening result</Eyebrow>
+        <h1 className="mt-4 font-display text-4xl leading-tight text-ink sm:text-6xl">{v.facility_name}</h1>
+        <p className="mt-3 text-[15px] text-muted">
           Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
           {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
         </p>
-        {v.outcome?.reason && <p className="mt-4 max-w-3xl text-lg leading-snug text-white">{v.outcome.reason}</p>}
+        {v.outcome?.reason && <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink">{v.outcome.reason}</p>}
       </div>
-      {img && <span className="absolute bottom-1 right-3 text-[10px] text-white/60">Imagery: Esri, Maxar, Earthstar Geographics</span>}
+      {img && <span className="absolute bottom-1 right-3 text-[10px] text-muted">Imagery: Esri, Maxar, Earthstar Geographics</span>}
     </section>
   );
 }
@@ -71,7 +74,7 @@ function ScaleBar({ ratio }: { ratio: number }) {
         <span className="text-muted">Federal threshold</span>
         <span className="text-alert-red">{Math.round(ratio).toLocaleString()}× over</span>
       </div>
-      <div className="relative mt-1 h-7 w-full border border-rule bg-paper">
+      <div className="relative mt-1 h-7 w-full border border-rule bg-panel2">
         <div className="absolute inset-y-0 left-0 bg-alert-red transition-[width] duration-[1200ms] ease-out" style={{ width: inView ? `${pct}%` : "0%" }} />
         {Array.from({ length: decades }, (_, i) => i + 1).map((d) => (
           <span key={d} className="absolute inset-y-0 w-px bg-ink/25" style={{ left: `${(d / decades) * 100}%` }} aria-hidden />
@@ -92,7 +95,7 @@ function Figure({ n, caption, children }: { n: number; caption: string; children
   return (
     <figure className="border border-rule">
       {children}
-      <figcaption className="border-t border-rule bg-paper px-3 py-2 text-sm"><b>Figure {n}.</b> {caption}</figcaption>
+      <figcaption className="border-t border-rule bg-panel2 px-3 py-2 text-sm"><b>Figure {n}.</b> {caption}</figcaption>
     </figure>
   );
 }
@@ -112,17 +115,17 @@ function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run
         <div>
           {core ? (
             <dl className="divide-y divide-rule border-y border-rule">
-              <button type="button" className="block w-full py-5 text-left hover:bg-paper" title="Show sources"
+              <button type="button" className="block w-full py-5 text-left hover:bg-panel" title="Show sources"
                 onClick={() => trace("Allowed", ["assumption:regulations.super_emitter_kg_h", "assumption:regulations.gwp100_ch4"])}>
                 <dt className="label">Federal threshold</dt>
-                <dd className="mt-1"><span className="text-6xl font-extrabold tracking-tight text-ink">{fmt(core.allowed.co2e_t_h, 1)}</span>
+                <dd className="mt-1"><span className="font-display text-6xl text-ink">{fmt(core.allowed.co2e_t_h, 1)}</span>
                   <span className="ml-2 text-lg text-muted">t CO₂e per hour</span></dd>
                 <dd className="text-sm text-muted">EPA super-emitter threshold, {fmt(core.allowed.ch4_kg_h)} kg CH₄ per hour</dd>
               </button>
-              <button type="button" className="block w-full py-5 text-left hover:bg-paper" title="Show sources"
+              <button type="button" className="block w-full py-5 text-left hover:bg-panel" title="Show sources"
                 onClick={() => trace("Actual", [...(me.evidence_ids ?? []), "assumption:regulations.gwp100_ch4", "tceq_steers"])}>
                 <dt className="label">Observed</dt>
-                <dd className="mt-1"><span className="text-6xl font-extrabold tracking-tight text-alert-red tabular-nums">{fmt(counted ?? core.actual.co2e_t_h)}</span>
+                <dd className="mt-1"><span className="font-display text-6xl tabular-nums text-alert-red">{fmt(counted ?? core.actual.co2e_t_h)}</span>
                   <span className="ml-2 text-lg text-muted">t CO₂e per hour</span></dd>
                 <dd className="text-sm text-muted">
                   {fmt(core.actual.ch4_kg_h / 1000, 1)} t CH₄ per hour · {fmt(core.ratio)} times the threshold · reported to TCEQ: {core.reported_same_day ? "yes" : "no"}
@@ -150,12 +153,12 @@ function KeyEvidence({ v }: { v: Verdict }) {
   const ke = (v.key_evidence ?? []).slice(0, 6);
   if (!ke.length) return null;
   return (
-    <Section title="Key evidence">
+    <Section title="Key evidence" eyebrow="What mattered most">
       <ol className="list-decimal space-y-2 pl-6 text-[15px]">
         {ke.map((k: any) => (
           <li key={k.id} className="pl-1">
             <span className="mb-1 mt-0.5 block h-1 w-24 bg-rule" aria-hidden>
-              <span className="block h-1 bg-primary" style={{ width: `${Math.round((k.importance ?? 0) * 100)}%` }} />
+              <span className="block h-1 bg-gold" style={{ width: `${Math.round((k.importance ?? 0) * 100)}%` }} />
             </span>
             <b className="text-ink">{k.label || k.text}</b>
             {k.reason && !k.reason.startsWith("hybrid rank") && <span className="text-muted"> — {k.reason}</span>}
@@ -171,15 +174,15 @@ function KeyEvidence({ v }: { v: Verdict }) {
 function Findings({ v }: { v: Verdict }) {
   if (!v.regulatory_findings.length) return null;
   return (
-    <Section title="Regulatory findings">
+    <Section title="Regulatory findings" eyebrow="Rules screened">
       <table className="w-full border border-rule text-sm">
-        <thead className="bg-paper text-left text-xs uppercase tracking-wide text-muted">
+        <thead className="bg-panel2 text-left text-[11px] uppercase tracking-[0.16em] text-muted">
           <tr><th className="px-4 py-2">Rule</th><th className="px-4 py-2">Status</th><th className="hidden px-4 py-2 md:table-cell">Observed</th></tr>
         </thead>
         <tbody>
           {v.regulatory_findings.map((r) => (
             <tr key={r.rule_id} className="border-t border-rule align-top">
-              <td className="px-4 py-2.5 font-semibold text-ink">{RULE_NAMES[r.rule_id] ?? r.rule_id}</td>
+              <td className="px-4 py-2.5 text-ink">{RULE_NAMES[r.rule_id] ?? r.rule_id}</td>
               <td className="px-4 py-2.5"><StatusBadge status={r.status} /></td>
               <td className="hidden px-4 py-2.5 text-muted md:table-cell">{r.observed !== "n/a" ? r.observed : "Not assessed: data not available"}</td>
             </tr>
@@ -194,7 +197,7 @@ function Figures({ run }: { run: RunState }) {
   const ids = FIGURES.filter((c) => run.charts[c]);
   if (!ids.length) return null;
   return (
-    <Section title="Figures">
+    <Section title="Figures" eyebrow="The measurements">
       <div className="grid items-start gap-6 lg:grid-cols-2">
         {ids.map((c, i) => (
           <Figure key={c} n={i + 2} caption={run.charts[c].title}>
@@ -210,7 +213,7 @@ function Accordion({ title, open, onToggle, children }: { title: string; open: b
   return (
     <div className="border border-rule">
       <button onClick={onToggle} aria-expanded={open}
-        className="flex w-full items-center justify-between bg-paper px-5 py-3 text-left font-bold text-ink hover:bg-[#e6e6e6]">
+        className="flex w-full items-center justify-between bg-panel2 px-5 py-3 text-left font-display text-lg text-ink hover:text-gold">
         {title}<span aria-hidden className="text-xl leading-none">{open ? "−" : "+"}</span>
       </button>
       {open && <div className="border-t border-rule p-5">{children}</div>}
@@ -229,12 +232,12 @@ export function Report({ run, f }: { run: RunState; f: Facility | null }) {
   };
   return (
     <div>
-      <SiteHeader right={<a href="/" className="font-semibold text-white underline underline-offset-2">New assessment</a>} />
+      <SiteHeader right={<a href="/" className="hover:text-gold">New assessment</a>} />
       <Summary v={v} f={f} run={run} onSources={showSources} />
       <KeyEvidence v={v} />
       <Findings v={v} />
       <Figures run={run} />
-      <Section title="Records">
+      <Section title="Records" eyebrow="Download and audit">
         <div className="mb-5 flex flex-wrap gap-3">
           <a className="btn-dark" href={`/api/runs/${run.runId}/report.html`} target="_blank" rel="noreferrer">Export report</a>
           <a className="btn-light" href={`/api/runs/${run.runId}/evidence.zip`}>Download evidence (.zip)</a>

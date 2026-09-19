@@ -39,18 +39,18 @@ export function LocationSearch({ initial, onPick, placeholder = "Search a facili
         className="input"
       />
       {open && res.length > 0 && (
-        <ul className="absolute z-40 mt-1.5 max-h-72 w-full min-w-[280px] overflow-auto rounded-2xl border border-slate-200 bg-white p-1 shadow-xl">
+        <ul className="absolute z-40 mt-1 max-h-72 w-full min-w-[280px] overflow-auto border border-rule bg-panel2">
           {res.map((r, i) => (
             <li key={r.label + i}>
               <button onMouseDown={() => pick(r)}
-                className={`flex w-full items-start justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm ${i === active ? "bg-slate-100" : "hover:bg-slate-50"}`}>
+                className={`flex w-full items-start justify-between gap-2 px-3 py-2 text-left text-sm ${i === active ? "bg-panel text-gold" : "hover:bg-panel"}`}>
                 <span>
-                  <span className="text-slate-900">{r.label}</span>
+                  <span className="text-ink">{r.label}</span>
                   {r.nearest_facility && r.kind !== "facility" && (
-                    <span className="block text-[11px] text-slate-500">nearest facility: {r.nearest_facility.name} ({r.nearest_facility.distance_km} km)</span>
+                    <span className="block text-[11px] text-muted">nearest facility: {r.nearest_facility.name} ({r.nearest_facility.distance_km} km)</span>
                   )}
                 </span>
-                <span className="text-[10px] uppercase tracking-wide text-slate-400">{r.kind}</span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-muted">{r.kind}</span>
               </button>
             </li>
           ))}
@@ -84,14 +84,14 @@ export function FacilityCard({ f }: { f: Facility }) {
   return (
     <div className="space-y-3">
       <div>
-        <div className="text-base font-semibold text-slate-900">{f.name}</div>
-        {f.data_status !== "cached" && <div className="mt-1 text-xs text-amber-700">No cached observations — assessment will report a data gap.</div>}
+        <div className="font-display text-lg text-ink">{f.name}</div>
+        {f.data_status !== "cached" && <div className="mt-1 text-xs text-alert-amber">No cached observations — assessment will report a data gap.</div>}
       </div>
       <dl className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs">
         {rows.filter(([, v]) => v).map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="text-slate-400">{k}</dt>
-            <dd className="text-slate-600">{v}</dd>
+            <dt className="text-muted">{k}</dt>
+            <dd className="text-ink">{v}</dd>
           </div>
         ))}
       </dl>
@@ -134,7 +134,7 @@ export function SiteMap({ f, run }: { f: Facility; run: RunState }) {
     data.push({ type: "scattermapbox", lat: firms.lat, lon: firms.lon, mode: "markers", name: "FIRMS ≤1.5 km",
       marker: { size: 11, color: "#fab219" }, text: firms.text, hovertemplate: "%{text}<extra>VIIRS</extra>" });
   data.push({ type: "scattermapbox", lat: [f.lat], lon: [f.lon], mode: "markers", name: f.name,
-    marker: { size: 14, color: "#1d2126" }, hovertemplate: `${f.name}<extra></extra>` });
+    marker: { size: 14, color: "#f3f1ea" }, hovertemplate: `${f.name}<extra></extra>` });
   const mapLayers: any[] = [];
   (["s2_truecolor", "s2_swir"] as const).forEach((id) => {
     const m = images[id];
@@ -148,7 +148,7 @@ export function SiteMap({ f, run }: { f: Facility; run: RunState }) {
     data,
     layout: {
       mapbox: { style: "open-street-map", center: { lat: f.lat + 0.015, lon: f.lon }, zoom: f.data_status === "cached" ? 11.3 : 9, layers: mapLayers },
-      margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: "#ffffff", showlegend: false,
+      margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: "#102124", showlegend: false,
     },
   };
   const toggles: [keyof Layers, string, boolean][] = [
@@ -157,8 +157,8 @@ export function SiteMap({ f, run }: { f: Facility; run: RunState }) {
   ];
   return (
     <div className="space-y-2">
-      <div className="overflow-hidden rounded-2xl border border-slate-200"><Plot figure={fig} height={340} /></div>
-      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
+      <div className="border border-rule"><Plot figure={fig} height={340} /></div>
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
         {toggles.map(([k, label, avail]) => (
           <label key={k} className={`flex items-center gap-1 ${avail ? "" : "opacity-40"}`} title={avail ? "" : "appears when the agent uses this data"}>
             <input type="checkbox" disabled={!avail} checked={layers[k]} onChange={(e) => setLayers((s) => ({ ...s, [k]: e.target.checked }))} />
@@ -167,7 +167,7 @@ export function SiteMap({ f, run }: { f: Facility; run: RunState }) {
         ))}
       </div>
       {(layers.s2_truecolor && images.s2_truecolor) || (layers.s2_swir && images.s2_swir) ? (
-        <p className="text-[11px] text-amber-700">Sentinel-2 layers are 2026-09-18 regional screenshots with approximate bounds — context only.</p>
+        <p className="text-[11px] text-alert-amber">Sentinel-2 layers are 2026-09-18 regional screenshots with approximate bounds — context only.</p>
       ) : null}
     </div>
   );

@@ -33,29 +33,29 @@ export function CsvTable({ url, columns, highlight, pageSize = 10, caption }: {
     }
     return r;
   }, [data, sort]);
-  if (err) return <div className="text-xs text-red-600">Could not load {url}: {err}</div>;
-  if (!data) return <div className="text-xs text-slate-400"><Spinner /> loading…</div>;
+  if (err) return <div className="text-xs text-alert-red">Could not load {url}: {err}</div>;
+  if (!data) return <div className="text-xs text-muted"><Spinner /> loading…</div>;
   const cols = columns?.filter((c) => data.columns.includes(c)) ?? data.columns;
   const pages = Math.max(1, Math.ceil(rows.length / pageSize));
   const view = rows.slice(page * pageSize, (page + 1) * pageSize);
   return (
     <div className="space-y-1">
-      {caption && <div className="text-[11px] text-slate-500">{caption}</div>}
-      <div className="overflow-x-auto rounded border border-slate-200">
+      {caption && <div className="text-[11px] text-muted">{caption}</div>}
+      <div className="overflow-x-auto border border-rule">
         <table className="w-full text-[11px]">
-          <thead className="bg-slate-50 text-slate-600">
+          <thead className="bg-panel2 text-muted">
             <tr>
               {cols.map((c) => (
-                <th key={c} className="cursor-pointer whitespace-nowrap px-2 py-1 text-left font-medium hover:text-slate-900"
+                <th key={c} className="cursor-pointer whitespace-nowrap px-2 py-1 text-left font-semibold uppercase tracking-[0.1em] hover:text-gold"
                   onClick={() => setSort((s) => ({ col: c, dir: s?.col === c && s.dir === 1 ? -1 : 1 }))}>
                   {c}{sort?.col === c ? (sort.dir === 1 ? " ▲" : " ▼") : ""}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="font-mono text-slate-600">
+          <tbody className="font-mono text-ink/80">
             {view.map((r, i) => (
-              <tr key={i} className={`border-t border-slate-200 ${highlight?.(r) ? "bg-amber-100 text-amber-900" : ""}`}>
+              <tr key={i} className={`border-t border-rule ${highlight?.(r) ? "bg-alert-amber/15 text-alert-amber" : ""}`}>
                 {cols.map((c) => <td key={c} className="whitespace-nowrap px-2 py-0.5">{r[c]}</td>)}
               </tr>
             ))}
@@ -63,10 +63,10 @@ export function CsvTable({ url, columns, highlight, pageSize = 10, caption }: {
         </table>
       </div>
       {pages > 1 && (
-        <div className="flex items-center gap-2 text-[11px] text-slate-500">
-          <button disabled={page === 0} onClick={() => setPage((p) => p - 1)} className="rounded px-1.5 hover:bg-slate-100 disabled:opacity-30">‹ prev</button>
+        <div className="flex items-center gap-2 text-[11px] text-muted">
+          <button disabled={page === 0} onClick={() => setPage((p) => p - 1)} className="px-1.5 hover:text-gold disabled:opacity-30">‹ prev</button>
           page {page + 1} / {pages} · {rows.length.toLocaleString()} rows
-          <button disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)} className="rounded px-1.5 hover:bg-slate-100 disabled:opacity-30">next ›</button>
+          <button disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)} className="px-1.5 hover:text-gold disabled:opacity-30">next ›</button>
         </div>
       )}
     </div>
