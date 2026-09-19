@@ -10,12 +10,6 @@ import { Plot } from "./Plot";
 import { Trajectory } from "./Trajectory";
 import { Segmented, StatusBadge } from "./ui";
 
-const STAMP: Record<string, { text: string; color: string }> = {
-  FAILED: { text: "FAILED", color: "#b50909" },
-  ACCEPTED: { text: "ACCEPTED", color: "#008817" },
-  INCONCLUSIVE: { text: "INCONCLUSIVE", color: "#936f38" },
-  NOT_ASSESSED: { text: "NOT ASSESSED", color: "#565c65" },
-};
 const FIGURES = ["emission_distribution", "report_comparison", "flare_timeline", "regulatory_comparison"];
 const RULE_NAMES: Record<string, string> = {
   US_SUPER_EMITTER: "Federal super-emitter threshold (40 CFR 60.5371a/b)",
@@ -83,7 +77,6 @@ function Figure({ n, caption, children }: { n: number; caption: string; children
 
 function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run: RunState; onSources: () => void }) {
   const core = v.report_comparison?.core;
-  const st = STAMP[v.outcome?.outcome ?? "NOT_ASSESSED"];
   const counted = useCountUp(core?.actual.co2e_t_h, true, 1100);
   const { setSel } = useTrace();
   const overlay = run.ledger.find((r) => r.slot_id === "site_imagery")?.preview_ref;
@@ -91,19 +84,13 @@ function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run
   const me = v.methane_estimate;
   return (
     <Section id="summary" title="Screening result">
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-rule pb-6">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-ink">{v.facility_name}</h1>
-          <p className="mt-1 text-muted">
-            Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
-            {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
-          </p>
-          {v.outcome?.reason && <p className="mt-3 max-w-2xl text-[15px] text-ink">{v.outcome.reason}</p>}
-        </div>
-        <div className="stamp select-none px-6 py-2 text-4xl font-black tracking-[0.12em] sm:text-5xl"
-          style={{ color: st.color, border: `6px solid ${st.color}` }} role="img" aria-label={`Screening outcome: ${st.text}`}>
-          {st.text}
-        </div>
+      <div className="mb-8 border-b border-rule pb-6">
+        <h1 className="text-3xl font-extrabold tracking-tight text-ink">{v.facility_name}</h1>
+        <p className="mt-1 text-muted">
+          Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
+          {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
+        </p>
+        {v.outcome?.reason && <p className="mt-3 max-w-3xl text-[15px] text-ink">{v.outcome.reason}</p>}
       </div>
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
