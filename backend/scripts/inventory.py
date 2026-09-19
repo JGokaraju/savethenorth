@@ -297,8 +297,9 @@ def firms_slot(good, bad) -> dict:
     rec = {"slot_id": "firms", **SOURCES["firms"], "type": "table", "originals": [file_rec(p) for p, _ in good + bad]}
     for p, info in bad:
         decisions.append(f"`firms`: `{rel(p)}` looks like the FIRMS file by name but its content is not a CSV: "
-                         f"\"{info.get('content_preview')}\". The FIRMS area API rejected the request "
-                         f"(day_count=15; the API accepts 1..5 per request). Treated as **missing**.")
+                         f"\"{info.get('content_preview')}\". The FIRMS area API rejected the original request "
+                         f"(day_count=15; the API accepts 1..5 per request). Ignored"
+                         + (" — superseded by the re-downloaded chunks below." if good else "."))
     if not good:
         return {**rec, "status": "missing",
                 "reason": "firms_viirs.csv contains an API error message, not detections"
@@ -306,18 +307,55 @@ def firms_slot(good, bad) -> dict:
     frames = []
     for p, _ in good:
         df = pd.read_csv(p)
+        if df.empty:
+            continue
         df.columns = [c.strip().lower() for c in df.columns]
+        product = next((t for t in ("VIIRS_NOAA20_SP", "VIIRS_NOAA21_SP", "VIIRS_NOAA20_NRT", "VIIRS_NOAA21_NRT",
+                                    "VIIRS_SNPP_SP", "VIIRS_SNPP_NRT") if t.lower() in p.name.lower()), "unknown")
+        df["product"] = product
+        df["source_file"] = rel(p)
         frames.append(df)
-    df = pd.concat(frames, ignore_index=True).drop_duplicates()
+    df = pd.concat(frames, ignore_index=True)
+    # SP (standard) supersedes NRT for the same satellite/time/location
+    df["_rank"] = df["product"].str.endswith("_SP").map({True: 0, False: 1})
+    df = (df.sort_values("_rank")
+            .drop_duplicates(subset=["latitude", "longitude", "acq_date", "acq_time", "satellite"])
+            .drop(columns="_rank").sort_values(["acq_date", "acq_time"]).reset_index(drop=True))
+    df["satellite"] = df["satellite"].astype(str).replace({"N": "SNPP"})
     dst = NORMALIZED / "firms_viirs.csv"
     df.to_csv(dst, index=False)
-    decisions.append(f"`firms` ← {', '.join('`'+rel(p)+'`' for p,_ in good)} concatenated ({len(df)} rows, duplicates dropped).")
-    return {**rec, "status": "present", "file": rel(good[0][0]), "sha256": sha256(good[0][0]), "normalized": rel(dst),
-            "date_coverage": f"{df['acq_date'].min()} .. {df['acq_date'].max()}", "stats": {"rows": len(df)}}
+    n_empty = len(good) - len(frames)
+    decisions.append(
+        f"`firms` ← {len(frames)} non-empty re-downloaded FIRMS area CSVs under `assets/firms/` "
+        f"({n_empty} header-only chunks skipped), fetched in 5-day chunks by `scripts/fetch_firms.py` "
+        f"(NOAA-20 SP, NOAA-21 NRT, Suomi-NPP SP; NOAA-21 has no SP product for 2025-08). Concatenated to "
+        f"`{rel(dst)}`: {len(df)} rows, SP preferred over NRT duplicates; satellite code 'N' renamed to 'SNPP'; "
+        f"`type` column (SP only) kept where present.")
+    return {**rec, "status": "present", "file": "assets/firms/", "sha256": sha256(dst), "normalized": rel(dst),
+            "date_coverage": f"{df['acq_date'].min()} .. {df['acq_date'].max()}",
+            "stats": {"rows": len(df), "files": len(frames),
+                      "satellites": sorted(df["satellite"].unique().tolist())}}
 
 
 def carbonmapper_slot(cands) -> dict:
     rec = {"slot_id": "carbonmapper", **SOURCES["carbonmapper"], "type": "table"}
+    synth = ROOT / "data" / "synthetic" / "carbonmapper_plumes_SYNTHETIC.csv"
+    if not cands and synth.exists():
+        df = pd.read_csv(synth)
+        dst = NORMALIZED / "carbonmapper_plumes.csv"
+        df.to_csv(dst, index=False)
+        decisions.append(
+            f"`carbonmapper`: no Carbon Mapper table in assets/. At the team's request a **SYNTHETIC placeholder** "
+            f"`{rel(synth)}` ({len(df)} rows; {int(df['detected'].sum())} detections, "
+            f"{int((~df['detected']).sum())} non-detects) is used instead. Only the 2025-08-08 plume ID and "
+            f"~21,500 kg/h come from the brief; all other rows are invented. Every output that uses it is labelled SYNTHETIC.")
+        return {**rec, "status": "present", "synthetic": True, "quality": "synthetic",
+                "source_name": "SYNTHETIC placeholder for Carbon Mapper plume records",
+                "citation": "Synthetic placeholder (not Carbon Mapper data); see data/synthetic/README.md",
+                "file": rel(synth), "sha256": sha256(synth), "normalized": rel(dst),
+                "originals": [file_rec(synth)], "date_coverage": f"{df['datetime_utc'].min()[:10]} .. {df['datetime_utc'].max()[:10]}",
+                "stats": {"rows": len(df), "detections": int(df["detected"].sum())},
+                "warnings": ["SYNTHETIC placeholder — not real Carbon Mapper data"]}
     if not cands:
         decisions.append("`carbonmapper`: no Carbon Mapper plume table found in assets/ → **data gap**. "
                          "The cross-check (§6.8) and detection frequency (§6.9) will report data gaps. "
@@ -488,7 +526,7 @@ def write_report(m: dict) -> None:
          "## Slot summary", "", "| Slot | Status | Source file | Normalized | Notes |", "|---|---|---|---|---|"]
     for k in SLOT_ORDER:
         r = s[k]
-        status = r["status"].upper() + (" (low quality)" if r.get("quality") == "low" else "")
+        status = r["status"].upper() + {"low": " (low quality)", "synthetic": " (SYNTHETIC)"}.get(r.get("quality"), "")
         note = r.get("reason") or "; ".join(r.get("warnings", [])[:2]) or r.get("date_coverage", "")
         L.append(f"| `{k}` | {status} | {('`'+r['file']+'`') if r.get('file') else '—'} | "
                  f"{('`'+r['normalized']+'`') if r.get('normalized') else '—'} | {note} |")
@@ -506,10 +544,9 @@ def write_report(m: dict) -> None:
         if s[k].get("stats"):
             L.append(f"- **{k}**: " + ", ".join(f"{a}={(round(b, 2) if isinstance(b, float) else b)}" for a, b in s[k]["stats"].items()))
     L += ["", "## Suggested fixes for the team", "",
-          "1. **FIRMS**: re-download in ≤5-day chunks (e.g. 2025-08-01, -06, -11 with day_count=5) for VIIRS_NOAA20_NRT "
-          "and VIIRS_NOAA21_NRT (or the `_SP` standard products for 2025), then concatenate. `scripts/fetch_firms.py` does this.",
-          "2. **Carbon Mapper**: export the plume record(s) for the site (incl. `emi20250808t144501p10004-A`) and any "
-          "non-detect overpasses to `assets/carbonmapper_plumes.csv`.",
+          "1. **Carbon Mapper**: replace the SYNTHETIC placeholder by exporting the real plume record(s) for the site "
+          "(incl. `emi20250808t144501p10004-A`) and any non-detect overpasses to `assets/carbonmapper_plumes.csv`.",
+          "2. **FIRMS**: done — re-downloaded via `scripts/fetch_firms.py` into `assets/firms/`.",
           "3. **Sentinel-2**: export a site-scale (~10 km) clear-sky image near 2025-08-08 (true colour + SWIR) with an "
           "`s2_bounds.json`. The current screenshots are from 2026-09-18 and regional-scale.",
           "4. **STEERS**: add incident 452090 (Red Lake) if it exists; include any events around 2025-08-08.",

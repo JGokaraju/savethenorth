@@ -1,4 +1,4 @@
-generated_utc: '2026-09-19T17:52:48+00:00'
+generated_utc: '2026-09-19T17:59:00+00:00'
 facility_id: tx-lenorah-redlake
 slots:
   emit_ch4enh:
@@ -117,13 +117,27 @@ slots:
       max: 10.383475303649902
   carbonmapper:
     slot_id: carbonmapper
-    source_name: Carbon Mapper plume records
+    source_name: SYNTHETIC placeholder for Carbon Mapper plume records
     source_url: https://data.carbonmapper.org
-    citation: Carbon Mapper data portal (data.carbonmapper.org)
+    citation: Synthetic placeholder (not Carbon Mapper data); see data/synthetic/README.md
     provider: Carbon Mapper
     type: table
-    status: missing
-    reason: no Carbon Mapper plume CSV/XLSX provided
+    status: present
+    synthetic: true
+    quality: synthetic
+    file: data/synthetic/carbonmapper_plumes_SYNTHETIC.csv
+    sha256: 00a49fe26626123c86d0b161601f96fe48842866c78ccf723e5e3b00651c1a7c
+    normalized: data/normalized/carbonmapper_plumes.csv
+    originals:
+    - file: data/synthetic/carbonmapper_plumes_SYNTHETIC.csv
+      sha256: 00a49fe26626123c86d0b161601f96fe48842866c78ccf723e5e3b00651c1a7c
+      size_bytes: 649
+    date_coverage: 2025-05-12 .. 2025-09-03
+    stats:
+      rows: 4
+      detections: 2
+    warnings:
+    - SYNTHETIC placeholder — not real Carbon Mapper data
   wind:
     slot_id: wind
     source_name: Open-Meteo historical weather (ERA5-based)
@@ -161,11 +175,57 @@ slots:
     provider: NASA
     type: table
     originals:
+    - file: assets/firms/firms_VIIRS_NOAA20_NRT_2025-08-01.csv
+      sha256: 7f06a3928b143c6bfc1dfe2dc500981277a0f166d5238059e29e9a5afd8e2290
+      size_bytes: 124
+    - file: assets/firms/firms_VIIRS_NOAA20_NRT_2025-08-06.csv
+      sha256: 7f06a3928b143c6bfc1dfe2dc500981277a0f166d5238059e29e9a5afd8e2290
+      size_bytes: 124
+    - file: assets/firms/firms_VIIRS_NOAA20_NRT_2025-08-11.csv
+      sha256: 7f06a3928b143c6bfc1dfe2dc500981277a0f166d5238059e29e9a5afd8e2290
+      size_bytes: 124
+    - file: assets/firms/firms_VIIRS_NOAA20_SP_2025-08-01.csv
+      sha256: 3bcac2c4fdec870c7cb5a6fb3b64be89fb0a2de3acb1066bc2100a8591cf2e3e
+      size_bytes: 625
+    - file: assets/firms/firms_VIIRS_NOAA20_SP_2025-08-06.csv
+      sha256: ff72377abf80689b7063cf145976f79f8b8b9f371459eb815fd732de4f3dbcfe
+      size_bytes: 1028
+    - file: assets/firms/firms_VIIRS_NOAA20_SP_2025-08-11.csv
+      sha256: ca75f559b918bda233e7035ba14a2e0e9a180553742585873f29b7e3c9eec5fe
+      size_bytes: 863
+    - file: assets/firms/firms_VIIRS_NOAA21_NRT_2025-08-01.csv
+      sha256: a9abc6fcc5d94690ef5cf3b07351b1fdf63377d8dba1b996c93ca36e5168360c
+      size_bytes: 291
+    - file: assets/firms/firms_VIIRS_NOAA21_NRT_2025-08-06.csv
+      sha256: 56aefbbfe89e214458cc4b9d1ffe85fb8b726d3128e0cdcbe833da9383b48a90
+      size_bytes: 1149
+    - file: assets/firms/firms_VIIRS_NOAA21_NRT_2025-08-11.csv
+      sha256: 1d46dda6e9127f461cce59e368f63620fd85c8b471175a8e85610794c166218f
+      size_bytes: 464
+    - file: assets/firms/firms_VIIRS_SNPP_SP_2025-08-01.csv
+      sha256: 3c16bd496bf6d909831a9efe6ff34864ac956ba459c45b40f278b49ddfcd8889
+      size_bytes: 857
+    - file: assets/firms/firms_VIIRS_SNPP_SP_2025-08-06.csv
+      sha256: 80bb9e244ce0e991e609abdf2dfc9827fc268836721177237503947577e3e28d
+      size_bytes: 1256
+    - file: assets/firms/firms_VIIRS_SNPP_SP_2025-08-11.csv
+      sha256: 9f3e0d60935f14150067c7cdcbee5edcc9db394ca83932897e5508d7ceaa0e06
+      size_bytes: 605
     - file: assets/firms_viirs.csv
       sha256: 17cdb7699e3fa6a61d9166c6c49e709c6d4ec75e0a7693e50da4637d1c2eaca4
       size_bytes: 34
-    status: missing
-    reason: firms_viirs.csv contains an API error message, not detections
+    status: present
+    file: assets/firms/
+    sha256: 70b9eadbcf91509af0c3bede0aca1a11ad2ed7cabed7d3b5cfcc33ff740d6705
+    normalized: data/normalized/firms_viirs.csv
+    date_coverage: 2025-08-01 .. 2025-08-15
+    stats:
+      rows: 73
+      files: 9
+      satellites:
+      - N20
+      - N21
+      - SNPP
   s2_truecolor:
     slot_id: s2_truecolor
     source_name: Copernicus Sentinel-2 L2A true color (Copernicus Browser export)
@@ -482,6 +542,78 @@ inventory:
     instrument: EMIT
     date_created: '2025-08-10T09:22:00Z'
     description: Methane Enhancement Uncertainty Values
+- file: assets/firms/firms_VIIRS_NOAA20_NRT_2025-08-01.csv
+  size_bytes: 124
+  sha256: 7f06a3928b143c6bfc1dfe2dc500981277a0f166d5238059e29e9a5afd8e2290
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+- file: assets/firms/firms_VIIRS_NOAA20_NRT_2025-08-06.csv
+  size_bytes: 124
+  sha256: 7f06a3928b143c6bfc1dfe2dc500981277a0f166d5238059e29e9a5afd8e2290
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+- file: assets/firms/firms_VIIRS_NOAA20_NRT_2025-08-11.csv
+  size_bytes: 124
+  sha256: 7f06a3928b143c6bfc1dfe2dc500981277a0f166d5238059e29e9a5afd8e2290
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+- file: assets/firms/firms_VIIRS_NOAA20_SP_2025-08-01.csv
+  size_bytes: 625
+  sha256: 3bcac2c4fdec870c7cb5a6fb3b64be89fb0a2de3acb1066bc2100a8591cf2e3e
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
+- file: assets/firms/firms_VIIRS_NOAA20_SP_2025-08-06.csv
+  size_bytes: 1028
+  sha256: ff72377abf80689b7063cf145976f79f8b8b9f371459eb815fd732de4f3dbcfe
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
+- file: assets/firms/firms_VIIRS_NOAA20_SP_2025-08-11.csv
+  size_bytes: 863
+  sha256: ca75f559b918bda233e7035ba14a2e0e9a180553742585873f29b7e3c9eec5fe
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
+- file: assets/firms/firms_VIIRS_NOAA21_NRT_2025-08-01.csv
+  size_bytes: 291
+  sha256: a9abc6fcc5d94690ef5cf3b07351b1fdf63377d8dba1b996c93ca36e5168360c
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+- file: assets/firms/firms_VIIRS_NOAA21_NRT_2025-08-06.csv
+  size_bytes: 1149
+  sha256: 56aefbbfe89e214458cc4b9d1ffe85fb8b726d3128e0cdcbe833da9383b48a90
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+- file: assets/firms/firms_VIIRS_NOAA21_NRT_2025-08-11.csv
+  size_bytes: 464
+  sha256: 1d46dda6e9127f461cce59e368f63620fd85c8b471175a8e85610794c166218f
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
+- file: assets/firms/firms_VIIRS_SNPP_SP_2025-08-01.csv
+  size_bytes: 857
+  sha256: 3c16bd496bf6d909831a9efe6ff34864ac956ba459c45b40f278b49ddfcd8889
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
+- file: assets/firms/firms_VIIRS_SNPP_SP_2025-08-06.csv
+  size_bytes: 1256
+  sha256: 80bb9e244ce0e991e609abdf2dfc9827fc268836721177237503947577e3e28d
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
+- file: assets/firms/firms_VIIRS_SNPP_SP_2025-08-11.csv
+  size_bytes: 605
+  sha256: 9f3e0d60935f14150067c7cdcbee5edcc9db394ca83932897e5508d7ceaa0e06
+  detected:
+    kind: firms
+    header: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
 - file: assets/firms_viirs.csv
   size_bytes: 34
   sha256: 17cdb7699e3fa6a61d9166c6c49e709c6d4ec75e0a7693e50da4637d1c2eaca4

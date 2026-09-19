@@ -1,0 +1,5 @@
+plume_id,datetime_utc,emission_rate_kg_h,emission_uncertainty_kg_h,lat,lon,instrument,detected,synthetic,note
+tan20250512t171204p00211-B,2025-05-12T17:12:04Z,3200,1100,32.3261,-101.8286,Tanager-1,true,true,SYNTHETIC placeholder - not a real Carbon Mapper record
+,2025-06-21T16:58:40Z,,,32.3264,-101.8269,EMIT,false,true,SYNTHETIC placeholder non-detect overpass
+emi20250808t144501p10004-A,2025-08-08T14:45:01Z,21500,6400,32.3259,-101.82905,EMIT,true,true,SYNTHETIC placeholder; rate is the team's recollection of the portal value (~21500 kg/h)
+,2025-09-03T17:31:10Z,,,32.3264,-101.8269,Tanager-1,false,true,SYNTHETIC placeholder non-detect overpass
