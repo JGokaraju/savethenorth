@@ -1,0 +1,26 @@
+# Python
+skyfall_env/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secrets
+.env
+
+# Large / sensitive raw assets (share out of band; see ASSET_REPORT.md)
+assets/emit_data/
+assets/**/*.tif
+assets/datacollection.py
+
+# Generated data
+data/normalized/
+data/processed/
+data/cache/
+data/runs/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/public/textures/*.jpg
+frontend/public/textures/*.png

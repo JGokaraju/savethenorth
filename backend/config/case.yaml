@@ -1,0 +1,72 @@
+# Tunable scientific constants for the Lenorah / Red Lake case.
+# Every value here is an ASSUMPTION (not a measurement). Values marked
+# `verify: true` must be double-checked by the team before relying on them.
+# Each entry: {value, unit, rationale, verify}
+
+case:
+  facility_id: tx-lenorah-redlake
+  event_date_utc: "2025-08-08"
+  overpass_utc: "2025-08-08T14:45:00Z"
+  known_plume_id: emi20250808t144501p10004-A
+
+emit:
+  nodata_threshold: {value: -9990, unit: "ppm·m", rationale: "EMIT L2B uses -9999 fill; mask anything <= -9990", verify: false}
+  crop_half_width_km: {value: 4.0, unit: km, rationale: "±4 km window around plume source hint (spec §6.1)", verify: false}
+  pixel_area_min_m2: {value: 2000, unit: "m²", rationale: "sanity bound on per-pixel area (~3600 m² expected at 60 m)", verify: false}
+  pixel_area_max_m2: {value: 5500, unit: "m²", rationale: "sanity bound on per-pixel area", verify: false}
+  fallback_uncert_frac: {value: 0.15, unit: "fraction", rationale: "if no uncertainty layer: 15% of |enhancement| + background std", verify: true}
+
+mask:
+  bg_annulus_inner_km: {value: 2.5, unit: km, rationale: "background annulus inner radius", verify: false}
+  bg_annulus_outer_km: {value: 4.0, unit: km, rationale: "background annulus outer radius", verify: false}
+  k_values: {value: [1.5, 2.0, 2.5, 3.0, 4.0], unit: "σ", rationale: "threshold multipliers (slider frames)", verify: false}
+  k_default: {value: 2.5, unit: "σ", rationale: "default threshold multiplier", verify: false}
+  attribution_radius_km: {value: 1.0, unit: km, rationale: "component must have a pixel within this distance of the source hint", verify: false}
+
+physics_constants:
+  M_CH4: {value: 0.01604, unit: "kg/mol", rationale: "molar mass of methane", verify: false}
+  R: {value: 8.314, unit: "J/(mol·K)", rationale: "universal gas constant", verify: false}
+  default_pressure_pa: {value: 92000, unit: Pa, rationale: "surface pressure at ~820 m elevation when wind.json lacks it", verify: true}
+  default_temperature_k: {value: 305, unit: K, rationale: "August mid-morning surface temperature when wind.json lacks it", verify: true}
+
+wind:
+  overpass_utc: {value: "2025-08-08T14:45:00Z", unit: "UTC", rationale: "EMIT scene start 14:44:49 / 14:45:01 UTC", verify: false}
+  ueff_model: {value: log, unit: "-", rationale: "'log' = Varon et al. 2018 form alpha*ln(U10)+beta; 'linear' = a*U10+b", verify: true}
+  alpha: {value: 1.1, unit: "m/s", rationale: "Varon et al. 2018 log-form coefficient (instrument-specific; confirm for EMIT 60 m)", verify: true}
+  beta: {value: 0.6, unit: "m/s", rationale: "Varon et al. 2018 log-form offset", verify: true}
+  linear_a: {value: 0.33, unit: "-", rationale: "linear alternative slope (Varon 2018, GHGSat-D-like); confirm", verify: true}
+  linear_b: {value: 0.45, unit: "m/s", rationale: "linear alternative intercept; confirm", verify: true}
+  ueff_min: {value: 0.5, unit: "m/s", rationale: "clamp for effective wind", verify: false}
+  sigma_u_floor: {value: 1.0, unit: "m/s", rationale: "min wind uncertainty (reanalysis vs local wind)", verify: false}
+  sigma_u_frac: {value: 0.3, unit: "fraction", rationale: "wind uncertainty as fraction of U10", verify: false}
+  sigma_u_window_h: {value: 2, unit: h, rationale: "hours either side of overpass for variability", verify: false}
+
+monte_carlo:
+  n: {value: 2000, unit: draws, rationale: "Monte Carlo sample count", verify: false}
+  seed: {value: 20250808, unit: "-", rationale: "fixed seed for determinism", verify: false}
+  coef_perturb_frac: {value: 0.2, unit: fraction, rationale: "alpha/beta ±20% uniform", verify: false}
+  u10_min: {value: 0.5, unit: "m/s", rationale: "truncate sampled U10", verify: false}
+
+flare:
+  radius_km: {value: 1.5, unit: km, rationale: "FIRMS detections attributed to facility within this radius", verify: false}
+  near_overpass_h: {value: 36, unit: h, rationale: "window for flare_observed_near_overpass", verify: false}
+  window_start: {value: "2025-08-01", unit: date, rationale: "FIRMS analysis window start", verify: false}
+  window_end: {value: "2025-08-15", unit: date, rationale: "FIRMS analysis window end", verify: false}
+
+plant:
+  ch4_fraction: {value: 0.75, unit: "mol fraction", range: [0.65, 0.85], rationale: "methane fraction of inlet gas (Permian wet gas)", verify: true}
+  ch4_g_per_scf: {value: 19.2, unit: "g/scf", rationale: "density of CH4 at standard conditions", verify: false}
+  combustion_efficiency: {value: 0.98, unit: fraction, range: [0.95, 0.99], rationale: "typical flare destruction efficiency", verify: true}
+
+comparison:
+  conflict_ratio_hi: {value: 2.0, unit: "-", rationale: "ratio above which estimates conflict", verify: false}
+  conflict_ratio_lo: {value: 0.5, unit: "-", rationale: "ratio below which estimates conflict", verify: false}
+
+annualization:
+  scenario_p: {value: [0.1, 0.5, 1.0], unit: "-", rationale: "detection-frequency scenarios when non-detects are unknown", verify: true}
+
+regulations:
+  super_emitter_kg_h: {value: 100, unit: "kg/h", rationale: "40 CFR 60.5371a/b super-emitter threshold", verify: false}
+  rq_lb: {value: 5000, unit: lb, rationale: "natural gas mixture RQ per 30 TAC 101.1(89)(B)(iv) — confirm", verify: true}
+  steers_match_window_days: {value: 1, unit: days, rationale: "STEERS event must start within ±1 day of detection", verify: false}
+  min_event_hours: {value: 1, unit: h, rationale: "plausible minimum event duration for RQ test", verify: true}

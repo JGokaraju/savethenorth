@@ -1,0 +1,543 @@
+generated_utc: '2026-09-19T17:52:48+00:00'
+facility_id: tx-lenorah-redlake
+slots:
+  emit_ch4enh:
+    slot_id: emit_ch4enh
+    source_name: NASA EMIT L2B Methane Enhancement v002 (CH4ENH)
+    source_url: https://doi.org/10.5067/EMIT/EMITL2BCH4ENH.002
+    citation: Green, R. et al., EMIT L2B Methane Enhancement Data 60 m V002, NASA LP DAAC, doi:10.5067/EMIT/EMITL2BCH4ENH.002
+    provider: NASA
+    type: raster
+    originals:
+    - file: assets/emit_data/EMIT_L2B_CH4ENH_002_20250808T144449_2522010_003.tif
+      sha256: b1fffbb68183536cfda7ae8567afeb3b289ec92b3a50136aa46c21c15c34b13d
+      size_bytes: 13370695
+    - file: assets/emit_data/EMIT_L2B_CH4ENH_002_20250808T144501_2522010_004.tif
+      sha256: 2aabb8a5f33770da64b282bd08cefc3771c6159a9571f3ea944ce0936adcc772
+      size_bytes: 26102461
+    rejected:
+    - file: assets/emit_data/EMIT_L2B_CH4ENH_002_20250808T144449_2522010_003.tif
+      reason: source hint pixel is nodata in this granule
+    status: present
+    file: assets/emit_data/EMIT_L2B_CH4ENH_002_20250808T144501_2522010_004.tif
+    sha256: 2aabb8a5f33770da64b282bd08cefc3771c6159a9571f3ea944ce0936adcc772
+    normalized: data/normalized/emit_ch4enh.tif
+    date_coverage: 2025-08-08T14:45:01Z (scene start from filename)
+    description: Methane Enhancement Values
+    units: ppm·m
+    crs: EPSG:4326
+    res_deg: 0.000542232520256367
+    full_granule_bounds:
+    - -102.18074
+    - 31.84445
+    - -100.34962
+    - 33.36595
+    granule_id: 20250808T144501_2522010_004
+    stats:
+      valid_pixels: 4237084
+      p1: -1078.7379150390625
+      median: -3.554832696914673
+      p99: 1111.10107421875
+      max: 13371.095703125
+  emit_ch4uncert:
+    slot_id: emit_ch4uncert
+    source_name: NASA EMIT L2B Methane Enhancement Uncertainty v002 (CH4UNCERT)
+    source_url: https://doi.org/10.5067/EMIT/EMITL2BCH4ENH.002
+    citation: Green, R. et al., EMIT L2B CH4 Enhancement Uncertainty V002, NASA LP DAAC
+    provider: NASA
+    type: raster
+    originals:
+    - file: assets/emit_data/EMIT_L2B_CH4UNCERT_002_20250808T144449_2522010_003.tif
+      sha256: 1e9791b1ac7b085e6671cce729111d435c49e268c4cb5ec9e27829be849e27f0
+      size_bytes: 11830009
+    - file: assets/emit_data/EMIT_L2B_CH4UNCERT_002_20250808T144501_2522010_004.tif
+      sha256: b8f192959dcccfc8578b41ee838c80cde5ebfdebd8c878cd6106ca7e55b504b6
+      size_bytes: 23268828
+    rejected:
+    - file: assets/emit_data/EMIT_L2B_CH4UNCERT_002_20250808T144449_2522010_003.tif
+      reason: source hint pixel is nodata in this granule
+    status: present
+    file: assets/emit_data/EMIT_L2B_CH4UNCERT_002_20250808T144501_2522010_004.tif
+    sha256: b8f192959dcccfc8578b41ee838c80cde5ebfdebd8c878cd6106ca7e55b504b6
+    normalized: data/normalized/emit_ch4uncert.tif
+    date_coverage: 2025-08-08T14:45:01Z (scene start from filename)
+    description: Methane Enhancement Uncertainty Values
+    units: ppm·m (1σ)
+    crs: EPSG:4326
+    res_deg: 0.000542232520256367
+    full_granule_bounds:
+    - -102.18074
+    - 31.84445
+    - -100.34962
+    - 33.36595
+    granule_id: 20250808T144501_2522010_004
+    stats:
+      valid_pixels: 4237084
+      p1: 359.8085632324219
+      median: 605.228759765625
+      p99: 1409.4532470703125
+      max: 14287.9111328125
+  emit_ch4sens:
+    slot_id: emit_ch4sens
+    source_name: NASA EMIT L2B Methane Enhancement Sensitivity v002 (CH4SENS)
+    source_url: https://doi.org/10.5067/EMIT/EMITL2BCH4ENH.002
+    citation: Green, R. et al., EMIT L2B CH4 Enhancement Sensitivity V002, NASA LP DAAC
+    provider: NASA
+    type: raster
+    originals:
+    - file: assets/emit_data/EMIT_L2B_CH4SENS_002_20250808T144449_2522010_003.tif
+      sha256: 9deed35200813f45a1e1ec0d4693cd48955cd4431923603ff21f2096b4e82543
+      size_bytes: 11804071
+    - file: assets/emit_data/EMIT_L2B_CH4SENS_002_20250808T144501_2522010_004.tif
+      sha256: cc6107ce431133798dc3f8d9f681106391e2d48e9a665e768030d27898e41994
+      size_bytes: 23314777
+    rejected:
+    - file: assets/emit_data/EMIT_L2B_CH4SENS_002_20250808T144449_2522010_003.tif
+      reason: source hint pixel is nodata in this granule
+    status: present
+    file: assets/emit_data/EMIT_L2B_CH4SENS_002_20250808T144501_2522010_004.tif
+    sha256: cc6107ce431133798dc3f8d9f681106391e2d48e9a665e768030d27898e41994
+    normalized: data/normalized/emit_ch4sens.tif
+    date_coverage: 2025-08-08T14:45:01Z (scene start from filename)
+    description: Methane Enhancement Sensitivity Values
+    units: dimensionless
+    crs: EPSG:4326
+    res_deg: 0.000542232520256367
+    full_granule_bounds:
+    - -102.18074
+    - 31.84445
+    - -100.34962
+    - 33.36595
+    granule_id: 20250808T144501_2522010_004
+    stats:
+      valid_pixels: 4237084
+      p1: 0.35577571392059326
+      median: 0.9622499346733093
+      p99: 1.8923163414001465
+      max: 10.383475303649902
+  carbonmapper:
+    slot_id: carbonmapper
+    source_name: Carbon Mapper plume records
+    source_url: https://data.carbonmapper.org
+    citation: Carbon Mapper data portal (data.carbonmapper.org)
+    provider: Carbon Mapper
+    type: table
+    status: missing
+    reason: no Carbon Mapper plume CSV/XLSX provided
+  wind:
+    slot_id: wind
+    source_name: Open-Meteo historical weather (ERA5-based)
+    source_url: https://open-meteo.com/en/docs/historical-weather-api
+    citation: Open-Meteo historical weather API (Zippenfenig, 2023; ERA5, Hersbach et al., 2020)
+    provider: Open-Meteo
+    type: table
+    status: present
+    file: assets/wind.json
+    sha256: aae801de6a1f42e5bf5328853a9da93d4bdef81a957a91fc23c4bdd134b9ab0a
+    normalized: data/normalized/wind.json
+    originals:
+    - file: assets/wind.json
+      sha256: aae801de6a1f42e5bf5328853a9da93d4bdef81a957a91fc23c4bdd134b9ab0a
+      size_bytes: 1683
+    date_coverage: 2025-08-08T00:00 .. 2025-08-08T23:00 UTC
+    units: m/s, °
+    notes:
+    - wind_speed_10m already in m/s; no conversion
+    - '`temperature_2m` absent → default from case.yaml will be used'
+    - '`surface_pressure` absent → default from case.yaml will be used'
+    - grid point (32.3023, -101.7818) is 5.0 km from the facility (Open-Meteo snaps to its grid)
+    stats:
+      n_hours: 24
+      u10_min: 3.05
+      u10_max: 5.62
+      grid_lat: 32.302284
+      grid_lon: -101.78183
+      grid_distance_km: 5.01
+  firms:
+    slot_id: firms
+    source_name: NASA FIRMS VIIRS 375 m active fire (NOAA-20/21)
+    source_url: https://firms.modaps.eosdis.nasa.gov/
+    citation: NASA FIRMS, VIIRS 375 m active fire product
+    provider: NASA
+    type: table
+    originals:
+    - file: assets/firms_viirs.csv
+      sha256: 17cdb7699e3fa6a61d9166c6c49e709c6d4ec75e0a7693e50da4637d1c2eaca4
+      size_bytes: 34
+    status: missing
+    reason: firms_viirs.csv contains an API error message, not detections
+  s2_truecolor:
+    slot_id: s2_truecolor
+    source_name: Copernicus Sentinel-2 L2A true color (Copernicus Browser export)
+    source_url: https://browser.dataspace.copernicus.eu/
+    citation: Contains modified Copernicus Sentinel data 2026, processed with Copernicus Browser
+    provider: Copernicus
+    type: image
+    status: present
+    quality: low
+    file: assets/s2_truecolor.jpg
+    sha256: a56c6b0c3922626f2ccaadc99c0a6735314d09242db4ca719aaec9952816af92
+    normalized: data/normalized/s2_truecolor.jpg
+    bounds_file: data/normalized/s2_truecolor_bounds.json
+    bounds:
+      west: -102.1748
+      east: -99.8949
+      north: 32.8563
+      south: 31.311
+      deg_per_px_x: 0.002746895675662426
+      deg_per_px_y: -0.0023273109279172274
+      fit_rms_km: 0.47
+      method: linear fit of town-label pixel positions (visual estimates) to town coordinates; APPROXIMATE
+      control_points:
+      - Lamesa
+      - Snyder
+      - Midland
+      - Stanton
+      - Big Spring
+      - Colorado City
+      - Sweetwater
+      - Merkel
+      - Winters
+      - Sterling City
+      - San Angelo
+      date: '2026-09-18'
+    originals:
+    - file: assets/s2_truecolor.jpg
+      sha256: a56c6b0c3922626f2ccaadc99c0a6735314d09242db4ca719aaec9952816af92
+      size_bytes: 354742
+    date_coverage: 2026-09-18 (13 months AFTER the 2025-08-08 event)
+    stats:
+      width: 830
+      height: 664
+      approx_m_per_px: 258
+    warnings:
+    - image date 2026-09-18 does not match the 2025-08-08 event
+    - regional (~200 km) screenshot; the plant spans only ~1–3 px
+    - extensive fair-weather cumulus and cloud shadows across the scene
+    - bounds are approximate (fitted from town labels)
+  s2_swir:
+    slot_id: s2_swir
+    source_name: Copernicus Sentinel-2 L2A SWIR false color (Copernicus Browser export)
+    source_url: https://browser.dataspace.copernicus.eu/
+    citation: Contains modified Copernicus Sentinel data 2026, processed with Copernicus Browser
+    provider: Copernicus
+    type: image
+    status: present
+    quality: low
+    file: assets/s2_swir.jpg
+    sha256: d5b402099af091c26cbcff46f44411d2fb36466825fffbfaac3ca46930bde2f5
+    normalized: data/normalized/s2_swir.jpg
+    bounds_file: data/normalized/s2_swir_bounds.json
+    bounds:
+      west: -102.1748
+      east: -99.8949
+      north: 32.8563
+      south: 31.311
+      deg_per_px_x: 0.002746895675662426
+      deg_per_px_y: -0.0023273109279172274
+      fit_rms_km: 0.47
+      method: linear fit of town-label pixel positions (visual estimates) to town coordinates; APPROXIMATE
+      control_points:
+      - Lamesa
+      - Snyder
+      - Midland
+      - Stanton
+      - Big Spring
+      - Colorado City
+      - Sweetwater
+      - Merkel
+      - Winters
+      - Sterling City
+      - San Angelo
+      date: '2026-09-18'
+    originals:
+    - file: assets/s2_swir.jpg
+      sha256: d5b402099af091c26cbcff46f44411d2fb36466825fffbfaac3ca46930bde2f5
+      size_bytes: 412915
+    date_coverage: 2026-09-18 (13 months AFTER the 2025-08-08 event)
+    stats:
+      width: 830
+      height: 664
+      approx_m_per_px: 258
+    warnings:
+    - image date 2026-09-18 does not match the 2025-08-08 event
+    - regional (~200 km) screenshot; the plant spans only ~1–3 px
+    - extensive fair-weather cumulus and cloud shadows across the scene
+    - bounds are approximate (fitted from town labels)
+  tceq_sob:
+    slot_id: tceq_sob
+    source_name: TCEQ Statement of Basis, Federal Operating Permit O4734 (Lenorah Gas Plant)
+    source_url: https://www.tceq.texas.gov/permitting/air/nav/titlev_permit_search.html
+    citation: TCEQ, Statement of Basis of the Federal Operating Permit O4734, ETC North Permian Midstream LLC
+    provider: TCEQ
+    type: document
+    status: present
+    file: assets/tceq_sob_lenorah.pdf
+    sha256: 6c5fc20a7764c037934e86ccd1850da60c6af20310da3b6bbfe900eeb1375ae2
+    normalized: data/normalized/tceq_sob.pdf
+    originals:
+    - file: assets/tceq_sob_lenorah.pdf
+      sha256: 6c5fc20a7764c037934e86ccd1850da60c6af20310da3b6bbfe900eeb1375ae2
+      size_bytes: 307628
+    date_coverage: prepared March 6, 2026
+    stats:
+      pages: 18
+  tceq_steers:
+    slot_id: tceq_steers
+    source_name: TCEQ STEERS Air Emission Event Report Database
+    source_url: https://www2.tceq.texas.gov/oce/eer/
+    citation: TCEQ Air Emission Event Report Database (STEERS)
+    provider: TCEQ
+    type: table
+    originals:
+    - file: assets/Air Emission Event Report Database Incident 441788.xls
+      sha256: 7c889b9ffabbb68cbdf023fc3889266779853365cdd2558a8acc9d8d49e69d8e
+      size_bytes: 6656
+    - file: assets/Air Emission Event Report Database Incident 452092.xls
+      sha256: 0e2169ab76b32c10fff0b9555734eaf373c45abbde7c63235e4c1003141eaa75
+      size_bytes: 6656
+    status: present
+    file: assets/Air Emission Event Report Database Incident 441788.xls
+    sha256: 7c889b9ffabbb68cbdf023fc3889266779853365cdd2558a8acc9d8d49e69d8e
+    normalized: data/normalized/steers_emission_points.csv
+    date_coverage: 2025-06-08 .. 2026-01-24
+    stats:
+      rows: 6
+      incidents:
+      - '441788'
+      - '452092'
+      facilities:
+      - LENORAH GAS PLANT
+inventory:
+- file: assets/Air Emission Event Report Database Incident 441788.xls
+  size_bytes: 6656
+  sha256: 7c889b9ffabbb68cbdf023fc3889266779853365cdd2558a8acc9d8d49e69d8e
+  detected:
+    kind: tceq_steers
+    rows: 3
+    columns:
+    - INCIDENT NO.
+    - RN
+    - RE NAME
+    - PHYSICAL LOCATION
+    - COUNTY
+    - TCEQ REGION
+    - START DATE/TIME
+    - END DATE/TIME
+    - EVENT TYPE
+    - EMISSION POINT NAME
+    - EPN
+    - CONTAMINANT
+    - EST QUANTITY/OPACITY
+    - ESTIMATED IND
+    - AMOUNT UNK IND
+    - UNITS
+    - EMISSION LIMIT
+    - LIMIT UNITS
+    - AUTHORIZATION COMMENT
+    - COMMENT NO.
+    incidents:
+    - '441788'
+- file: assets/Air Emission Event Report Database Incident 452092.xls
+  size_bytes: 6656
+  sha256: 0e2169ab76b32c10fff0b9555734eaf373c45abbde7c63235e4c1003141eaa75
+  detected:
+    kind: tceq_steers
+    rows: 3
+    columns:
+    - INCIDENT NO.
+    - RN
+    - RE NAME
+    - PHYSICAL LOCATION
+    - COUNTY
+    - TCEQ REGION
+    - START DATE/TIME
+    - END DATE/TIME
+    - EVENT TYPE
+    - EMISSION POINT NAME
+    - EPN
+    - CONTAMINANT
+    - EST QUANTITY/OPACITY
+    - ESTIMATED IND
+    - AMOUNT UNK IND
+    - UNITS
+    - EMISSION LIMIT
+    - LIMIT UNITS
+    - AUTHORIZATION COMMENT
+    - COMMENT NO.
+    incidents:
+    - '452092'
+- file: assets/datacollection.py
+  size_bytes: 811
+  sha256: 74df39da2054b152fac59645d2898ede90a6b78e10a6f5425f9c1e5749b2943c
+  detected:
+    kind: script
+    mentions_firms: true
+    contains_api_key: true
+- file: assets/emit_data/EMIT_L2B_CH4ENH_002_20250808T144449_2522010_003.tif
+  size_bytes: 13370695
+  sha256: b1fffbb68183536cfda7ae8567afeb3b289ec92b3a50136aa46c21c15c34b13d
+  detected:
+    kind: emit_ch4enh
+    crs: EPSG:4326
+    width: 2278
+    height: 1896
+    bounds:
+    - -102.78641
+    - 31.32065
+    - -101.55121
+    - 32.34873
+    res_deg: 0.000542232520256367
+    nodata: -9999.0
+    instrument: EMIT
+    date_created: '2025-08-10T09:21:04Z'
+    description: Methane Enhancement Values
+- file: assets/emit_data/EMIT_L2B_CH4ENH_002_20250808T144501_2522010_004.tif
+  size_bytes: 26102461
+  sha256: 2aabb8a5f33770da64b282bd08cefc3771c6159a9571f3ea944ce0936adcc772
+  detected:
+    kind: emit_ch4enh
+    crs: EPSG:4326
+    width: 3377
+    height: 2806
+    bounds:
+    - -102.18074
+    - 31.84445
+    - -100.34962
+    - 33.36595
+    res_deg: 0.000542232520256367
+    nodata: -9999.0
+    instrument: EMIT
+    date_created: '2025-08-10T09:21:58Z'
+    description: Methane Enhancement Values
+- file: assets/emit_data/EMIT_L2B_CH4SENS_002_20250808T144449_2522010_003.tif
+  size_bytes: 11804071
+  sha256: 9deed35200813f45a1e1ec0d4693cd48955cd4431923603ff21f2096b4e82543
+  detected:
+    kind: emit_ch4sens
+    crs: EPSG:4326
+    width: 2278
+    height: 1896
+    bounds:
+    - -102.78641
+    - 31.32065
+    - -101.55121
+    - 32.34873
+    res_deg: 0.000542232520256367
+    nodata: -9999.0
+    instrument: EMIT
+    date_created: '2025-08-10T09:21:05Z'
+    description: Methane Enhancement Sensitivity Values
+- file: assets/emit_data/EMIT_L2B_CH4SENS_002_20250808T144501_2522010_004.tif
+  size_bytes: 23314777
+  sha256: cc6107ce431133798dc3f8d9f681106391e2d48e9a665e768030d27898e41994
+  detected:
+    kind: emit_ch4sens
+    crs: EPSG:4326
+    width: 3377
+    height: 2806
+    bounds:
+    - -102.18074
+    - 31.84445
+    - -100.34962
+    - 33.36595
+    res_deg: 0.000542232520256367
+    nodata: -9999.0
+    instrument: EMIT
+    date_created: '2025-08-10T09:21:59Z'
+    description: Methane Enhancement Sensitivity Values
+- file: assets/emit_data/EMIT_L2B_CH4UNCERT_002_20250808T144449_2522010_003.tif
+  size_bytes: 11830009
+  sha256: 1e9791b1ac7b085e6671cce729111d435c49e268c4cb5ec9e27829be849e27f0
+  detected:
+    kind: emit_ch4uncert
+    crs: EPSG:4326
+    width: 2278
+    height: 1896
+    bounds:
+    - -102.78641
+    - 31.32065
+    - -101.55121
+    - 32.34873
+    res_deg: 0.000542232520256367
+    nodata: -9999.0
+    instrument: EMIT
+    date_created: '2025-08-10T09:21:05Z'
+    description: Methane Enhancement Uncertainty Values
+- file: assets/emit_data/EMIT_L2B_CH4UNCERT_002_20250808T144501_2522010_004.tif
+  size_bytes: 23268828
+  sha256: b8f192959dcccfc8578b41ee838c80cde5ebfdebd8c878cd6106ca7e55b504b6
+  detected:
+    kind: emit_ch4uncert
+    crs: EPSG:4326
+    width: 3377
+    height: 2806
+    bounds:
+    - -102.18074
+    - 31.84445
+    - -100.34962
+    - 33.36595
+    res_deg: 0.000542232520256367
+    nodata: -9999.0
+    instrument: EMIT
+    date_created: '2025-08-10T09:22:00Z'
+    description: Methane Enhancement Uncertainty Values
+- file: assets/firms_viirs.csv
+  size_bytes: 34
+  sha256: 17cdb7699e3fa6a61d9166c6c49e709c6d4ec75e0a7693e50da4637d1c2eaca4
+  detected:
+    kind: unparseable_csv
+    content_preview: Invalid day range. Expects [1..5].
+- file: assets/s2_swir.jpg
+  size_bytes: 412915
+  sha256: d5b402099af091c26cbcff46f44411d2fb36466825fffbfaac3ca46930bde2f5
+  detected:
+    kind: s2_swir
+    size:
+    - 830
+    - 664
+    mean_rgb:
+    - 183.8
+    - 189.6
+    - 135.2
+    green_gt_red: true
+- file: assets/s2_truecolor.jpg
+  size_bytes: 354742
+  sha256: a56c6b0c3922626f2ccaadc99c0a6735314d09242db4ca719aaec9952816af92
+  detected:
+    kind: s2_truecolor
+    size:
+    - 830
+    - 664
+    mean_rgb:
+    - 171.0
+    - 154.8
+    - 137.1
+    green_gt_red: false
+- file: assets/tceq_sob_lenorah.pdf
+  size_bytes: 307628
+  sha256: 6c5fc20a7764c037934e86ccd1850da60c6af20310da3b6bbfe900eeb1375ae2
+  detected:
+    kind: tceq_sob
+    pages: 18
+    permit: O4734
+    first_line: 'Statement of Basis of the Federal Operating Permit '
+- file: assets/wind.json
+  size_bytes: 1683
+  sha256: aae801de6a1f42e5bf5328853a9da93d4bdef81a957a91fc23c4bdd134b9ab0a
+  detected:
+    kind: wind
+    variables:
+    - time
+    - wind_speed_10m
+    - wind_direction_10m
+    units:
+      time: iso8601
+      wind_speed_10m: m/s
+      wind_direction_10m: °
+    lat: 32.302284
+    lon: -101.78183
+    n: 24
+    t0: 2025-08-08T00:00
+    t1: 2025-08-08T23:00
+    elevation: 809.0

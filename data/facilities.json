@@ -1,0 +1,22 @@
+[
+  {
+    "facility_id": "tx-lenorah-redlake",
+    "name": "Lenorah / Red Lake Gas Plants",
+    "aliases": ["Lenorah Gas Plant", "Red Lake Gas Plant", "ETC Lenorah", "Stanton gas plant"],
+    "operator": "ETC North Permian Midstream LLC (Energy Transfer) — potentially responsible operator",
+    "state": "TX", "county": "Martin", "nearest_city": "Stanton",
+    "lat": 32.3264, "lon": -101.8269,
+    "plume_source_hint": {"lat": 32.3259, "lon": -101.82905},
+    "regulated_entity_number": "RN112061593",
+    "title_v_permit": "O4734", "nsr_authorization": "177845",
+    "sector": "Natural gas processing (NAICS 211130)",
+    "design_capacity_mmscfd": 500,
+    "equipment": ["2 cryogenic processing trains", "amine treating", "TEG dehydration", "process flares FL-3501/FL-3502/FL-3504", "thermal oxidizers", "5 simple-cycle turbines", "vapor combustor"],
+    "federal_rules": ["40 CFR 60 Subpart OOOOb (fugitives, compressors, tanks)", "40 CFR 60 Subpart KKKK (turbines)"],
+    "analysis_bbox": {"west": -101.90, "south": 32.28, "east": -101.75, "north": 32.37},
+    "data_status": "cached"
+  },
+  {"facility_id": "tx-redbluff", "name": "Red Bluff Gas Processing Plant", "operator": "ET Gathering & Processing LLC", "county": "Reeves", "state": "TX", "lat": 31.7997, "lon": -103.9297, "data_status": "no_cached_observations"},
+  {"facility_id": "tx-jameson", "name": "Jameson Gas Plant", "operator": "ETC Jameson, LP", "county": "Coke", "state": "TX", "lat": 32.05, "lon": -100.6917, "data_status": "no_cached_observations"},
+  {"facility_id": "tx-pegasus", "name": "Pegasus Gas Plant", "operator": "DCP Operating Company, LP", "county": "Midland", "state": "TX", "lat": 31.6617, "lon": -102.1381, "data_status": "no_cached_observations"}
+]
