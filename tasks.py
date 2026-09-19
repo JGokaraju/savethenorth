@@ -73,7 +73,8 @@ def prep() -> None:
 
 
 def dev() -> None:
-    procs = [subprocess.Popen([PY, "-m", "uvicorn", "backend.app:app", "--reload", "--port", "8000"], cwd=ROOT)]
+    # no --reload: file watching is unreliable inside OneDrive-synced folders
+    procs = [subprocess.Popen([PY, "-m", "uvicorn", "backend.app:app", "--port", "8000"], cwd=ROOT)]
     if (FRONTEND / "package.json").exists():
         procs.append(subprocess.Popen([NPM, "run", "dev"], cwd=FRONTEND, shell=IS_WIN))
     try:

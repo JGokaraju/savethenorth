@@ -70,10 +70,9 @@ def plume_map(crop, bg, masks: dict, det_by_k: dict, facility: dict, wind, k_def
         title=dict(text=steps[active]["args"][1]["title.text"]),
         sliders=[dict(active=active, steps=steps, currentvalue=dict(prefix="Threshold k = ", font=dict(color=INK2)),
                       pad=dict(t=40), font=dict(color=MUTED), bgcolor=GRID, bordercolor=AXIS)],
-        xaxis=dict(title="Longitude (°E)", range=[lon[0], lon[-1]], showgrid=False, constrain="domain"),
-        yaxis=dict(title="Latitude (°N)", range=[lat[-1], lat[0]], showgrid=False, scaleanchor="x",
-                   scaleratio=1 / coslat, constrain="domain"),
-        legend=dict(y=-0.32), margin=dict(b=120))
+        xaxis=dict(title="Longitude (°E)", range=[lon[0], lon[-1]], showgrid=False),
+        yaxis=dict(title="Latitude (°N)", range=[lat[-1], lat[0]], showgrid=False, scaleanchor="x", scaleratio=1 / coslat),
+        margin=dict(t=90, b=60, l=70, r=20))
     m = masks[k_default]
     stats = {"k_default": k_default, "n_pixels": m.n_pixels, "area_m2": round(m.area_m2), "length_m": round(m.length_m),
              "max_enh_ppm_m": round(m.max_enh), "max_at": [round(m.max_lat, 5), round(m.max_lon, 5)],

@@ -51,7 +51,8 @@ def build_verdict(st: RunState) -> dict:
     tx_clause = {"NO_MATCHING_REPORT_FOUND": "no matching TCEQ emissions-event report found",
                  "REPORTED": "a matching TCEQ emissions-event report was found",
                  "BELOW_RQ": "below the Texas reportable quantity"}.get(tx, "Texas reporting not assessed")
-    headline = (f"Estimated {em['median_t_h']:.1f} t/h [p5–p95 {em['p5_t_h']:.1f}–{em['p95_t_h']:.1f} t/h] of methane on "
+    t = {k: em[f"{k}_kg_h"] / 1000 for k in ("median", "p5", "p95")}  # format from kg/h: avoid double rounding
+    headline = (f"Estimated {t['median']:.1f} t/h [p5–p95 {t['p5']:.1f}–{t['p95']:.1f} t/h] of methane on "
                 f"{st.date} — ~{em['times_super_emitter_threshold']:,.0f}× the 100 kg/h EPA super-emitter threshold; {tx_clause}.")
     omni = {c["target_id"]: c for c in st.omni_calls}
     attr_ev = [f"EMIT plume of {pm.get('n_pixels', '?')} pixels originates within 1 km of the source hint beside the "

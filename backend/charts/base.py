@@ -35,9 +35,9 @@ pio.templates["plumewatch"] = go.layout.Template(layout=dict(
     colorway=[S1, S2, S3, S_VIOLET],
     xaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickfont=dict(color=MUTED), title=dict(font=dict(color=INK2))),
     yaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickfont=dict(color=MUTED), title=dict(font=dict(color=INK2))),
-    legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=INK2), orientation="h", y=-0.18, x=0),
+    legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=INK2), orientation="h", y=1.0, yanchor="bottom", x=1.0, xanchor="right"),
     hoverlabel=dict(bgcolor="#22252c", bordercolor=AXIS, font=dict(color=INK, family=FONT)),
-    margin=dict(l=70, r=30, t=70, b=70),
+    margin=dict(l=70, r=30, t=90, b=60),
 ))
 pio.templates.default = "plumewatch"
 

@@ -1,0 +1,181 @@
+import { useMemo } from "react";
+import { LedgerRecord, runFileUrl } from "../lib/api";
+import { useTrace } from "../lib/trace";
+import { RunState } from "../lib/useRun";
+import { CsvTable, useCsv } from "./CsvTable";
+import { Chip, ShortHash } from "./ui";
+
+const PROVIDER_TONE: Record<string, any> = { NASA: "sky", "Carbon Mapper": "violet", Copernicus: "emerald", TCEQ: "amber", "Open-Meteo": "slate" };
+
+function toolData(run: RunState, name: string): any {
+  const ev = [...run.events].reverse().find((e) => e.type === "tool_result" && e.name === name && e.status === "ok");
+  return ev?.data ?? {};
+}
+
+function DataPreview({ rec, run }: { rec: LedgerRecord; run: RunState }) {
+  const id = run.runId!;
+  const u = (ref: string) => runFileUrl(id, ref);
+  switch (rec.slot_id) {
+    case "emit_ch4enh": {
+      const pm = toolData(run, "plume_map");
+      return (
+        <div className="space-y-2">
+          <div className="flex gap-3">
+            <img src={u("evidence/emit_quicklook.png")} alt="EMIT crop quicklook with plume mask in orange"
+              className="h-40 w-40 flex-none rounded border border-slate-700 object-cover [image-rendering:pixelated]" />
+            <p className="text-[11px] text-slate-400">
+              Crop quicklook (enhancement, mask pixels in orange). Using <b className="text-slate-200">{pm.n_pixels?.toLocaleString() ?? "?"}</b> of{" "}
+              <b className="text-slate-200">{pm.valid_pixels_in_crop?.toLocaleString() ?? "?"}</b> valid pixels in the crop (k = {pm.k_default}).
+              Background {pm.background_mu_ppm_m} ± {pm.background_sigma_ppm_m} ppm·m from {pm.background_pixels?.toLocaleString()} annulus pixels.
+              <br /><a className="text-sky-400 hover:underline" href={u("evidence/emit_crop.tif")}>Download GeoTIFF crop</a>
+            </p>
+          </div>
+          <CsvTable url={u("evidence/emit_plume_pixels.csv")} caption="Plume-mask pixels (sortable)" />
+        </div>
+      );
+    }
+    case "emit_ch4uncert":
+      return <p className="text-[11px] text-slate-400">Per-pixel 1σ values for the same mask pixels are in the <code>uncert_ppm_m</code> column of the EMIT pixel table above.</p>;
+    case "carbonmapper": {
+      return <CarbonMapperPreview run={run} />;
+    }
+    case "wind":
+      return <CsvTable url={u("evidence/wind_hourly_near_overpass.csv")} highlight={(r) => String(r.time).includes("interpolated")}
+        caption="Hourly rows around the overpass; interpolated overpass row highlighted" />;
+    case "firms": {
+      const fa = toolData(run, "flare_activity");
+      const keys = [fa.nearest_before_overpass?.time_utc, fa.nearest_after_overpass?.time_utc].filter(Boolean).map((t: string) => t.slice(0, 10) + (t.slice(11, 13) + t.slice(14, 16)));
+      return <CsvTable url={u("evidence/firms_subset.csv")}
+        columns={["acq_date", "acq_time", "satellite", "product", "frp", "confidence", "daynight", "dist_km", "hours_from_overpass"]}
+        highlight={(r) => keys.includes(r.acq_date + String(r.acq_time).padStart(4, "0"))}
+        caption="VIIRS detections within 1.5 km; nearest detections before/after the overpass highlighted" />;
+    }
+    case "s2_truecolor":
+    case "s2_swir":
+      return (
+        <div className="flex gap-3">
+          {rec.preview_ref && <a href={u(rec.preview_ref)} target="_blank" rel="noreferrer"><img src={u(rec.preview_ref)} alt="image sent to OMNI" className="h-28 rounded border border-slate-700" /></a>}
+          <p className="text-[11px] text-slate-400">Exact image sent to Huawei OMNI (full scene with facility marker + 8× zoom). Acquisition shown in header: 2026-09-18. Bounds approximate (fitted from town labels).</p>
+        </div>
+      );
+    case "tceq_sob": {
+      const refs = [rec.preview_ref, ...(rec.extra_refs ?? [])].filter((r) => r && r.endsWith(".png")) as string[];
+      return (
+        <div className="space-y-2">
+          <div className="flex gap-2 overflow-x-auto">
+            {refs.map((r) => <a key={r} href={u(r)} target="_blank" rel="noreferrer"><img src={u(r)} alt={r} className="h-32 rounded border border-slate-700 bg-white" /></a>)}
+          </div>
+          <CsvTable url={u("evidence/tceq_sob_snippets.csv")} caption="Extracted text snippets (keyword matches) from the pages sent" pageSize={6} />
+        </div>
+      );
+    }
+    case "tceq_steers":
+      return (
+        <div className="space-y-2">
+          <CsvTable url={u("evidence/steers_events.csv")} columns={["incident_no", "start_date", "end_date", "duration_h", "facility", "event_type", "methane_reported"]}
+            caption="STEERS incidents parsed from the exports" />
+          {run.omniCalls.some((c) => c.target_id === "tceq_steers") && (
+            <a href={u("evidence/omni_tceq_steers_table.png")} target="_blank" rel="noreferrer" className="text-[11px] text-sky-400 hover:underline">Table image sent to OMNI</a>
+          )}
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
+function CarbonMapperPreview({ run }: { run: RunState }) {
+  const u = (ref: string) => runFileUrl(run.runId!, ref);
+  const match = useCsv(u("evidence/carbonmapper_match.csv"));
+  const pid = match.data?.rows[0]?.plume_id;
+  return <CsvTable url={u("evidence/carbonmapper_rows.csv")} columns={["plume_id", "datetime_utc", "emission_rate_kg_h", "emission_uncertainty_kg_h", "instrument", "detected", "synthetic"]}
+    highlight={(r) => !!pid && r.plume_id === pid} caption="Rows used; the matching plume row is highlighted" />;
+}
+
+function SourceCard({ rec, run, active }: { rec: LedgerRecord; run: RunState; active: boolean }) {
+  return (
+    <div id={`ledger-${rec.id}`} className={`space-y-2 rounded-lg border p-3 ${active ? "border-sky-400 ring-2 ring-sky-400/30" : "border-slate-800"} bg-slate-900/60`}>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            {rec.provider && <Chip tone={PROVIDER_TONE[rec.provider] ?? "slate"}>{rec.provider}</Chip>}
+            <span className="text-sm font-semibold text-slate-100">{rec.source_name}</span>
+            {rec.synthetic && <Chip tone="violet">SYNTHETIC placeholder</Chip>}
+            {rec.quality === "low" && <Chip tone="amber">low quality</Chip>}
+          </div>
+          <div className="mt-1 text-[11px] text-slate-400"><code>{rec.file}</code> · <ShortHash hash={rec.sha256} /> · {rec.date_coverage}</div>
+        </div>
+        {rec.preview_ref && (
+          <a href={runFileUrl(run.runId!, rec.preview_ref)} className="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 hover:bg-slate-800">⬇ Download subset</a>
+        )}
+      </div>
+      <div className="text-[11px] text-slate-500">{rec.citation} · {rec.source_url && <a href={rec.source_url} target="_blank" rel="noreferrer" className="text-sky-400 hover:underline">source</a>}</div>
+      {rec.subset && <div className="text-[11px] text-slate-400"><span className="text-slate-500">Subset used:</span> {rec.subset}</div>}
+      {rec.warnings && rec.warnings.length > 0 && <ul className="list-disc pl-5 text-[11px] text-amber-300/90">{rec.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>}
+      <div className="flex flex-wrap items-center gap-1 text-[11px] text-slate-500">Used by {rec.used_by_tools.map((t) => <Chip key={t}>{t}</Chip>)}</div>
+      <DataPreview rec={rec} run={run} />
+    </div>
+  );
+}
+
+export function EvidencePanel({ run }: { run: RunState }) {
+  const { sel } = useTrace();
+  const data = useMemo(() => run.ledger.filter((r) => r.type === "data"), [run.ledger]);
+  const assumptions = useMemo(() => run.ledger.filter((r) => r.type === "assumption"), [run.ledger]);
+  const derived = useMemo(() => run.ledger.filter((r) => r.type === "derived"), [run.ledger]);
+  const active = (id: string) => !!sel?.evidenceIds.includes(id);
+  if (!run.runId) return <p className="text-sm text-slate-500">Run an assessment to see the data it used.</p>;
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-slate-400">{data.length} datasets, {assumptions.length} assumptions, {run.omniCalls.length} AI analyses in this run's Evidence Ledger.</p>
+        <a href={`/api/runs/${run.runId}/evidence.zip`} className="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700">⬇ Download all evidence (.zip)</a>
+      </div>
+      <section className="space-y-3">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Measured data</h4>
+        {data.map((r) => <SourceCard key={r.id} rec={r} run={run} active={active(r.id)} />)}
+        {derived.map((r) => (
+          <div key={r.id} id={`ledger-${r.id}`} className={`rounded-lg border p-3 text-[11px] text-slate-400 ${active(r.id) ? "border-sky-400" : "border-slate-800"}`}>
+            <b className="text-slate-200">{r.name}</b> · {r.record_count?.toLocaleString()} values · {r.source}
+            {r.preview_ref && <> · <a className="text-sky-400 hover:underline" href={runFileUrl(run.runId!, r.preview_ref)}>download</a></>}
+          </div>
+        ))}
+      </section>
+      <section className="space-y-2">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Assumptions (hard-coded inputs, not measurements)</h4>
+        <div className="overflow-x-auto rounded border border-slate-800">
+          <table className="w-full text-[11px]">
+            <thead className="bg-slate-800/60 text-left text-slate-300"><tr><th className="px-2 py-1">Constant</th><th className="px-2 py-1">Value</th><th className="px-2 py-1">Rationale</th><th className="px-2 py-1">Used by</th></tr></thead>
+            <tbody>
+              {assumptions.map((a) => (
+                <tr key={a.id} id={`ledger-${a.id}`} className={`border-t border-slate-800 align-top ${active(a.id) ? "bg-sky-500/10" : ""}`}>
+                  <td className="px-2 py-1 font-mono text-slate-300">{a.name}{a.verify && <span className="ml-1"><Chip tone="amber">needs verification</Chip></span>}</td>
+                  <td className="whitespace-nowrap px-2 py-1 font-mono text-slate-200">{JSON.stringify(a.value)} {a.unit}{a.range ? <span className="text-slate-500"> (range {a.range.join("–")})</span> : null}</td>
+                  <td className="px-2 py-1 text-slate-400">{a.rationale} <span className="text-slate-600">[{a.source}]</span></td>
+                  <td className="px-2 py-1 text-slate-500">{a.used_by_tools.join(", ")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section className="space-y-2">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">AI analysis log (Huawei OMNI)</h4>
+        {run.omniCalls.map((c) => (
+          <div key={c.id} id={`ledger-${c.id}`} className={`flex gap-3 rounded-lg border p-3 ${active(c.id) ? "border-sky-400" : "border-slate-800"}`}>
+            {c.input_ref && <a href={runFileUrl(run.runId!, c.input_ref)} target="_blank" rel="noreferrer"><img src={runFileUrl(run.runId!, c.input_ref)} alt="" className="h-16 w-24 flex-none rounded border border-slate-700 bg-white object-cover" /></a>}
+            <div className="min-w-0 text-[11px]">
+              <div className="flex flex-wrap items-center gap-2">
+                <code className="text-slate-300">{c.id}</code><Chip>{c.tool}</Chip><span className="text-slate-400">{c.target_id}</span>
+                <Chip tone={c.mode === "LIVE" ? "emerald" : c.mode === "CACHED" ? "sky" : "amber"}>{c.mode}</Chip>
+                <span className="text-slate-500">{c.model} · {c.timestamp}</span>
+              </div>
+              <div className="mt-1 text-slate-400">Q: {c.question}</div>
+              <div className="mt-1 line-clamp-4 whitespace-pre-wrap text-slate-300">{c.answer}</div>
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
+}

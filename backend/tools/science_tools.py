@@ -188,7 +188,7 @@ def compute_emission_rate(st: RunState, facility_id: str, date: str | None = Non
                             f"background {bg.mu:.0f} ± {bg.sigma:.0f} ppm·m (annulus 2.5–4 km, plume excluded)",
                             f"U10 = {w.u10:.2f} ± {w.sigma_u:.2f} m/s (ERA5 via Open-Meteo)"]}
     st.results["emission"] = result
-    s = (f"Estimated methane emission {result['median_t_h']:.1f} t/h (p5–p95 {result['p5_t_h']:.1f}–{result['p95_t_h']:.1f} t/h), "
+    s = (f"Estimated methane emission {mc['median_kg_h'] / 1000:.1f} t/h (p5–p95 {mc['p5_kg_h'] / 1000:.1f}–{mc['p95_kg_h'] / 1000:.1f} t/h), "
          f"~{result['times_super_emitter_threshold']:,.0f}× the 100 kg/h super-emitter threshold.")
     if not (st.evidence_dir / "emit_plume_pixels.csv").exists():
         _write_emit_evidence(st, crop, bg, masks[k])
