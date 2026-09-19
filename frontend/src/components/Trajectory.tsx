@@ -84,21 +84,21 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
         <div className="flex items-center gap-3">
           {running && <Spinner className="h-4 w-4" />}
           <div>
-            <div className="text-[15px] font-semibold text-slate-800">{title}</div>
-            <div className="text-xs text-slate-400">{running ? "The agent is working" : "Finished"} · {steps.length} steps</div>
+            <div className="text-lg font-bold text-ink">{title}</div>
+            <div className="text-sm text-muted">{running ? "The agent is working" : "Finished"} · {steps.length} steps</div>
           </div>
         </div>
       )}
-      <ol className="relative space-y-0.5 border-l border-slate-200 pl-5">
+      <ol className="relative space-y-0.5 border-l-2 border-rule pl-5">
         {steps.map((s, i) => {
           const hl = !!sel?.callIds.some((c) => s.callIds.includes(c));
           return (
-            <li key={s.id} className={`fade-up relative flex items-center gap-3 rounded-lg py-1.5 pr-2 text-sm ${hl ? "bg-sky-50" : ""}`}
+            <li key={s.id} className={`fade-up relative flex items-center gap-3 rounded-lg py-1.5 pr-2 text-sm ${hl ? "bg-[#e7f2f8]" : ""}`}
               style={{ animationDelay: `${Math.min(i * 10, 80)}ms` }}>
               <span className="absolute -left-[27px] flex h-4 w-4 items-center justify-center rounded-full bg-white">
                 <Icon status={s.status} />
               </span>
-              <span className={s.status === "running" ? "font-medium text-slate-900" : "text-slate-600"}>{s.label}</span>
+              <span className={s.status === "running" ? "font-bold text-ink" : "text-ink"}>{s.label}</span>
               {s.status === "data_gap" && <span className="text-[11px] text-amber-700">data gap</span>}
             </li>
           );

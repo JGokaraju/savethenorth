@@ -43,6 +43,7 @@ class Item:
     source: str
     reliability: float
     flags: list[str] = field(default_factory=list)
+    label: str = ""  # short plain-English statement for display
 
 
 # ------------------------------------------------------------------ corpus
@@ -51,11 +52,12 @@ def build_corpus(st) -> list[Item]:
     items: list[Item] = []
     seen = set()
 
-    def add(id_, text, kind, source, rel, flags=None):
+    def add(id_, text, kind, source, rel, flags=None, label=""):
         if id_ in seen or not text:
             return
         seen.add(id_)
-        items.append(Item(id_, re.sub(r"\s+", " ", text).strip(), kind, source, rel, flags or []))
+        text = re.sub(r"\s+", " ", text).strip()
+        items.append(Item(id_, text, kind, source, rel, flags or [], label or _first_sentence(text)))
 
     for rec in st.ledger.values():
         t = rec.get("type")
@@ -64,15 +66,18 @@ def build_corpus(st) -> list[Item]:
             rel = 0.2 if rec.get("synthetic") else 0.35 if rec.get("quality") == "low" else 0.9
             warn = "; ".join(rec.get("warnings") or [])
             add(rec["id"], f"{rec.get('source_name')}: {rec.get('subset') or ''}. Coverage {rec.get('date_coverage')}. {warn}",
-                "data", rec.get("provider") or rec["id"], rel, flags)
+                "data", rec.get("provider") or rec["id"], rel, flags,
+                f"{rec.get('source_name')}" + (" (placeholder data)" if rec.get("synthetic") else " (low quality)" if rec.get("quality") == "low" else ""))
         elif t == "assumption":
             add(rec["id"], f"Assumption {rec.get('name')} = {rec.get('value')} {rec.get('unit') or ''}: {rec.get('rationale')}"
                 + (" (needs verification)" if rec.get("verify") else ""), "assumption", rec.get("source", "config"),
-                0.5 if rec.get("verify") else 0.7, ["unverified"] if rec.get("verify") else [])
+                0.5 if rec.get("verify") else 0.7, ["unverified"] if rec.get("verify") else [],
+                f"Assumption: {rec.get('name')} = {rec.get('value')} {rec.get('unit') or ''}".strip())
         elif t == "ai_analysis":
             add(rec["id"], f"Huawei OMNI read of {rec.get('target_id')} ({rec.get('mode')}): {rec.get('answer')}", "ai_analysis",
                 "Huawei OMNI", 0.55 if rec.get("mode") in ("LIVE", "CACHED") else 0.3,
-                [] if rec.get("mode") in ("LIVE", "CACHED") else ["demo_text"])
+                [] if rec.get("mode") in ("LIVE", "CACHED") else ["demo_text"],
+                f"Image/document reading of {str(rec.get('target_id')).replace('_', ' ')}: {_first_sentence(str(rec.get('answer')))}")
     # tool findings (latest successful result per tool)
     latest = {}
     for c in st.tool_calls:
@@ -84,25 +89,44 @@ def build_corpus(st) -> list[Item]:
             continue
         res = st.results["_calls"][c["call_id"]]
         add(f"finding:{name}", f"{name}: {res['summary']}", "finding", name, 0.85,
-            ["has_warnings"] if res.get("warnings") else [])
+            ["has_warnings"] if res.get("warnings") else [], _first_sentence(res["summary"]))
     for r in st.results.get("regulations", []):
         add(f"rule:{r['rule_id']}", f"Rule {r['rule_id']} ({r['rule']}): status {r['status']}. Observed {r['observed']}. {r['note']}",
-            "rule", "check_regulations", 0.9)
+            "rule", "check_regulations", 0.9, None,
+            f"{RULE_LABELS.get(r['rule_id'], r['rule_id'])}: {r['status'].replace('_', ' ').lower()}"
+            + (f" ({r['observed']})" if r.get("observed") not in (None, "", "n/a") else ""))
     cmp_ = st.results.get("comparison")
     if cmp_:
         add("finding:cross_check", f"Carbon Mapper cross-check ratio {cmp_['ratio']}; consistent={cmp_['consistent']}; "
             + "; ".join(cmp_.get("notes", [])), "finding", "compare_estimates", 0.2 if cmp_.get("synthetic") else 0.8,
-            ["synthetic"] if cmp_.get("synthetic") else [])
+            ["synthetic"] if cmp_.get("synthetic") else [],
+            f"Carbon Mapper cross-check: ratio {cmp_['ratio']}" + (" (placeholder value)" if cmp_.get("synthetic") else ""))
     ph = st.results.get("physics")
     if ph:
         add("finding:physics", f"Physics: {ph['interpretation']} Required flared CH4 {ph['required_flared_ch4_t_h']} t/h vs "
-            f"plant ceiling {ph['ceiling_t_h']} t/h ({ph['classification']}).", "finding", "physics_bounds", 0.8)
+            f"plant ceiling {ph['ceiling_t_h']} t/h ({ph['classification']}).", "finding", "physics_bounds", 0.8, None,
+            f"Flare slip would need {ph['required_flared_ch4_t_h']:,.0f} t/h flared vs a {ph['ceiling_t_h']:.0f} t/h plant ceiling")
     rc = st.results.get("report_comparison") or {}
     if rc:
         add("finding:reports", f"Operator reports on file: {len(rc.get('reported_events', []))}; reported within ±1 day of "
             f"{rc.get('event_date')}: {len(rc.get('reported_on_event_date', []))}. Methane itemised in any report: "
-            f"{rc.get('methane_reported_anywhere')}. {rc.get('note', '')}", "finding", "TCEQ STEERS", 0.85)
+            f"{rc.get('methane_reported_anywhere')}. {rc.get('note', '')}", "finding", "TCEQ STEERS", 0.85, None,
+            f"No emissions-event report within ±1 day of {rc.get('event_date')}" if not rc.get("reported_on_event_date")
+            else f"Emissions-event report filed for {rc.get('event_date')}")
     return items
+
+
+RULE_LABELS = {
+    "US_SUPER_EMITTER": "Federal super-emitter threshold", "TX_EMISSIONS_EVENT_REPORTING": "Texas emissions-event reporting",
+    "PLANT_PHYSICS_CEILING": "Plant capacity check", "NOX_PERMIT_LIMITS": "NOx permit limits", "GHGRP_REPORTED": "EPA greenhouse gas reporting",
+}
+
+
+def _first_sentence(t: str, n: int = 150) -> str:
+    t = re.sub(r"\s+", " ", t).strip().lstrip("{").strip()
+    m = re.search(r"(?<=[.!?])\s", t)
+    s = t[: m.start()] if m else t
+    return s if len(s) <= n else s[: n - 1] + "…"
 
 
 # ------------------------------------------------------------------ retrieval
@@ -316,20 +340,26 @@ def rank(st, live: bool, embed_client: Callable | None = None, rerank_client: Ca
     rr = Reranker(live, rerank_client)
     by_id = {i.id: i for i in items}
     questions, best, modes = {}, {}, set()
-    for (qk, q), qv in zip(QUESTIONS.items(), q_vecs):
-        cands = hybrid_candidates(q, items, vecs, qv)
-        ranked, mode = rr.rank(qk, q, cands, items)
+    cand_by_q = {qk: hybrid_candidates(q, items, vecs, qv) for (qk, q), qv in zip(QUESTIONS.items(), q_vecs)}
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=len(QUESTIONS)) as pool:  # the five reranks are independent
+        futures = {qk: pool.submit(rr.rank, qk, QUESTIONS[qk], cand_by_q[qk], items) for qk in QUESTIONS}
+        reranked = {qk: fut.result() for qk, fut in futures.items()}
+    for qk, q in QUESTIONS.items():
+        cands = cand_by_q[qk]
+        ranked, mode = reranked[qk]
         modes.add(mode)
         fused = {items[c["idx"]].id: c for c in cands}
         questions[qk] = {"question": q, "ranking": [
-            {**r, "text": by_id[r["id"]].text[:220], "source": by_id[r["id"]].source, "kind": by_id[r["id"]].kind,
+            {**r, "text": by_id[r["id"]].text[:220], "label": by_id[r["id"]].label, "source": by_id[r["id"]].source, "kind": by_id[r["id"]].kind,
              "flags": by_id[r["id"]].flags, "bm25": round(fused[r["id"]]["bm25"], 3), "dense": round(fused[r["id"]]["dense"], 3),
              "fused": round(fused[r["id"]]["fused"], 4)} for r in ranked]}
         for r in ranked[:5]:
             if r["importance"] > best.get(r["id"], {}).get("importance", -1):
                 best[r["id"]] = {**r, "question": qk}
     key = sorted(best.values(), key=lambda r: -r["importance"])[:8]
-    key = [{**k, "text": by_id[k["id"]].text[:220], "source": by_id[k["id"]].source, "flags": by_id[k["id"]].flags} for k in key]
+    key = [{**k, "text": by_id[k["id"]].text[:220], "label": by_id[k["id"]].label, "source": by_id[k["id"]].source,
+            "flags": by_id[k["id"]].flags} for k in key]
     return {"items": len(items), "questions": questions, "key_evidence": key,
             "backends": {"lexical": "BM25 (k1=1.5, b=0.75)", "dense": emb.name, "fusion": f"reciprocal rank fusion (k={RRF_K})",
                          "reranker": rr.name, "rerank_modes": sorted(modes)}}

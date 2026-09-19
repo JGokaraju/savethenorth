@@ -100,6 +100,7 @@ export interface Verdict {
   disclaimer: string;
   outcome?: { outcome: "BUSTED" | "ACCEPTED" | "INCONCLUSIVE" | "NOT_ASSESSED"; reason: string } | null;
   report_comparison?: ReportComparison | null;
+  key_evidence?: { id: string; importance: number; reason: string; question: string; text: string; label?: string; source: string; flags: string[] }[] | null;
 }
 
 export interface LedgerRecord {

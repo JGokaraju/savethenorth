@@ -80,19 +80,28 @@ export function useRun(onToast?: (msg: string, kind?: "error" | "info") => void)
     };
   }, [onToast, refreshEvidence]);
 
-  const start = useCallback(async (facilityId: string, date: string, mode: "demo" | "live" = "demo") => {
+  const start = useCallback(async (facilityId: string, date: string, mode: "demo" | "live" = "demo"): Promise<string | null> => {
     esRef.current?.close();
     setState({ ...empty, status: "starting" });
     try {
       const r = await api.startRun(facilityId, date, mode);
       setState({ ...empty, runId: r.run_id, mode: r.mode, status: "starting" });
       subscribe(r.run_id);
+      return r.run_id;
     } catch (e: any) {
       setState({ ...empty, status: "error", error: String(e.message ?? e) });
       onToast?.(`Could not start the run: ${e.message ?? e}`, "error");
+      return null;
     }
   }, [subscribe, onToast]);
 
+  /** Re-attach to an existing run (page reload / shared link): replays its events, never starts a new run. */
+  const attach = useCallback((runId: string) => {
+    esRef.current?.close();
+    setState({ ...empty, runId, status: "starting" });
+    subscribe(runId);
+  }, [subscribe]);
+
   useEffect(() => () => esRef.current?.close(), []);
-  return { state, start };
+  return { state, start, attach };
 }

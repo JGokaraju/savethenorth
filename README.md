@@ -120,6 +120,19 @@ crash. The verdict is validated against run state: medians within 1%, regulatory
 | `skills/` | 5 playbooks the agent loads (`data-discovery`, `methane-quantification`, `flare-and-cause-analysis`, `texas-regulatory-check`, `verdict-report`) |
 | `frontend/src/` | Landing (globe), Workspace, components |
 
+## Evidence ranking (`rank_evidence`)
+Before the verdict, the agent ranks everything it has gathered for five questions: threshold, reporting, attribution,
+cause and data reliability. Each tool finding, data source, assumption and Huawei OMNI reading becomes a short evidence
+item with a reliability score. Synthetic or low-quality items score lower.
+1. **Hybrid retrieval:** BM25 (keyword) and dense vectors (OpenAI `text-embedding-3-small` in Live; a local hashed
+   n-gram vectoriser in Demo), merged with reciprocal-rank fusion.
+2. **LLM rerank:** the top 10 candidates per question are ordered by importance by GPT (`OPENAI_MODEL`). An OpenAI-compatible
+   endpoint such as Baseten can be used instead: set `RERANK_BASE_URL`, `RERANK_API_KEY` and `RERANK_MODEL`. The five
+   reranks run in parallel.
+3. **Validation:** only real evidence ids with scores in [0, 1] are kept, and anything the model omits keeps its fused order.
+   Results are cached. The verdict is rejected until `rank_evidence` has run, and the report's **Key evidence** list
+   comes from it.
+
 ## Method (summary; the in-app **Method** tab shows the formulas with this run's values)
 1. **Mask:** crop ±6 km around the plume source. Take a robust background (median/MAD) from a 2.5–4 km annulus with the plume
    excluded, threshold at μ + kσ (k ∈ {1.5, 2, 2.5, 3, 4}), apply a 3×3 opening, and keep components within 1 km of the source.
