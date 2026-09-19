@@ -11,6 +11,7 @@ import { Trajectory } from "./Trajectory";
 import { Segmented, StatusBadge } from "./ui";
 
 const FIGURES = ["emission_distribution", "report_comparison", "flare_timeline", "regulatory_comparison"];
+const FIGURE_HEIGHT: Record<string, number> = { flare_timeline: 470 };
 const RULE_NAMES: Record<string, string> = {
   US_SUPER_EMITTER: "Federal super-emitter threshold (40 CFR 60.5371a/b)",
   TX_EMISSIONS_EVENT_REPORTING: "Texas emissions-event reporting (30 TAC 101.201)",
@@ -194,10 +195,10 @@ function Figures({ run }: { run: RunState }) {
   if (!ids.length) return null;
   return (
     <Section title="Figures">
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         {ids.map((c, i) => (
           <Figure key={c} n={i + 2} caption={run.charts[c].title}>
-            <Plot figure={run.charts[c].figure_json} height={380} />
+            <Plot figure={run.charts[c].figure_json} height={FIGURE_HEIGHT[c] ?? 380} />
           </Figure>
         ))}
       </div>

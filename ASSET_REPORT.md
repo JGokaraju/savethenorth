@@ -1,6 +1,6 @@
 # Asset Report
 
-Generated 2026-09-19T19:46:33+00:00 by `python -m backend.scripts.inventory`. Originals in `assets/` are never modified; normalized copies live in `data/normalized/`. Machine-readable version: `data/manifest.yaml`.
+Generated 2026-09-19T22:59:30+00:00 by `python -m backend.scripts.inventory`. Originals in `assets/` are never modified; normalized copies live in `data/normalized/`. Machine-readable version: `data/manifest.yaml`.
 
 ## Slot summary
 

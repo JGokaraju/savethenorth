@@ -171,48 +171,46 @@ def wind_timeseries(hourly: pd.DataFrame, wind) -> ChartArtifact:
 
 # 5 -------------------------------------------------------------------- flare timeline
 def flare_timeline(fa: dict, facility: dict, overpass_utc: str) -> ChartArtifact:
+    """Two stacked panels on one time axis: fire power, and distance from the plant (readable in a narrow column)."""
     near, allw = fa["_near"], fa["_all"]
-    fig = make_subplots(rows=1, cols=2, column_widths=[0.6, 0.4], horizontal_spacing=0.1,
-                        subplot_titles=("(a) Fire power ≤ %.1f km" % fa["radius_km"], "(b) Detections"))
-    for dn, name, color in (("N", "Night", S1), ("D", "Day", S2)):
-        d = near[near["daynight"] == dn]
-        fig.add_trace(go.Scatter(x=d["time_utc"], y=d["frp"], mode="markers", name=f"{name} detection",
-                                 marker=dict(size=11, color=color, line=dict(color=SURFACE, width=2)),
-                                 customdata=np.stack([d["satellite"].astype(str), d["dist_km"]], axis=1) if len(d) else None,
-                                 hovertemplate="%{x|%Y-%m-%d %H:%M} UTC<br>FRP %{y:.2f} MW<br>%{customdata[0]}, "
-                                               "%{customdata[1]:.2f} km from facility<extra></extra>"), row=1, col=1)
-    ov = pd.Timestamp(overpass_utc)
-    fig.add_vline(x=ov, line=dict(color=CRITICAL, dash="dash", width=2), row=1, col=1)
-    fig.add_annotation(x=ov, y=0.98, yref="y domain", xref="x", text="EMIT overpass", showarrow=False, yanchor="top",
-                       xanchor="left", font=dict(color=INK2, size=11), bgcolor=SURFACE, row=1, col=1)
-    far = allw[allw["dist_km"] > fa["radius_km"]]
-    fig.add_trace(go.Scatter(x=far["longitude"], y=far["latitude"], mode="markers", name="Other detections",
-                             marker=dict(size=8, color=NEUTRAL, line=dict(color=SURFACE, width=1)),
-                             hovertemplate="%{y:.4f}, %{x:.4f}<extra></extra>"), row=1, col=2)
-    fig.add_trace(go.Scatter(x=near["longitude"], y=near["latitude"], mode="markers", name="≤ 1.5 km (attributed)",
-                             marker=dict(size=10, color=S2, line=dict(color=SURFACE, width=2)),
-                             hovertemplate="%{y:.4f}, %{x:.4f}<extra></extra>"), row=1, col=2)
-    coslat = np.cos(np.radians(facility["lat"]))
-    th = np.linspace(0, 2 * np.pi, 120)
     r = fa["radius_km"]
-    fig.add_trace(go.Scatter(x=facility["lon"] + r / (111.32 * coslat) * np.cos(th), y=facility["lat"] + r / 110.54 * np.sin(th),
-                             mode="lines", line=dict(color=INK2, width=1.5, dash="dot"), name="1.5 km radius",
-                             hoverinfo="skip"), row=1, col=2)
-    fig.add_trace(go.Scatter(x=[facility["lon"]], y=[facility["lat"]], mode="markers", name="Facility",
-                             marker=dict(symbol="square", size=12, color=INK, line=dict(color=SURFACE, width=2)),
-                             hovertemplate="Facility<extra></extra>"), row=1, col=2)
-    fig.update_xaxes(title_text="Time (UTC)", row=1, col=1)
-    fig.update_yaxes(title_text="Fire radiative power (MW)", rangemode="tozero", row=1, col=1)
-    fig.update_xaxes(title_text="Longitude (°E)", row=1, col=2)
-    fig.update_yaxes(title_text="Latitude (°N)", scaleanchor="x2", scaleratio=1 / coslat, row=1, col=2)
-    fig.update_layout(title="VIIRS active-fire detections near the plant (NASA FIRMS)", margin=dict(t=100, b=150),
-                      legend=dict(orientation="h", y=-0.3, yanchor="top", x=0, xanchor="left"))
-    for a in fig.layout.annotations[:2]:
-        a.font = dict(color=INK2, size=12)
+    ov = pd.Timestamp(overpass_utc)
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.07, row_heights=[0.62, 0.38])
+
+    for dn, name, color in (("N", "Night pass", S1), ("D", "Day pass", S2)):
+        d = near[near["daynight"] == dn]
+        common = dict(customdata=np.stack([d["satellite"].astype(str), d["dist_km"]], axis=1) if len(d) else None,
+                      hovertemplate="%{x|%Y-%m-%d %H:%M} UTC<br>FRP %{y:.2f} MW<br>%{customdata[0]}, "
+                                    "%{customdata[1]:.2f} km from plant<extra></extra>")
+        fig.add_trace(go.Scatter(x=d["time_utc"], y=d["frp"], mode="markers", name=name, legendgroup=name,
+                                 marker=dict(size=12, color=color, line=dict(color=SURFACE, width=2)), **common), row=1, col=1)
+        fig.add_trace(go.Scatter(x=d["time_utc"], y=d["dist_km"], mode="markers", name=name, legendgroup=name, showlegend=False,
+                                 marker=dict(size=9, color=color, line=dict(color=SURFACE, width=1.5)),
+                                 hovertemplate="%{x|%Y-%m-%d %H:%M} UTC<br>%{y:.2f} km from plant<extra></extra>"), row=2, col=1)
+    far = allw[allw["dist_km"] > r]
+    fig.add_trace(go.Scatter(x=far["time_utc"], y=far["dist_km"], mode="markers", name=f"Beyond {r} km (not attributed)",
+                             marker=dict(size=7, color=NEUTRAL, line=dict(color=SURFACE, width=1)),
+                             hovertemplate="%{x|%Y-%m-%d %H:%M} UTC<br>%{y:.2f} km from plant<extra></extra>"), row=2, col=1)
+
+    for row in (1, 2):
+        fig.add_vline(x=ov, line=dict(color=CRITICAL, dash="dash", width=2), row=row, col=1)
+    fig.add_annotation(x=ov, y=1.02, yref="y domain", xref="x", text="EMIT overpass", showarrow=False, yanchor="bottom",
+                       xanchor="center", font=dict(color=CRITICAL, size=11), bgcolor=SURFACE, row=1, col=1)
+    fig.add_hline(y=r, line=dict(color=INK2, dash="dot", width=1.5), row=2, col=1)
+    fig.add_annotation(x=0.005, xref="x domain", y=r, yref="y2", text=f"{r} km attribution radius", showarrow=False,
+                       xanchor="left", yanchor="bottom", font=dict(color=INK2, size=10), bgcolor=SURFACE, row=2, col=1)
+
+    dmax = float(allw["dist_km"].max()) if len(allw) else r * 2
+    fig.update_yaxes(title_text="Fire power (MW)", rangemode="tozero", automargin=True, row=1, col=1)
+    fig.update_yaxes(title_text="Distance (km)", range=[0, min(dmax * 1.12, 20)], automargin=True, row=2, col=1)
+    fig.update_xaxes(title_text="Date (UTC)", automargin=True, row=2, col=1)
+    fig.update_layout(title=f"VIIRS active-fire detections, {fa['window'][0]} to {fa['window'][1]} (NASA FIRMS)",
+                      margin=dict(t=90, b=110, l=60, r=30),
+                      legend=dict(orientation="h", y=-0.26, yanchor="top", x=0.5, xanchor="center"))
     stats = {k: fa[k] for k in ("n_near_facility", "n_day", "n_night", "frp_max_mw", "flare_observed_near_overpass",
                                 "nearest_before_overpass", "nearest_after_overpass")}
     stats["frp_total_mw"] = round(fa["frp_total_mw"], 2)
-    return save("flare_timeline", "Flare activity timeline", fig, stats)
+    return save("flare_timeline", "Flare detections near the plant", fig, stats)
 
 
 # 6 -------------------------------------------------------------------- reporting timeline
