@@ -16,7 +16,7 @@ export function useHealth(pollMs = 8000) {
 }
 
 /** Site header. `overlay` floats it above a hero image; otherwise it sits on the page background. */
-export function SiteHeader({ right, overlay = false }: { right?: ReactNode; overlay?: boolean }) {
+export function SiteHeader({ right, overlay = false, hideWordmark = false }: { right?: ReactNode; overlay?: boolean; hideWordmark?: boolean }) {
   return (
     <div className={overlay ? "absolute inset-x-0 top-0 z-30" : "sticky top-0 z-30 bg-page"}>
       <header className={overlay ? "border-b border-white/25" : "border-b-[3px] border-primary-dark bg-page"}>
@@ -24,7 +24,7 @@ export function SiteHeader({ right, overlay = false }: { right?: ReactNode; over
           <Link to="/" className={`flex items-center gap-3 ${overlay ? "text-white" : "text-ink"}`} aria-label="Save the North — home">
             <Logo size={34} />
             <span className="leading-none">
-              <span className="block text-xl font-bold tracking-tight">Save the North</span>
+              {!hideWordmark && <span className="block text-xl font-bold tracking-tight">Save the North</span>}
             </span>
           </Link>
           <div className={`flex items-center gap-5 text-[14px] font-semibold ${overlay ? "text-white/90" : "text-accent"}`}>{right}</div>

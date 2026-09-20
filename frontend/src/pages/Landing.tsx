@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AvailabilityChips, LocationSearch } from "../components/FacilityPanel";
 import { Footer, SiteHeader, useHealth } from "../components/Header";
 import { useToast } from "../components/Toasts";
-import { Eyebrow, ModeToggle, ShortHash, Spinner } from "../components/ui";
+import { Eyebrow, Logo, ModeToggle, ShortHash, Spinner } from "../components/ui";
 import { api, Dataset, Facility, GeoResult, RecentRun } from "../lib/api";
 import { useElementSize, useInView } from "../lib/hooks";
 import { useRunMode } from "../lib/mode";
@@ -260,26 +260,25 @@ export default function Landing() {
       <section id="hero" className="relative flex min-h-[calc(100vh-40px)] flex-col justify-center overflow-hidden">
         <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-primary-darker/85" aria-hidden />
-        <SiteHeader overlay right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white">Data sources</button>} />
+        <SiteHeader overlay hideWordmark right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white">Data sources</button>} />
 
-        <div className="relative mx-auto w-full max-w-6xl px-6">
-          <div className="max-w-3xl">
-            <p className="fade-in flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-white/80">
-              <span className="block h-[3px] w-6 bg-white/80" aria-hidden />Satellite emissions verification
-            </p>
-            <h1 className="fade-in mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-6xl" style={{ animationDelay: "0.2s" }}>
-              Agentic analysis of<br />factory emissions
-            </h1>
-            <div className="fade-in mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.45s" }}>
-              <button className="btn-dark" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
-                Assess a facility
-              </button>
-              <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
-                className="flex items-center gap-2 text-[15px] font-bold text-white underline underline-offset-4 hover:text-white/80">
-                How the data is collected
-                <svg viewBox="0 0 24 24" className="nudge h-4 w-4"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" d="M12 4v16M6 14l6 6 6-6" /></svg>
-              </button>
-            </div>
+        <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-6 text-center">
+          <div className="fade-in"><Logo size={104} speed={26} /></div>
+          <h1 className="fade-in mt-7 text-5xl font-bold leading-tight tracking-tight text-white sm:text-7xl" style={{ animationDelay: "0.2s" }}>
+            Save the North
+          </h1>
+          <p className="fade-in mt-4 text-lg text-white/85 sm:text-2xl" style={{ animationDelay: "0.4s" }}>
+            Agentic analysis of factory emissions
+          </p>
+          <div className="fade-in mt-9 flex flex-wrap items-center justify-center gap-5" style={{ animationDelay: "0.6s" }}>
+            <button className="btn-dark" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
+              Assess a facility
+            </button>
+            <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
+              className="flex items-center gap-2 text-[15px] font-bold text-white underline underline-offset-4 hover:text-white/80">
+              How the data is collected
+              <svg viewBox="0 0 24 24" className="nudge h-4 w-4"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" d="M12 4v16M6 14l6 6 6-6" /></svg>
+            </button>
           </div>
         </div>
       </section>
