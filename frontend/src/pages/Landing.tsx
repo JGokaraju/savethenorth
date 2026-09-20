@@ -269,11 +269,7 @@ export default function Landing() {
             <h1 className="fade-in mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-6xl" style={{ animationDelay: "0.2s" }}>
               Agentic analysis of<br />factory emissions
             </h1>
-            <p className="fade-in mt-5 max-w-2xl text-[17px] leading-relaxed text-white/85" style={{ animationDelay: "0.45s" }}>
-              This service measures methane plumes from satellite observations, screens them against federal and Texas
-              requirements, checks them against the operator&rsquo;s own filings, and records the source of every number.
-            </p>
-            <div className="fade-in mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.7s" }}>
+            <div className="fade-in mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.45s" }}>
               <button className="btn-dark" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
                 Assess a facility
               </button>

@@ -15,25 +15,10 @@ export function useHealth(pollMs = 8000) {
   return h;
 }
 
-/** Slim band above the header, in the manner of a public-agency site. */
-function DisclosureStrip() {
-  return (
-    <div className="bg-primary-darker text-white">
-      <div className="mx-auto flex max-w-6xl items-center gap-2 px-6 py-1.5 text-[12px] leading-tight">
-        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 flex-none" aria-hidden>
-          <path fill="currentColor" d="M8 1l6 3v4c0 3.3-2.5 6.2-6 7-3.5-.8-6-3.7-6-7V4l6-3z" />
-        </svg>
-        <span>Independent screening prototype — not an official government service.</span>
-      </div>
-    </div>
-  );
-}
-
 /** Site header. `overlay` floats it above a hero image; otherwise it sits on the page background. */
 export function SiteHeader({ right, overlay = false }: { right?: ReactNode; overlay?: boolean }) {
   return (
     <div className={overlay ? "absolute inset-x-0 top-0 z-30" : "sticky top-0 z-30 bg-page"}>
-      <DisclosureStrip />
       <header className={overlay ? "border-b border-white/25" : "border-b-[3px] border-primary-dark bg-page"}>
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
           <Link to="/" className={`flex items-center gap-3 ${overlay ? "text-white" : "text-ink"}`} aria-label="Save the North — home">
