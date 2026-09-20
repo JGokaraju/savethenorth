@@ -1,6 +1,7 @@
 """Huawei OMNI (Qwen3.5-Omni) client over the OpenAI-compatible Chat Completions endpoint.
 
 - one image per request (multi-page documents are called per page and merged by the caller)
+- optional spoken question alongside the image (field mode): audio in, text out
 - non-streaming first; on a stream-related error retry with stream=True and accumulate deltas
 - disk cache keyed by sha256(model + prompt + image hash)
 - mock mode: deterministic, clearly labelled text built from the chart's summary_stats
@@ -41,19 +42,27 @@ def _client():
     return OpenAI(base_url=os.getenv("OMNI_BASE_URL"), api_key=os.getenv("OMNI_API_KEY"), timeout=60, max_retries=0)
 
 
-def _cache_key(prompt: str, image_bytes: bytes | None) -> str:
+def _cache_key(prompt: str, image_bytes: bytes | None, audio_bytes: bytes | None = None) -> str:
     h = hashlib.sha256()
     h.update(model_name().encode()); h.update(b"\0"); h.update(SYSTEM.encode()); h.update(b"\0"); h.update(prompt.encode())
     if image_bytes:
         h.update(hashlib.sha256(image_bytes).digest())
+    if audio_bytes:
+        h.update(b"\0audio\0"); h.update(hashlib.sha256(audio_bytes).digest())
     return h.hexdigest()
 
 
-def _call_live(prompt: str, image_bytes: bytes | None, mime: str) -> str:
+def _call_live(prompt: str, image_bytes: bytes | None, mime: str,
+               audio_bytes: bytes | None = None, audio_format: str = "webm") -> str:
     content = []
     if image_bytes:
         b64 = base64.b64encode(image_bytes).decode()
         content.append({"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}})
+    if audio_bytes:  # spoken question (field mode); the model still answers in text
+        # the Qwen-Omni gateway wants a data URI here, not bare base64
+        content.append({"type": "input_audio",
+                        "input_audio": {"data": f"data:;base64,{base64.b64encode(audio_bytes).decode()}",
+                                        "format": audio_format}})
     content.append({"type": "text", "text": prompt})
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": content}]
     client = _client()
@@ -94,12 +103,15 @@ def _call_live(prompt: str, image_bytes: bytes | None, mime: str) -> str:
 
 
 def ask(prompt: str, image_path: Path | None = None, image_bytes: bytes | None = None,
-        mock_text: str | None = None) -> dict:
-    """Returns {answer, mode: live|cached|mock, model, cache_key}."""
+        mock_text: str | None = None, audio_bytes: bytes | None = None, audio_format: str = "webm") -> dict:
+    """Returns {answer, mode: live|cached|mock, model, cache_key}.
+
+    `audio_bytes` carries a spoken question (field mode) alongside the image; the answer is text.
+    """
     if image_path is not None and image_bytes is None:
         image_bytes = Path(image_path).read_bytes()
     mime = "image/jpeg" if image_path and str(image_path).lower().endswith((".jpg", ".jpeg")) else "image/png"
-    key = _cache_key(prompt, image_bytes)
+    key = _cache_key(prompt, image_bytes, audio_bytes)
     cache_file = CACHE_DIR / "omni" / f"{key}.json"
     if cache_file.exists():
         with _lock:
@@ -112,7 +124,7 @@ def ask(prompt: str, image_path: Path | None = None, image_bytes: bytes | None =
         return {"answer": mock_text or "No live model configured.", "mode": "mock",
                 "model": f"{model_name()} (demo)", "cache_key": key}
     try:
-        answer = _call_live(prompt, image_bytes, mime)
+        answer = _call_live(prompt, image_bytes, mime, audio_bytes, audio_format)
     except Exception as e:  # noqa: BLE001 — never fail the run; fall back to the mock text
         with _lock:
             _counter["mock"] += 1

@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response
 from pydantic import BaseModel
@@ -26,6 +26,7 @@ from backend.charts.base import load as load_chart
 from backend.llm import omni
 from backend.science.common import DataGap, haversine_km, slot
 from backend.settings import CHARTS_DIR, DATA, ROOT, RUNS_DIR, facilities
+from backend.tools import field_tools
 from backend.tools.state import RunState, get_state, new_state
 
 app = FastAPI(title="Save the North API", version="1.1")
@@ -191,6 +192,27 @@ def create_run(req: RunRequest) -> dict:
     st = new_state(req.facility_id, req.date, mode=orchestrator.mode(req.mode))
     threading.Thread(target=orchestrator.run, args=(st,), daemon=True).start()
     return {"run_id": st.run_id, "mode": st.mode}
+
+
+@app.post("/api/field-note")
+async def field_note(facility_id: str = Form(...), audio: UploadFile = File(...),
+                     context: str | None = Form(None)) -> dict:
+    """Field mode: a spoken question from someone at the site, answered by OMNI from the audio + site view.
+
+    Not part of the agent's tool set — the desk assessment has no microphone to call it with.
+    """
+    blob = await audio.read()
+    if len(blob) > 8_000_000:
+        raise HTTPException(413, "recording too long")
+    fmt = (audio.filename or "clip.webm").rsplit(".", 1)[-1].lower()
+    if fmt not in {"webm", "wav", "mp3", "m4a", "ogg"}:
+        fmt = "webm"
+    try:
+        return field_tools.field_question(facility_id, blob, fmt, context)
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 def _run_or_404(run_id: str) -> RunState | None:

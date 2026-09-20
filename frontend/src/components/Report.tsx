@@ -4,6 +4,7 @@ import { useCountUp, useInView } from "../lib/hooks";
 import { useTrace } from "../lib/trace";
 import { RunState } from "../lib/useRun";
 import { EvidencePanel } from "./EvidencePanel";
+import { FieldNote } from "./FieldNote";
 import { SiteHeader } from "./Header";
 import { MethodTab } from "./MethodTab";
 import { Plot } from "./Plot";
@@ -239,6 +240,9 @@ export function Report({ run, f }: { run: RunState; f: Facility | null }) {
       <KeyEvidence v={v} />
       <Findings v={v} />
       <Figures run={run} />
+      <Section title="From the field" eyebrow="Spoken follow-up">
+        <FieldNote facilityId={v.facility_id ?? f?.facility_id ?? ""} context={v.outcome?.reason} />
+      </Section>
       <Section title="Records" eyebrow="Download and audit">
         <div className="mb-5 flex flex-wrap gap-3">
           <a className="btn-dark" href={`/api/runs/${run.runId}/report.html`} target="_blank" rel="noreferrer">Export report</a>

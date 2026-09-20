@@ -173,6 +173,15 @@ async function j<T>(url: string, init?: RequestInit): Promise<T> {
   return r.json();
 }
 
+export type FieldNote = {
+  answer: string;
+  mode: string;
+  model: string;
+  facility: string;
+  image_used: boolean;
+  modalities: string[];
+};
+
 export const api = {
   health: () => j<Health>("/api/health"),
   facilities: (q = "") => j<Facility[]>(`/api/facilities?q=${encodeURIComponent(q)}`),
@@ -189,6 +198,16 @@ export const api = {
   recentRuns: (limit = 6) => j<RecentRun[]>(`/api/runs?limit=${limit}`),
   evidence: (runId: string) => j<{ ledger: LedgerRecord[]; omni_calls: LedgerRecord[]; tool_calls: any[] }>(`/api/runs/${runId}/evidence`),
   image: (id: string) => j<{ url: string; bounds: { west: number; south: number; east: number; north: number }; date: string; warnings: string[] }>(`/api/images/${id}`),
+  /** Field mode: a spoken question recorded at the site, answered by OMNI from the audio + site view. */
+  fieldNote: async (facilityId: string, clip: Blob, context?: string) => {
+    const form = new FormData();
+    form.append("facility_id", facilityId);
+    form.append("audio", clip, "question.webm");
+    if (context) form.append("context", context);
+    const r = await fetch("/api/field-note", { method: "POST", body: form });
+    if (!r.ok) throw new Error((await r.text()).slice(0, 200) || r.statusText);
+    return (await r.json()) as FieldNote;
+  },
 };
 
 export const runFileUrl = (runId: string, ref: string) => `/api/runs/${runId}/${ref.replace(/^\/+/, "")}`;
