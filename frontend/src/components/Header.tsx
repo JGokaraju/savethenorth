@@ -40,9 +40,6 @@ export function SiteHeader({ right, overlay = false }: { right?: ReactNode; over
             <Logo size={34} />
             <span className="leading-none">
               <span className="block text-xl font-bold tracking-tight">Save the North</span>
-              <span className={`mt-1 block text-[11px] font-semibold uppercase tracking-[0.12em] ${overlay ? "text-white/75" : "text-muted"}`}>
-                Satellite methane verification
-              </span>
             </span>
           </Link>
           <div className={`flex items-center gap-5 text-[14px] font-semibold ${overlay ? "text-white/90" : "text-accent"}`}>{right}</div>

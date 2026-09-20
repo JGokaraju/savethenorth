@@ -202,7 +202,7 @@ export default function Landing() {
     resumeTimer.current = window.setTimeout(() => setRotate(true), RESUME_MS);
   }, [setRotate]);
 
-  const flyTo = useCallback((lat: number, lng: number, altitude = 1.6, ms = 2000) => {
+  const flyTo = useCallback((lat: number, lng: number, altitude = 1.35, ms = 2000) => {
     userLocked.current = true;
     setRotate(false);
     globe.current?.pointOfView({ lat, lng, altitude }, reduced ? 0 : ms);
@@ -224,7 +224,7 @@ export default function Landing() {
     c.enableZoom = false; // the page scrolls; the globe must not capture the wheel
     c.addEventListener("start", () => { window.clearTimeout(resumeTimer.current); setRotate(false); });
     c.addEventListener("end", () => { if (!userLocked.current) pauseThenResume(); });
-    g.pointOfView({ lat: 25, lng: -40, altitude: 2.2 }, 0);
+    g.pointOfView({ lat: 25, lng: -40, altitude: 1.75 }, 0);
     setRotate(true);
   }, [setRotate, pauseThenResume]);
 
@@ -235,7 +235,7 @@ export default function Landing() {
 
   useEffect(() => { // once the globe scrolls into view: spin ~2 s, then fly to the selected site
     if (!globeVisible || !sel || userLocked.current) return;
-    const t = window.setTimeout(() => flyTo(sel.lat, sel.lon, 1.6, 2600), reduced ? 0 : 2000);
+    const t = window.setTimeout(() => flyTo(sel.lat, sel.lon, 1.35, 2600), reduced ? 0 : 2000);
     return () => window.clearTimeout(t);
   }, [globeVisible, sel, flyTo, reduced]);
 
@@ -267,7 +267,7 @@ export default function Landing() {
               <span className="block h-[3px] w-6 bg-white/80" aria-hidden />Satellite emissions verification
             </p>
             <h1 className="fade-in mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-6xl" style={{ animationDelay: "0.2s" }}>
-              Independent verification of<br />industrial methane emissions
+              Agentic analysis of<br />factory emissions
             </h1>
             <p className="fade-in mt-5 max-w-2xl text-[17px] leading-relaxed text-white/85" style={{ animationDelay: "0.45s" }}>
               This service measures methane plumes from satellite observations, screens them against federal and Texas
@@ -377,7 +377,7 @@ export default function Landing() {
             </div>
           )}
 
-          <div ref={box.ref} className="relative mt-8 h-[70vh] min-h-[460px] w-full border border-rule bg-page">
+          <div ref={box.ref} className="relative mx-auto mt-8 h-[560px] w-full max-w-2xl border border-rule bg-page">
             {box.w > 0 && (
               <Globe
                 ref={globe}
@@ -411,7 +411,7 @@ export default function Landing() {
               />
             )}
           </div>
-          <p className="mt-2 text-right text-[10px] uppercase tracking-[0.16em] text-muted">Earth imagery: NASA Blue Marble</p>
+          <p className="mx-auto mt-2 max-w-2xl text-right text-[10px] uppercase tracking-[0.16em] text-muted">Earth imagery: NASA Blue Marble</p>
         </div>
       </section>
 
