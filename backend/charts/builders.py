@@ -57,7 +57,7 @@ def plume_map(crop, bg, masks: dict, det_by_k: dict, facility: dict, wind, k_def
                        axref="x", ayref="y", showarrow=True, arrowhead=3, arrowsize=1.4, arrowwidth=2.5, arrowcolor=INK,
                        text="")
     fig.add_annotation(x=x0, y=y0, text=f"wind {wind.u10:.1f} m/s from {wind.direction_deg:.0f}°", showarrow=False,
-                       yshift=-18, font=dict(color=INK, size=12), bgcolor="rgba(16,33,36,0.85)")
+                       yshift=-18, font=dict(color=INK, size=12), bgcolor="rgba(255,255,255,0.85)")
     steps = []
     for i, k in enumerate(ks):
         vis = [True] + [kk == k for kk in ks] + [True, True]
@@ -117,7 +117,7 @@ def wind_sensitivity(curve: dict, u10_obs: float, q_obs_kg_h: float, sigma_u: fl
     u = curve["u10"]
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=u + u[::-1], y=curve["q_hi_kg_h"] + curve["q_lo_kg_h"][::-1], fill="toself",
-                             fillcolor="rgba(57,135,229,0.18)", line=dict(width=0), hoverinfo="skip",
+                             fillcolor="rgba(42,120,214,0.16)", line=dict(width=0), hoverinfo="skip",
                              name="α, β ± 20%"))
     fig.add_trace(go.Scatter(x=u, y=curve["q_kg_h"], mode="lines", line=dict(color=S1, width=2), name="Q(U10), default mask",
                              hovertemplate="U10 %{x:.1f} m/s<br>Q %{y:,.0f} kg/h<extra></extra>"))
@@ -263,7 +263,7 @@ def regulatory_comparison(mc: dict, cm: dict | None, phys: dict | None) -> Chart
         fig.add_trace(go.Bar(
             y=[name], x=[v], orientation="h", marker=dict(color=color, line=dict(width=0)), name=name, showlegend=False,
             error_x=dict(type="data", symmetric=False, array=[hi], arrayminus=[lo], color=INK, thickness=2, width=8) if lo else None,
-            text=[_fmt_kgh(v)], textposition="outside", textfont=dict(color=INK),
+            text=[_fmt_kgh(v)], textposition="outside", textfont=dict(color=INK), cliponaxis=False,
             hovertemplate=f"{name}<br>%{{x:,.0f}} kg/h" + (f"<br>p5–p95 {_fmt_kgh(mc['p5_kg_h'])}–{_fmt_kgh(mc['p95_kg_h'])}" if lo else "")
                           + "<extra></extra>"))
     fig.update_layout(title="Estimate vs. regulatory threshold and plant capacity", bargap=0.45,
@@ -308,7 +308,7 @@ def report_comparison(cmp_: dict) -> ChartArtifact:
     fig = go.Figure()
     for name, v, c in rows:
         fig.add_trace(go.Bar(y=[name], x=[v], orientation="h", marker=dict(color=c, line=dict(width=0)), showlegend=False,
-                             text=[f"{v:,.0f} lb"], textposition="outside", textfont=dict(color=INK),
+                             text=[f"{v:,.0f} lb"], textposition="outside", textfont=dict(color=INK), cliponaxis=False,
                              hovertemplate=f"{name}<br>%{{x:,.0f}} lb<extra></extra>"))
     none_txt = ("No emissions-event report filed within ±1 day of " + cmp_["event_date"]) if not cmp_.get("reported_on_event_date") else ""
     if none_txt:
@@ -316,8 +316,8 @@ def report_comparison(cmp_: dict) -> ChartArtifact:
                            yanchor="bottom", showarrow=False, xanchor="left", font=dict(color=CRITICAL, size=12))
     vmax = max([r[1] for r in rows] or [10])
     fig.update_layout(title="Satellite observation vs the operator's reported emissions", bargap=0.45,
-                      xaxis=dict(type="log", title="Pounds (log scale)", range=[1, np.log10(vmax * 60)]),
-                      yaxis=dict(autorange="reversed", title="", automargin=True), margin=dict(l=250, r=90, b=90))
+                      xaxis=dict(type="log", title="Pounds (log scale)", range=[1, np.log10(vmax * 300)]),
+                      yaxis=dict(autorange="reversed", title="", automargin=True), margin=dict(l=250, r=110, b=90))
     stats = {"rows": {r[0]: round(r[1]) for r in rows}, "reported_on_event_date": len(cmp_.get("reported_on_event_date", [])),
              "methane_reported_anywhere": cmp_.get("methane_reported_anywhere")}
     return save("report_comparison", "Satellite vs technical report", fig, stats)

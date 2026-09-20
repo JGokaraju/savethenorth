@@ -43,7 +43,7 @@ export function LocationSearch({ initial, onPick, placeholder = "Search a facili
           {res.map((r, i) => (
             <li key={r.label + i}>
               <button onMouseDown={() => pick(r)}
-                className={`flex w-full items-start justify-between gap-2 px-3 py-2 text-left text-sm ${i === active ? "bg-panel text-gold" : "hover:bg-panel"}`}>
+                className={`flex w-full items-start justify-between gap-2 px-3 py-2 text-left text-sm ${i === active ? "bg-panel text-accent" : "hover:bg-panel"}`}>
                 <span>
                   <span className="text-ink">{r.label}</span>
                   {r.nearest_facility && r.kind !== "facility" && (
@@ -84,7 +84,7 @@ export function FacilityCard({ f }: { f: Facility }) {
   return (
     <div className="space-y-3">
       <div>
-        <div className="font-display text-lg text-ink">{f.name}</div>
+        <div className="text-base font-bold text-ink">{f.name}</div>
         {f.data_status !== "cached" && <div className="mt-1 text-xs text-alert-amber">No cached observations — assessment will report a data gap.</div>}
       </div>
       <dl className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs">
@@ -134,7 +134,7 @@ export function SiteMap({ f, run }: { f: Facility; run: RunState }) {
     data.push({ type: "scattermapbox", lat: firms.lat, lon: firms.lon, mode: "markers", name: "FIRMS ≤1.5 km",
       marker: { size: 11, color: "#fab219" }, text: firms.text, hovertemplate: "%{text}<extra>VIIRS</extra>" });
   data.push({ type: "scattermapbox", lat: [f.lat], lon: [f.lon], mode: "markers", name: f.name,
-    marker: { size: 14, color: "#f3f1ea" }, hovertemplate: `${f.name}<extra></extra>` });
+    marker: { size: 14, color: "#1b1b1b" }, hovertemplate: `${f.name}<extra></extra>` });
   const mapLayers: any[] = [];
   (["s2_truecolor", "s2_swir"] as const).forEach((id) => {
     const m = images[id];
@@ -148,7 +148,7 @@ export function SiteMap({ f, run }: { f: Facility; run: RunState }) {
     data,
     layout: {
       mapbox: { style: "open-street-map", center: { lat: f.lat + 0.015, lon: f.lon }, zoom: f.data_status === "cached" ? 11.3 : 9, layers: mapLayers },
-      margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: "#102124", showlegend: false,
+      margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: "#ffffff", showlegend: false,
     },
   };
   const toggles: [keyof Layers, string, boolean][] = [

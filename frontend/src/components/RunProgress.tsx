@@ -43,7 +43,7 @@ export function RunProgress({ run }: { run: RunState }) {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule bg-panel2 px-4 py-3">
         <div className="flex items-center gap-2.5">
           {live ? <Spinner className="h-4 w-4" /> : null}
-          <span className="font-display text-lg text-ink">{done ? "Verification complete" : PHASES[phase]}</span>
+          <span className="text-base font-bold text-ink">{done ? "Verification complete" : PHASES[phase]}</span>
           <span className="font-mono text-sm tabular-nums text-muted">{fmtDuration(elapsed)}</span>
         </div>
         <div className="flex gap-5 text-xs text-muted">
@@ -53,7 +53,7 @@ export function RunProgress({ run }: { run: RunState }) {
         </div>
       </div>
       <div className="h-1 w-full bg-rule">
-        <div className="h-1 bg-gold transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
+        <div className="h-1 bg-accent transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
       </div>
       <ol className="grid grid-cols-2 divide-y divide-rule sm:grid-cols-5 sm:divide-y-0">
         {PHASES.map((p, i) => {

@@ -94,19 +94,19 @@ function CarbonMapperPreview({ run }: { run: RunState }) {
 
 function SourceCard({ rec, run, active }: { rec: LedgerRecord; run: RunState; active: boolean }) {
   return (
-    <div id={`ledger-${rec.id}`} className={`space-y-2 border p-3 ${active ? "border-gold" : "border-rule"} bg-panel`}>
+    <div id={`ledger-${rec.id}`} className={`space-y-2 border p-3 ${active ? "border-accent" : "border-rule"} bg-panel`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             {rec.provider && <Chip tone={PROVIDER_TONE[rec.provider] ?? "slate"}>{rec.provider}</Chip>}
-            <span className="font-display text-base text-ink">{rec.source_name}</span>
+            <span className="text-[15px] font-bold text-ink">{rec.source_name}</span>
             {rec.synthetic && <Chip tone="violet">SYNTHETIC placeholder</Chip>}
             {rec.quality === "low" && <Chip tone="amber">low quality</Chip>}
           </div>
           <div className="mt-1 text-[11px] text-muted"><code>{rec.file}</code> · <ShortHash hash={rec.sha256} /> · {rec.date_coverage}</div>
         </div>
         {rec.preview_ref && (
-          <a href={runFileUrl(run.runId!, rec.preview_ref)} className="border border-rule px-2 py-1 text-[11px] text-muted hover:border-gold hover:text-gold">⬇ Download subset</a>
+          <a href={runFileUrl(run.runId!, rec.preview_ref)} className="border border-rule px-2 py-1 text-[11px] text-muted hover:border-accent hover:text-accent">⬇ Download subset</a>
         )}
       </div>
       <div className="text-[11px] text-muted">{rec.citation} · {rec.source_url && <a href={rec.source_url} target="_blank" rel="noreferrer" className="link">source</a>}</div>
@@ -129,13 +129,13 @@ export function EvidencePanel({ run }: { run: RunState }) {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted">{data.length} datasets, {assumptions.length} assumptions, {run.omniCalls.length} AI analyses in this run's Evidence Ledger.</p>
-        <a href={`/api/runs/${run.runId}/evidence.zip`} className="border border-gold/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-gold hover:text-gold-light">⬇ Download all evidence (.zip)</a>
+        <a href={`/api/runs/${run.runId}/evidence.zip`} className="border border-accent/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-accent hover:text-accent-light">⬇ Download all evidence (.zip)</a>
       </div>
       <section className="space-y-3">
         <h4 className="label">Measured data</h4>
         {data.map((r) => <SourceCard key={r.id} rec={r} run={run} active={active(r.id)} />)}
         {derived.map((r) => (
-          <div key={r.id} id={`ledger-${r.id}`} className={`border p-3 text-[11px] text-muted ${active(r.id) ? "border-gold" : "border-rule"}`}>
+          <div key={r.id} id={`ledger-${r.id}`} className={`border p-3 text-[11px] text-muted ${active(r.id) ? "border-accent" : "border-rule"}`}>
             <b className="text-ink">{r.name}</b> · {r.record_count?.toLocaleString()} values · {r.source}
             {r.preview_ref && <> · <a className="link" href={runFileUrl(run.runId!, r.preview_ref)}>download</a></>}
           </div>
@@ -162,7 +162,7 @@ export function EvidencePanel({ run }: { run: RunState }) {
       <section className="space-y-2">
         <h4 className="label">AI analysis log (Huawei OMNI)</h4>
         {run.omniCalls.map((c) => (
-          <div key={c.id} id={`ledger-${c.id}`} className={`flex gap-3 border p-3 ${active(c.id) ? "border-gold" : "border-rule"}`}>
+          <div key={c.id} id={`ledger-${c.id}`} className={`flex gap-3 border p-3 ${active(c.id) ? "border-accent" : "border-rule"}`}>
             {c.input_ref && <a href={runFileUrl(run.runId!, c.input_ref)} target="_blank" rel="noreferrer"><img src={runFileUrl(run.runId!, c.input_ref)} alt="" className="h-16 w-24 flex-none border border-rule bg-panel2 object-cover" /></a>}
             <div className="min-w-0 text-[11px]">
               <div className="flex flex-wrap items-center gap-2">

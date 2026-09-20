@@ -46,7 +46,7 @@ export function CsvTable({ url, columns, highlight, pageSize = 10, caption }: {
           <thead className="bg-panel2 text-muted">
             <tr>
               {cols.map((c) => (
-                <th key={c} className="cursor-pointer whitespace-nowrap px-2 py-1 text-left font-semibold uppercase tracking-[0.1em] hover:text-gold"
+                <th key={c} className="cursor-pointer whitespace-nowrap px-2 py-1 text-left font-semibold uppercase tracking-[0.1em] hover:text-accent"
                   onClick={() => setSort((s) => ({ col: c, dir: s?.col === c && s.dir === 1 ? -1 : 1 }))}>
                   {c}{sort?.col === c ? (sort.dir === 1 ? " ▲" : " ▼") : ""}
                 </th>
@@ -64,9 +64,9 @@ export function CsvTable({ url, columns, highlight, pageSize = 10, caption }: {
       </div>
       {pages > 1 && (
         <div className="flex items-center gap-2 text-[11px] text-muted">
-          <button disabled={page === 0} onClick={() => setPage((p) => p - 1)} className="px-1.5 hover:text-gold disabled:opacity-30">‹ prev</button>
+          <button disabled={page === 0} onClick={() => setPage((p) => p - 1)} className="px-1.5 hover:text-accent disabled:opacity-30">‹ prev</button>
           page {page + 1} / {pages} · {rows.length.toLocaleString()} rows
-          <button disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)} className="px-1.5 hover:text-gold disabled:opacity-30">next ›</button>
+          <button disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)} className="px-1.5 hover:text-accent disabled:opacity-30">next ›</button>
         </div>
       )}
     </div>

@@ -103,7 +103,7 @@ function MediaStrip({ media, onOpen }: { media: Media[]; onOpen: (m: Media) => v
     <div className="mt-2 flex flex-wrap gap-2">
       {media.map((m) => (
         <figure key={m.src} className="fade-up">
-          <button type="button" onClick={() => onOpen(m)} className="block border border-rule bg-panel2 p-0.5 hover:border-gold"
+          <button type="button" onClick={() => onOpen(m)} className="block border border-rule bg-panel2 p-0.5 hover:border-accent"
             aria-label={`Enlarge: ${m.caption}`}>
             <img src={m.src} alt={m.caption} loading="lazy"
               className={`${m.kind === "page" ? "h-36 w-auto" : "h-28 w-auto max-w-[220px] object-cover"} block bg-panel`} />
@@ -135,7 +135,7 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
         <div className="flex items-center gap-3">
           {running && <Spinner className="h-4 w-4" />}
           <div>
-            <div className="font-display text-xl text-ink">{title}</div>
+            <div className="text-lg font-bold text-ink">{title}</div>
             <div className="text-sm text-muted">{running ? "The agent is working" : "Finished"} · {steps.length} steps</div>
           </div>
         </div>

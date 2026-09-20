@@ -22,7 +22,7 @@ export function StatusBadge({ status }: { status: string }) {
 type Tone = "slate" | "amber" | "red" | "sky" | "emerald" | "violet";
 const TONES: Record<Tone, string> = {
   slate: "border-rule text-muted", amber: "border-alert-amber/50 text-alert-amber", red: "border-alert-red/50 text-alert-red",
-  sky: "border-primary/50 text-primary", emerald: "border-alert-green/50 text-alert-green", violet: "border-gold/50 text-gold",
+  sky: "border-primary/50 text-primary", emerald: "border-alert-green/50 text-alert-green", violet: "border-accent/50 text-accent",
 };
 
 export function Chip({ children, tone = "slate", title }: { children: ReactNode; tone?: Tone; title?: string }) {
@@ -41,7 +41,7 @@ export function Card({ title, children, right, className = "", pad = true }: {
     <section className={`panel ${className}`}>
       {title && (
         <header className="flex items-center justify-between border-b border-rule px-5 py-3">
-          <h3 className="font-display text-lg text-ink">{title}</h3>{right}
+          <h3 className="text-base font-bold text-ink">{title}</h3>{right}
         </header>
       )}
       <div className={pad ? "p-5" : ""}>{children}</div>
@@ -57,7 +57,7 @@ export function Segmented<T extends string>({ value, options, onChange, size = "
       {options.map((o, i) => (
         <button key={o.value} role="tab" aria-selected={value === o.value} disabled={o.disabled} title={o.title} onClick={() => onChange(o.value)}
           className={`font-semibold uppercase tracking-[0.12em] transition-colors ${size === "sm" ? "px-3 py-1.5 text-[11px]" : "px-4 py-2 text-xs"} ${i ? "border-l border-rule" : ""} ${
-            value === o.value ? "bg-gold text-page" : "text-muted hover:text-ink"} disabled:cursor-not-allowed disabled:text-muted/40`}>
+            value === o.value ? "bg-accent text-page" : "text-muted hover:text-ink"} disabled:cursor-not-allowed disabled:text-muted/40`}>
           {o.label}
         </button>
       ))}
@@ -90,7 +90,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 }
 
 export function Spinner({ className = "" }: { className?: string }) {
-  return <span className={`inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-rule border-t-gold ${className}`} aria-label="loading" />;
+  return <span className={`inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-rule border-t-accent ${className}`} aria-label="loading" />;
 }
 
 export function ShortHash({ hash }: { hash?: string }) {

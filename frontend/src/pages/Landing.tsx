@@ -32,13 +32,6 @@ const PIPELINE = [
   { n: 5, t: "Rank", d: "Hybrid search and rerank, then verdict" },
 ];
 
-const SECTIONS = [
-  { id: "hero", label: "Start" },
-  { id: "data", label: "01" },
-  { id: "assess", label: "02" },
-  { id: "recent", label: "03" },
-];
-
 function useReducedMotion() {
   const [r, setR] = useState(() => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
   useEffect(() => {
@@ -75,10 +68,10 @@ function DatasetsModal({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={onClose} role="dialog" aria-modal="true" aria-label="Source datasets">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose} role="dialog" aria-modal="true" aria-label="Source datasets">
       <div className="panel max-h-[85vh] w-full max-w-4xl overflow-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-rule px-6 py-4">
-          <h2 className="font-display text-2xl text-ink">Source datasets</h2>
+          <h2 className="text-xl font-bold text-ink">Source datasets</h2>
           <button onClick={onClose} className="read-more" aria-label="Close">Close</button>
         </div>
         {!ds ? <div className="p-6"><Spinner /></div> : (
@@ -124,13 +117,10 @@ function datasetCounts(ds: Dataset[]): { label: string; value: string }[] {
 
 function SectionHead({ num, eyebrow, title, children }: { num: string; eyebrow: string; title: string; children?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-end gap-x-8 gap-y-2">
-      <span className="numeral">{num}</span>
-      <div className="min-w-0 flex-1">
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h2 className="h2 mt-3">{title}</h2>
-        {children}
-      </div>
+    <div className="border-b border-rule pb-4">
+      <Eyebrow>{num} · {eyebrow}</Eyebrow>
+      <h2 className="h2 mt-2">{title}</h2>
+      {children}
     </div>
   );
 }
@@ -144,7 +134,7 @@ function RecentRuns({ runs }: { runs: RecentRun[] }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.15);
   if (!runs.length) return null;
   return (
-    <section id="recent" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-20">
+    <section id="recent" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-16">
       <div ref={ref} className={`reveal ${inView ? "in" : ""}`}>
         <SectionHead num="03" eyebrow="Previous work" title="Recent assessments" />
         <table className="mt-8 w-full border-t border-rule text-sm">
@@ -156,7 +146,7 @@ function RecentRuns({ runs }: { runs: RecentRun[] }) {
             {runs.map((r) => (
               <tr key={r.run_id} className="border-t border-rule/60 transition-colors hover:bg-panel">
                 <td className="py-4 pr-4">
-                  <a className="font-display text-lg text-ink hover:text-gold" href={`/assess/${r.facility_id}?date=${r.date}&run=${r.run_id}`}>
+                  <a className="text-base font-bold text-ink hover:text-accent" href={`/assess/${r.facility_id}?date=${r.date}&run=${r.run_id}`}>
                     {r.facility_name ?? r.facility_id}
                   </a>
                 </td>
@@ -250,7 +240,7 @@ export default function Landing() {
   }, [globeVisible, sel, flyTo, reduced]);
 
   const points = useMemo(() => facilities.map((f) => ({
-    ...f, color: f.data_status === "cached" ? "#e05c4b" : "#f3f1ea", size: 0.012,
+    ...f, color: f.data_status === "cached" ? "#b50909" : "#ffffff", size: 0.012,
     label: f.data_status === "cached" ? "Methane plume detected" : "No cached observations",
   })), [facilities]);
   const rings = useMemo(() => facilities.map((f) => ({ lat: f.lat, lng: f.lon, hot: f.data_status === "cached" })), [facilities]);
@@ -266,55 +256,47 @@ export default function Landing() {
   return (
     <div>
       {/* ------------------------------------------------------------------ hero */}
-      <section id="hero" className="relative flex min-h-screen flex-col justify-center overflow-hidden">
+      <section id="hero" className="relative flex min-h-[calc(100vh-40px)] flex-col justify-center overflow-hidden">
         <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-page/85 via-page/60 to-page" aria-hidden />
-        <SiteHeader overlay right={<button onClick={() => setShowDs(true)} className="hover:text-gold">Data sources</button>} />
-
-        {/* instrument rail */}
-        <div className="pointer-events-none absolute bottom-28 left-7 hidden lg:block">
-          <span className="block origin-bottom-left -rotate-90 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.3em] text-muted">
-            EMIT · VIIRS · Sentinel-2 · ERA5
-          </span>
-        </div>
-        {/* section index */}
-        <nav className="absolute right-8 top-1/2 hidden -translate-y-1/2 flex-col items-end gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] lg:flex" aria-label="Sections">
-          {SECTIONS.map((s, i) => (
-            <button key={s.id} onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}
-              className={i === 0 ? "text-gold" : "text-muted hover:text-ink"}>{s.label}</button>
-          ))}
-        </nav>
+        <div className="absolute inset-0 bg-primary-darker/85" aria-hidden />
+        <SiteHeader overlay right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white">Data sources</button>} />
 
         <div className="relative mx-auto w-full max-w-6xl px-6">
-          <div className="max-w-2xl">
-            <Eyebrow className="fade-in">Satellite emissions verification</Eyebrow>
-            <h1 className="fade-in mt-6 font-display text-5xl leading-[1.05] text-ink sm:text-7xl" style={{ animationDelay: "0.25s" }}>
-              Watching methane<br />from orbit
-            </h1>
-            <p className="fade-in mt-6 max-w-xl text-[17px] leading-relaxed text-muted" style={{ animationDelay: "0.6s" }}>
-              An agent that measures industrial methane plumes from satellite data, checks them against the operator&rsquo;s own
-              filings, and shows the source of every number.
+          <div className="max-w-3xl">
+            <p className="fade-in flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-white/80">
+              <span className="block h-[3px] w-6 bg-white/80" aria-hidden />Satellite emissions verification
             </p>
-            <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
-              className="fade-in mt-10 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.2em] text-ink hover:text-gold"
-              style={{ animationDelay: "0.9s" }}>
-              Scroll down
-              <svg viewBox="0 0 24 24" className="nudge h-5 w-5"><path fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" d="M12 4v16M6 14l6 6 6-6" /></svg>
-            </button>
+            <h1 className="fade-in mt-5 text-4xl font-bold leading-tight tracking-tight text-white sm:text-6xl" style={{ animationDelay: "0.2s" }}>
+              Independent verification of<br />industrial methane emissions
+            </h1>
+            <p className="fade-in mt-5 max-w-2xl text-[17px] leading-relaxed text-white/85" style={{ animationDelay: "0.45s" }}>
+              This service measures methane plumes from satellite observations, screens them against federal and Texas
+              requirements, checks them against the operator&rsquo;s own filings, and records the source of every number.
+            </p>
+            <div className="fade-in mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.7s" }}>
+              <button className="btn-dark" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
+                Assess a facility
+              </button>
+              <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex items-center gap-2 text-[15px] font-bold text-white underline underline-offset-4 hover:text-white/80">
+                How the data is collected
+                <svg viewBox="0 0 24 24" className="nudge h-4 w-4"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" d="M12 4v16M6 14l6 6 6-6" /></svg>
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ------------------------------------------------------------- 01 the data */}
-      <section id="data" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-20">
+      <section id="data" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-16">
         <div ref={dataRef} className={`reveal ${dataIn ? "in" : ""}`}>
           <SectionHead num="01" eyebrow="Where it looks" title="How the data is collected" />
           <div className="mt-8 grid gap-x-12 gap-y-6 lg:grid-cols-2">
             {[DATA_BULLETS.slice(0, 3), DATA_BULLETS.slice(3)].map((col, i) => (
               <ul key={i} className="space-y-5">
                 {col.map((d) => (
-                  <li key={d.title} className="border-l border-gold/50 pl-4">
-                    <div className="text-ink">{d.title}</div>
+                  <li key={d.title} className="border-l-[3px] border-accent pl-4">
+                    <div className="font-bold text-ink">{d.title}</div>
                     <div className="text-sm leading-relaxed text-muted">{d.line}</div>
                   </li>
                 ))}
@@ -326,7 +308,7 @@ export default function Landing() {
             <dl className="mt-12 grid grid-cols-2 gap-px border border-rule bg-rule sm:grid-cols-3 lg:grid-cols-6">
               {counts.map((c) => (
                 <div key={c.label} className="bg-page px-4 py-5">
-                  <dd className="font-display text-3xl text-ink">{c.value}</dd>
+                  <dd className="text-2xl font-bold tabular-nums text-ink">{c.value}</dd>
                   <dt className="mt-1 text-[10px] uppercase tracking-[0.16em] text-muted">{c.label}</dt>
                 </div>
               ))}
@@ -337,7 +319,7 @@ export default function Landing() {
           <ol className="mt-4 grid gap-px border border-rule bg-rule sm:grid-cols-5">
             {PIPELINE.map((s) => (
               <li key={s.n} className="bg-page px-4 py-5">
-                <span className="font-display text-2xl text-gold">{String(s.n).padStart(2, "0")}</span>
+                <span className="text-xl font-bold text-accent">{String(s.n).padStart(2, "0")}</span>
                 <div className="mt-1 text-ink">{s.t}</div>
                 <p className="mt-1 text-xs leading-snug text-muted">{s.d}</p>
               </li>
@@ -347,7 +329,7 @@ export default function Landing() {
       </section>
 
       {/* ----------------------------------------------------------- 02 assessment */}
-      <section id="assess" className="scroll-mt-24 border-t border-rule bg-panel/40 py-20">
+      <section id="assess" className="scroll-mt-24 border-t border-rule bg-panel py-16">
         <div ref={globeSection} className="mx-auto max-w-6xl px-6">
           <SectionHead num="02" eyebrow="Run an assessment" title="Assess a facility" />
 
@@ -376,7 +358,7 @@ export default function Landing() {
                 <tr key={f.facility_id} onClick={() => selectFacility(f.facility_id)}
                   className={`cursor-pointer border-t border-rule/60 transition-colors ${sel?.facility_id === f.facility_id ? "bg-panel2" : "hover:bg-panel"}`}>
                   <td className="py-4 pr-4">
-                    <button className={`text-left font-display text-lg ${sel?.facility_id === f.facility_id ? "text-gold" : "text-ink"}`}>{f.name}</button>
+                    <button className={`text-left text-[15px] font-bold ${sel?.facility_id === f.facility_id ? "text-accent" : "text-ink"}`}>{f.name}</button>
                   </td>
                   <td className="py-4 pr-4 text-muted">{f.county} County, {f.state}</td>
                   <td className="hidden py-4 pr-4 text-muted md:table-cell">{f.operator?.split(" — ")[0] ?? "—"}</td>
@@ -395,7 +377,7 @@ export default function Landing() {
             </div>
           )}
 
-          <div ref={box.ref} className="relative mt-10 h-[70vh] min-h-[460px] w-full border border-rule bg-page">
+          <div ref={box.ref} className="relative mt-8 h-[70vh] min-h-[460px] w-full border border-rule bg-page">
             {box.w > 0 && (
               <Globe
                 ref={globe}
@@ -406,23 +388,23 @@ export default function Landing() {
                 globeImageUrl={tex.earth ?? undefined}
                 bumpImageUrl={tex.bump ?? undefined}
                 showAtmosphere
-                atmosphereColor="#9bd3ff"
+                atmosphereColor="#ffffff"
                 atmosphereAltitude={0.18}
                 polygonsData={tex.earth ? [] : tex.countries}
-                polygonCapColor={() => "rgba(36,57,60,0.9)"}
+                polygonCapColor={() => "rgba(214,214,205,0.9)"}
                 polygonSideColor={() => "rgba(0,0,0,0)"}
-                polygonStrokeColor={() => "#4a6b6d"}
+                polygonStrokeColor={() => "#a9aeb1"}
                 pointsData={points}
                 pointLat="lat"
                 pointLng="lon"
                 pointColor="color"
                 pointAltitude="size"
                 pointRadius={0.35}
-                pointLabel={(d: any) => `<div style="padding:6px 8px;background:#102124;border:1px solid #24393c;font:13px 'Public Sans',Arial;color:#f3f1ea"><b>${d.name}</b><br/><span style="color:#9bacab">${d.label}</span></div>`}
+                pointLabel={(d: any) => `<div style="padding:6px 8px;background:#ffffff;border:1px solid #dfe1e2;font:13px 'Public Sans',Arial;color:#1b1b1b"><b>${d.name}</b><br/><span style="color:#565c65">${d.label}</span></div>`}
                 onPointClick={(d: any) => selectFacility(d.facility_id)}
                 onPointHover={(d: any) => { if (d) { window.clearTimeout(resumeTimer.current); setRotate(false); } else if (!userLocked.current) pauseThenResume(); }}
                 ringsData={rings}
-                ringColor={(d: any) => (t: number) => d.hot ? `rgba(224,92,75,${1 - t})` : `rgba(243,241,234,${0.8 * (1 - t)})`}
+                ringColor={(d: any) => (t: number) => d.hot ? `rgba(181,9,9,${1 - t})` : `rgba(255,255,255,${0.9 * (1 - t)})`}
                 ringMaxRadius={(d: any) => (d.hot ? 4.5 : 1.8)}
                 ringPropagationSpeed={reduced ? 0 : 1.4}
                 ringRepeatPeriod={(d: any) => (d.hot ? 1100 : 2200)}

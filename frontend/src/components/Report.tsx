@@ -46,19 +46,21 @@ function Section({ id, title, eyebrow, children, flush = false }: {
 function ResultBanner({ v, f }: { v: Verdict; f: Facility | null }) {
   const img = f?.data_status === "cached" ? `/api/facilities/${f.facility_id}/imagery/site` : null;
   return (
-    <section className="relative overflow-hidden border-b border-rule bg-page">
+    <section className="relative overflow-hidden bg-primary-darker">
       {img && <img src={img} alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />}
-      <div className="absolute inset-0 bg-gradient-to-r from-page via-page/85 to-page/45" aria-hidden />
-      <div className="relative mx-auto max-w-6xl px-6 py-20">
-        <Eyebrow>Screening result</Eyebrow>
-        <h1 className="mt-4 font-display text-4xl leading-tight text-ink sm:text-6xl">{v.facility_name}</h1>
-        <p className="mt-3 text-[15px] text-muted">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary-darker/95 via-primary-darker/85 to-primary-darker/55" aria-hidden />
+      <div className="relative mx-auto max-w-6xl px-6 py-16">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-white/80">
+          <span className="block h-[3px] w-6 bg-white/80" aria-hidden />Screening result
+        </p>
+        <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-white sm:text-5xl">{v.facility_name}</h1>
+        <p className="mt-3 text-[15px] text-white/80">
           Event date {v.event_date_utc}{f ? ` · ${f.county} County, ${f.state}` : ""}
           {f?.operator ? ` · ${f.operator.split(" — ")[0]}` : ""}
         </p>
-        {v.outcome?.reason && <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink">{v.outcome.reason}</p>}
+        {v.outcome?.reason && <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white">{v.outcome.reason}</p>}
       </div>
-      {img && <span className="absolute bottom-1 right-3 text-[10px] text-muted">Imagery: Esri, Maxar, Earthstar Geographics</span>}
+      {img && <span className="absolute bottom-1 right-3 text-[10px] text-white/60">Imagery: Esri, Maxar, Earthstar Geographics</span>}
     </section>
   );
 }
@@ -77,7 +79,7 @@ function ScaleBar({ ratio }: { ratio: number }) {
       <div className="relative mt-1 h-7 w-full border border-rule bg-panel2">
         <div className="absolute inset-y-0 left-0 bg-alert-red transition-[width] duration-[1200ms] ease-out" style={{ width: inView ? `${pct}%` : "0%" }} />
         {Array.from({ length: decades }, (_, i) => i + 1).map((d) => (
-          <span key={d} className="absolute inset-y-0 w-px bg-ink/25" style={{ left: `${(d / decades) * 100}%` }} aria-hidden />
+          <span key={d} className="absolute inset-y-0 w-px bg-rule" style={{ left: `${(d / decades) * 100}%` }} aria-hidden />
         ))}
         <span className="absolute inset-y-0 left-0 w-[3px] bg-ink" aria-hidden />
       </div>
@@ -118,14 +120,14 @@ function Summary({ v, f, run, onSources }: { v: Verdict; f: Facility | null; run
               <button type="button" className="block w-full py-5 text-left hover:bg-panel" title="Show sources"
                 onClick={() => trace("Allowed", ["assumption:regulations.super_emitter_kg_h", "assumption:regulations.gwp100_ch4"])}>
                 <dt className="label">Federal threshold</dt>
-                <dd className="mt-1"><span className="font-display text-6xl text-ink">{fmt(core.allowed.co2e_t_h, 1)}</span>
+                <dd className="mt-1"><span className="text-6xl font-bold tracking-tight tabular-nums text-ink">{fmt(core.allowed.co2e_t_h, 1)}</span>
                   <span className="ml-2 text-lg text-muted">t CO₂e per hour</span></dd>
                 <dd className="text-sm text-muted">EPA super-emitter threshold, {fmt(core.allowed.ch4_kg_h)} kg CH₄ per hour</dd>
               </button>
               <button type="button" className="block w-full py-5 text-left hover:bg-panel" title="Show sources"
                 onClick={() => trace("Actual", [...(me.evidence_ids ?? []), "assumption:regulations.gwp100_ch4", "tceq_steers"])}>
                 <dt className="label">Observed</dt>
-                <dd className="mt-1"><span className="font-display text-6xl tabular-nums text-alert-red">{fmt(counted ?? core.actual.co2e_t_h)}</span>
+                <dd className="mt-1"><span className="text-6xl font-bold tracking-tight tabular-nums text-alert-red">{fmt(counted ?? core.actual.co2e_t_h)}</span>
                   <span className="ml-2 text-lg text-muted">t CO₂e per hour</span></dd>
                 <dd className="text-sm text-muted">
                   {fmt(core.actual.ch4_kg_h / 1000, 1)} t CH₄ per hour · {fmt(core.ratio)} times the threshold · reported to TCEQ: {core.reported_same_day ? "yes" : "no"}
@@ -158,7 +160,7 @@ function KeyEvidence({ v }: { v: Verdict }) {
         {ke.map((k: any) => (
           <li key={k.id} className="pl-1">
             <span className="mb-1 mt-0.5 block h-1 w-24 bg-rule" aria-hidden>
-              <span className="block h-1 bg-gold" style={{ width: `${Math.round((k.importance ?? 0) * 100)}%` }} />
+              <span className="block h-1 bg-accent" style={{ width: `${Math.round((k.importance ?? 0) * 100)}%` }} />
             </span>
             <b className="text-ink">{k.label || k.text}</b>
             {k.reason && !k.reason.startsWith("hybrid rank") && <span className="text-muted"> — {k.reason}</span>}
@@ -213,7 +215,7 @@ function Accordion({ title, open, onToggle, children }: { title: string; open: b
   return (
     <div className="border border-rule">
       <button onClick={onToggle} aria-expanded={open}
-        className="flex w-full items-center justify-between bg-panel2 px-5 py-3 text-left font-display text-lg text-ink hover:text-gold">
+        className="flex w-full items-center justify-between bg-panel2 px-5 py-3 text-left text-base font-bold text-ink hover:text-accent">
         {title}<span aria-hidden className="text-xl leading-none">{open ? "−" : "+"}</span>
       </button>
       {open && <div className="border-t border-rule p-5">{children}</div>}
@@ -232,7 +234,7 @@ export function Report({ run, f }: { run: RunState; f: Facility | null }) {
   };
   return (
     <div>
-      <SiteHeader right={<a href="/" className="hover:text-gold">New assessment</a>} />
+      <SiteHeader right={<a href="/" className="hover:text-accent">New assessment</a>} />
       <Summary v={v} f={f} run={run} onSources={showSources} />
       <KeyEvidence v={v} />
       <Findings v={v} />

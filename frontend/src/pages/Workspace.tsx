@@ -85,7 +85,7 @@ export default function Workspace() {
               <h1 className="h1">{f?.name ?? "Loading…"}</h1>
               {f && <p className="mt-1 text-muted">{f.county} County, {f.state} · event date {date}</p>}
             </div>
-            <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${busy ? "bg-gold text-page" : run.status === "error" ? "bg-alert-red text-page" : "border border-rule text-muted"}`}>
+            <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${busy ? "bg-accent text-page" : run.status === "error" ? "bg-alert-red text-page" : "border border-rule text-muted"}`}>
               {busy ? "In progress" : run.status === "error" ? "Stopped" : run.status === "finished" ? "Complete" : "Not started"}
             </span>
           </div>
@@ -99,7 +99,7 @@ export default function Workspace() {
             )}
             {run.status === "error" && (
               <div className="border-l-2 border-alert-red bg-alert-red/10 px-4 py-3">
-                <p className="font-display text-lg text-ink">The assessment stopped</p>
+                <p className="text-base font-bold text-ink">The assessment stopped</p>
                 <p className="text-sm text-ink">{run.error ?? "An unexpected error occurred."}</p>
                 <button className="btn-dark mt-3" onClick={assess}>Try again</button>
               </div>

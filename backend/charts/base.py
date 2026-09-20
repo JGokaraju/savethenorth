@@ -11,21 +11,22 @@ import plotly.io as pio
 from backend.charts import static_png
 from backend.settings import CHARTS_DIR, ROOT
 
-# Validated dark-mode categorical steps (dataviz reference palette, checked against surface #102124)
-# + reserved status colours.
-SURFACE = "#102124"
-PAGE = "#0b1719"
-INK = "#f3f1ea"
-INK2 = "#cfd8d6"
-MUTED = "#9bacab"
-GRID = "rgba(243,241,234,0.10)"
-AXIS = "rgba(243,241,234,0.28)"
-S1, S2, S3 = "#3987e5", "#d95926", "#199e70"     # blue, orange, aqua
-S_VIOLET = "#8a79e0"
-CRITICAL, WARNING, GOOD = "#e05c4b", "#e0a83c", "#2fa96b"
-NEUTRAL = "#6f8382"
-# sequential (single hue: blue), dark surface -> low values recede into the surface
-SEQ_BLUE = [[0.0, "#12262c"], [0.25, "#1b4a73"], [0.5, "#2a74bd"], [0.75, "#5aa3e8"], [1.0, "#b7d9f7"]]
+# Validated light-mode categorical steps (dataviz reference palette, checked against surface #ffffff)
+# + reserved status colours. Every series is also directly labelled or legended, which covers the
+# aqua step's sub-3:1 contrast warning.
+SURFACE = "#ffffff"
+PAGE = "#f5f6f7"
+INK = "#1b1b1b"
+INK2 = "#3d4551"
+MUTED = "#565c65"
+GRID = "#ebebeb"
+AXIS = "#a9aeb1"
+S1, S2, S3 = "#2a78d6", "#eb6834", "#1baf7a"     # blue, orange, aqua
+S_VIOLET = "#4a3aa7"
+CRITICAL, WARNING, GOOD = "#b50909", "#8a6100", "#008817"
+NEUTRAL = "#8d9297"
+# sequential (single hue: blue), light surface -> low values recede into the surface
+SEQ_BLUE = [[0.0, "#f3f7fd"], [0.25, "#b7d3f6"], [0.5, "#5598e7"], [0.75, "#1c5cab"], [1.0, "#0d366b"]]
 
 FONT = "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
 
@@ -37,7 +38,7 @@ pio.templates["plumewatch"] = go.layout.Template(layout=dict(
     xaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickfont=dict(color=MUTED), title=dict(font=dict(color=INK2))),
     yaxis=dict(gridcolor=GRID, linecolor=AXIS, zerolinecolor=AXIS, tickfont=dict(color=MUTED), title=dict(font=dict(color=INK2))),
     legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=INK2), orientation="h", y=1.0, yanchor="bottom", x=1.0, xanchor="right"),
-    hoverlabel=dict(bgcolor="#16292c", bordercolor=AXIS, font=dict(color=INK, family=FONT)),
+    hoverlabel=dict(bgcolor="#ffffff", bordercolor=AXIS, font=dict(color=INK, family=FONT)),
     margin=dict(l=70, r=30, t=90, b=60),
 ))
 pio.templates.default = "plumewatch"
