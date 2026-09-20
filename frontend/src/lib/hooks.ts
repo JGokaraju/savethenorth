@@ -3,16 +3,17 @@ import { useEffect, useRef, useState } from "react";
 const reduced = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
 /** True once the element has scrolled into view (for reveal animations and lazy work). */
-export function useInView<T extends Element>(threshold = 0.2) {
+export function useInView<T extends Element>(threshold = 0.2, rootMargin = "0px") {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el || inView) return;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); io.disconnect(); } }, { threshold });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); io.disconnect(); } },
+                                        { threshold, rootMargin });
     io.observe(el);
     return () => io.disconnect();
-  }, [threshold, inView]);
+  }, [threshold, rootMargin, inView]);
   return { ref, inView };
 }
 

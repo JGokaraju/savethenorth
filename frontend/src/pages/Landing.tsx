@@ -14,6 +14,7 @@ const DEFAULT_QUERY = "Lenorah Gas Plant, Stanton, Texas";
 const TEX = "/textures/earth-blue-marble.jpg";
 const BUMP = "/textures/earth-topology.png";
 const RESUME_MS = 5000;
+const REVEAL_MARGIN = "0px 0px -30% 0px"; // reveal as the section arrives, not while it is still below the fold
 
 const DATA_BULLETS: { title: string; line: string }[] = [
   { title: "Methane", line: "NASA EMIT imaging spectrometer, 60 m methane enhancement" },
@@ -131,7 +132,7 @@ const OUTCOME_CLS: Record<string, string> = {
 };
 
 function RecentRuns({ runs }: { runs: RecentRun[] }) {
-  const { ref, inView } = useInView<HTMLDivElement>(0.15);
+  const { ref, inView } = useInView<HTMLDivElement>(0, REVEAL_MARGIN);
   if (!runs.length) return null;
   return (
     <section id="recent" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-16">
@@ -175,7 +176,7 @@ export default function Landing() {
   const globe = useRef<GlobeMethods>();
   const box = useElementSize<HTMLDivElement>();
   const { ref: globeSection, inView: globeVisible } = useInView<HTMLDivElement>(0.3);
-  const { ref: dataRef, inView: dataIn } = useInView<HTMLDivElement>(0.2);
+  const { ref: dataRef, inView: dataIn } = useInView<HTMLDivElement>(0, REVEAL_MARGIN);
   const reduced = useReducedMotion();
   const tex = useTextures();
   const [facilities, setFacilities] = useState<Facility[]>([]);

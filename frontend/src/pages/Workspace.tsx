@@ -93,7 +93,7 @@ export default function Workspace() {
             {run.status === "idle" && f && <p className="text-muted">Select <b className="text-ink">Assess</b> to start the verification.</p>}
             {(busy || run.status === "finished") && (
               <div className="space-y-6">
-                <div className="sticky top-[76px] z-10 bg-page pb-1"><RunProgress run={run} /></div>
+                <div className="sticky top-[61px] z-10 bg-page pb-1"><RunProgress run={run} /></div>
                 <Trajectory run={run} title="Verification steps" />
               </div>
             )}

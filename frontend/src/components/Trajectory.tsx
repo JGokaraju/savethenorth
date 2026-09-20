@@ -122,7 +122,14 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
   const [zoom, setZoom] = useState<Media | null>(null);
   const running = run.status === "running" || run.status === "starting";
   const mediaCount = steps.reduce((n, st) => n + st.media.length, 0);
-  useEffect(() => { if (running && !compact) end.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, [steps.length, mediaCount, running, compact]);
+  const list = useRef<HTMLOListElement>(null);
+  // Follow the newest step. scroll-margin on the items keeps it clear of the sticky progress bar,
+  // which overlays the page and would otherwise hide the step the agent just finished.
+  useEffect(() => {
+    if (!running || compact) return;
+    const last = (list.current?.lastElementChild as HTMLElement | null) ?? end.current;
+    last?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [steps.length, mediaCount, running, compact]);
   useEffect(() => {
     if (!zoom) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setZoom(null);
@@ -140,12 +147,12 @@ export function Trajectory({ run, title, compact = false }: { run: RunState; tit
           </div>
         </div>
       )}
-      <ol className="relative space-y-1 border-l-2 border-rule pl-5">
+      <ol ref={list} className="relative space-y-1 border-l-2 border-rule pl-5">
         {steps.map((st, i) => {
           const hl = !!sel?.callIds.some((c) => st.callIds.includes(c));
           const tag = SOURCE_TAG[st.name];
           return (
-            <li key={st.id} className={`fade-up relative py-1.5 pr-2 text-sm ${hl ? "bg-panel2" : ""}`}
+            <li key={st.id} className={`fade-up relative scroll-mb-8 scroll-mt-[200px] py-1.5 pr-2 text-sm ${hl ? "bg-panel2" : ""}`}
               style={{ animationDelay: `${Math.min(i * 10, 80)}ms` }}>
               <span className="absolute -left-[27px] top-2 flex h-4 w-4 items-center justify-center bg-page">
                 <Icon status={st.status} />
