@@ -11,7 +11,10 @@ import { useRunMode } from "../lib/mode";
 
 const DEFAULT_ID = "tx-lenorah-redlake";
 const DEFAULT_QUERY = "Lenorah Gas Plant, Stanton, Texas";
-// 2x2 solid navy: the sphere reads as the page, so only the country outlines show
+const TEX = "/textures/earth-blue-marble.jpg";
+const BUMP = "/textures/earth-topology.png";
+const RESUME_MS = 5000;
+// 2x2 solid navy: the hero sphere reads as the page, so only the country outlines show
 const SPHERE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR42mMQ0wsEIgYIBQAPbgJVflHuUgAAAABJRU5ErkJggg==";
 const IDLE_SPIN_MS = 5000;
 const REVEAL_MARGIN = "0px 0px -30% 0px"; // reveal as the section arrives, not while it is still below the fold
@@ -42,6 +45,22 @@ function useReducedMotion() {
     return () => m?.removeEventListener?.("change", on);
   }, []);
   return r;
+}
+
+/** Texture if it loads (bundled by setup, works offline); otherwise a plain sphere with country outlines. */
+function useTextures() {
+  const [state, setState] = useState<{ earth: string | null; bump: string | null; countries: any[] }>({ earth: null, bump: null, countries: [] });
+  useEffect(() => {
+    const probe = (url: string) => new Promise<boolean>((res) => { const i = new Image(); i.onload = () => res(true); i.onerror = () => res(false); i.src = url; });
+    Promise.all([probe(TEX), probe(BUMP)]).then(async ([e, b]) => {
+      let countries: any[] = [];
+      if (!e) {
+        try { countries = (await (await fetch("/geo/countries.geojson")).json()).features; } catch { /* plain sphere */ }
+      }
+      setState({ earth: e ? TEX : null, bump: b ? BUMP : null, countries });
+    });
+  }, []);
+  return state;
 }
 
 /** Country outlines for the wireframe globe. */
@@ -88,11 +107,14 @@ function HeroGlobe({ facilities, focus, onPick, onHover, reduced }: {
     spin(true);
   }, [spin, spinLater]);
 
-  useEffect(() => { // follow the site the list (or a marker hover) points at
+  useEffect(() => { // settle on the site being previewed, then drift again
     if (!focus) return;
-    spin(false);
-    globe.current?.pointOfView({ lat: focus.lat, lng: focus.lon, altitude: 1.6 }, reduced ? 0 : 1100);
-    spinLater();
+    const t = window.setTimeout(() => {
+      spin(false);
+      globe.current?.pointOfView({ lat: focus.lat, lng: focus.lon, altitude: 1.9 }, reduced ? 0 : 2200);
+      spinLater();
+    }, reduced ? 0 : 1600);
+    return () => window.clearTimeout(t);
   }, [focus, spin, spinLater, reduced]);
 
   const points = useMemo(() => facilities.map((f) => ({
@@ -252,39 +274,85 @@ export default function Landing() {
   const toast = useToast();
   const health = useHealth(10000);
   const { mode, setMode } = useRunMode(health?.live_available);
+  const globe = useRef<GlobeMethods>();
+  const box = useElementSize<HTMLDivElement>();
+  const { ref: globeSection, inView: globeVisible } = useInView<HTMLDivElement>(0.3);
   const { ref: dataRef, inView: dataIn } = useInView<HTMLDivElement>(0, REVEAL_MARGIN);
   const reduced = useReducedMotion();
+  const tex = useTextures();
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [sel, setSel] = useState<Facility | null>(null);
-  const [hover, setHover] = useState<string | null>(null);
   const [date, setDate] = useState("2025-08-08");
   const [showDs, setShowDs] = useState(false);
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [recent, setRecent] = useState<RecentRun[]>([]);
+  const resumeTimer = useRef<number>();
+  const userLocked = useRef(false); // stop auto-rotation once a location is chosen
 
   useEffect(() => { api.facilities().then(setFacilities).catch((e) => toast(`Backend not reachable: ${e.message}`, "error")); }, [toast]);
   useEffect(() => { api.datasets().then(setDatasets).catch(() => setDatasets([])); }, []);
   useEffect(() => { api.recentRuns(5).then(setRecent).catch(() => setRecent([])); }, []);
 
+  const setRotate = useCallback((on: boolean) => {
+    const c = globe.current?.controls() as any;
+    if (c) { c.autoRotate = on && !reduced && !userLocked.current; c.autoRotateSpeed = 2.5; }
+  }, [reduced]);
+
+  const pauseThenResume = useCallback(() => {
+    setRotate(false);
+    window.clearTimeout(resumeTimer.current);
+    resumeTimer.current = window.setTimeout(() => setRotate(true), RESUME_MS);
+  }, [setRotate]);
+
+  const flyTo = useCallback((lat: number, lng: number, altitude = 1.35, ms = 2000) => {
+    userLocked.current = true;
+    setRotate(false);
+    globe.current?.pointOfView({ lat, lng, altitude }, reduced ? 0 : ms);
+  }, [setRotate, reduced]);
+
   const selectFacility = useCallback((id: string) => {
     const f = facilities.find((x) => x.facility_id === id);
-    if (f) setSel(f);
-  }, [facilities]);
+    if (!f) return;
+    setSel(f);
+    flyTo(f.lat, f.lon);
+  }, [facilities, flyTo]);
+
+  const onReady = useCallback(() => {
+    const g = globe.current;
+    if (!g) return;
+    g.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const c = g.controls() as any;
+    c.enableDamping = true;
+    c.enableZoom = false; // the page scrolls; the globe must not capture the wheel
+    c.addEventListener("start", () => { window.clearTimeout(resumeTimer.current); setRotate(false); });
+    c.addEventListener("end", () => { if (!userLocked.current) pauseThenResume(); });
+    g.pointOfView({ lat: 25, lng: -40, altitude: 1.75 }, 0);
+    setRotate(true);
+  }, [setRotate, pauseThenResume]);
 
   useEffect(() => { // preselect the default case
     if (!facilities.length || sel) return;
     setSel(facilities.find((f) => f.facility_id === DEFAULT_ID) ?? null);
   }, [facilities, sel]);
 
-  // the globe follows the row under the cursor, falling back to the selected site
-  const focus = useMemo(() => facilities.find((f) => f.facility_id === (hover ?? sel?.facility_id)) ?? null,
-                        [facilities, hover, sel]);
+  useEffect(() => { // once the globe scrolls into view: spin ~2 s, then fly to the selected site
+    if (!globeVisible || !sel || userLocked.current) return;
+    const t = window.setTimeout(() => flyTo(sel.lat, sel.lon, 1.35, 2600), reduced ? 0 : 2000);
+    return () => window.clearTimeout(t);
+  }, [globeVisible, sel, flyTo, reduced]);
+
+  const points = useMemo(() => facilities.map((f) => ({
+    ...f, color: f.data_status === "cached" ? "#b50909" : "#ffffff", size: 0.012,
+    label: f.data_status === "cached" ? "Methane plume detected" : "No cached observations",
+  })), [facilities]);
+  const rings = useMemo(() => facilities.map((f) => ({ lat: f.lat, lng: f.lon, hot: f.data_status === "cached" })), [facilities]);
 
   const onPick = (r: GeoResult) => {
     const id = r.facility_id ?? r.nearest_facility?.facility_id;
     if (id) selectFacility(id);
-    else { setSel(null); toast(`No monitored facility within 25 km of ${r.label}.`, "info"); }
+    else { setSel(null); flyTo(r.lat, r.lon); toast(`No monitored facility within 25 km of ${r.label}.`, "info"); }
   };
+
   const assess = (f?: Facility) => {
     const t = f ?? sel;
     if (t) nav(`/assess/${t.facility_id}?date=${date}&mode=${mode}`);
@@ -299,60 +367,31 @@ export default function Landing() {
         <div className="absolute inset-0 bg-primary-darker/90" aria-hidden />
         <SiteHeader overlay hideWordmark right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white">Data sources</button>} />
 
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-6 py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,560px)] lg:gap-12">
-          <div>
-            <h1 className="fade-in text-6xl font-bold leading-[0.92] tracking-tight text-white sm:text-8xl">
-              Save the<br />North
-            </h1>
-            <p className="fade-in mt-5 max-w-md text-lg leading-snug text-white/75 sm:text-xl" style={{ animationDelay: "0.2s" }}>
-              Agentic analysis of factory emissions
-            </p>
+        <div className="relative mx-auto w-full max-w-6xl px-6 py-14">
+          <h1 className="fade-in text-center text-6xl font-bold leading-[0.95] tracking-tight text-white sm:text-8xl">
+            Save the North
+          </h1>
 
-            {/* the site list is the call to action: it steers the globe and starts the assessment */}
-            <div className="fade-in mt-10" style={{ animationDelay: "0.4s" }}>
-              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/50">
-                <span className="block h-px w-6 bg-white/40" aria-hidden />
-                Monitored sites — select one to assess
+          <div className="mt-12 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-14">
+            <div className="fade-in text-center lg:text-left" style={{ animationDelay: "0.25s" }}>
+              <p className="text-2xl leading-snug text-white/85 sm:text-3xl">
+                Agentic analysis of factory emissions
               </p>
-              <ul className="mt-3 border-t border-white/15">
-                {facilities.map((f) => (
-                  <li key={f.facility_id}>
-                    <button
-                      onMouseEnter={() => setHover(f.facility_id)}
-                      onFocus={() => setHover(f.facility_id)}
-                      onMouseLeave={() => setHover(null)}
-                      onBlur={() => setHover(null)}
-                      onClick={() => assess(f)}
-                      className="group flex w-full items-center gap-3 border-b border-white/15 py-3 text-left transition-colors hover:bg-white/[0.07] focus:bg-white/[0.07] focus:outline-none">
-                      <span aria-hidden className={`h-2 w-2 flex-none ${f.data_status === "cached" ? "bg-[#ff6b57]" : "bg-white/50"}`} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[17px] font-semibold text-white">{f.name}</span>
-                        <span className="block truncate text-[13px] text-white/55">
-                          {f.county} County, {f.state}
-                          {f.data_status === "cached" ? " · methane plume on record" : " · no observations yet"}
-                        </span>
-                      </span>
-                      <span className="flex-none text-[12px] font-bold uppercase tracking-[0.12em] text-transparent transition-colors group-hover:text-white group-focus:text-white">
-                        Assess →
-                      </span>
-                    </button>
-                  </li>
-                ))}
-                {!facilities.length && <li className="border-b border-white/15 py-3 text-white/60">Loading sites…</li>}
-              </ul>
-              <button onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}
-                className="mt-6 flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.14em] text-white/70 hover:text-white">
-                How the data is collected
-                <svg viewBox="0 0 24 24" className="nudge h-4 w-4"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" d="M12 4v16M6 14l6 6 6-6" /></svg>
-              </button>
+              <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
+                <button className="btn-hero" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
+                  Assess a facility
+                </button>
+                <button className="btn-hero" onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}>
+                  How the data is collected
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="fade-in order-first lg:order-none" style={{ animationDelay: "0.3s" }}>
-            <HeroGlobe facilities={facilities} focus={focus} reduced={reduced}
-              onPick={(id) => assess(facilities.find((x) => x.facility_id === id))}
-              onHover={setHover} />
-            <p className="mt-1 text-right text-[10px] uppercase tracking-[0.14em] text-white/40">Drag to rotate · click a site to assess</p>
+            <div className="fade-in mx-auto w-full max-w-[340px] lg:max-w-none" style={{ animationDelay: "0.4s" }}>
+              <HeroGlobe facilities={facilities} focus={sel} reduced={reduced}
+                onPick={(id) => assess(facilities.find((x) => x.facility_id === id))}
+                onHover={() => {}} />
+            </div>
           </div>
         </div>
       </section>
@@ -400,7 +439,7 @@ export default function Landing() {
 
       {/* ----------------------------------------------------------- 02 assessment */}
       <section id="assess" className="scroll-mt-24 border-t border-rule bg-panel py-16">
-        <div className="mx-auto max-w-6xl px-6">
+        <div ref={globeSection} className="mx-auto max-w-6xl px-6">
           <SectionHead num="02" eyebrow="Run an assessment" title="Assess a facility" />
 
           <div className="mt-8 grid gap-4 sm:grid-cols-[1fr_auto_auto] sm:items-end">
@@ -446,6 +485,41 @@ export default function Landing() {
             </div>
           )}
 
+          <div ref={box.ref} className="relative mx-auto mt-8 h-[560px] w-full max-w-2xl border border-rule bg-page">
+            {box.w > 0 && (
+              <Globe
+                ref={globe}
+                width={box.w}
+                height={box.h}
+                onGlobeReady={onReady}
+                backgroundColor="rgba(0,0,0,0)"
+                globeImageUrl={tex.earth ?? undefined}
+                bumpImageUrl={tex.bump ?? undefined}
+                showAtmosphere
+                atmosphereColor="#ffffff"
+                atmosphereAltitude={0.18}
+                polygonsData={tex.earth ? [] : tex.countries}
+                polygonCapColor={() => "rgba(214,214,205,0.9)"}
+                polygonSideColor={() => "rgba(0,0,0,0)"}
+                polygonStrokeColor={() => "#a9aeb1"}
+                pointsData={points}
+                pointLat="lat"
+                pointLng="lon"
+                pointColor="color"
+                pointAltitude="size"
+                pointRadius={0.35}
+                pointLabel={(d: any) => `<div style="padding:6px 8px;background:#ffffff;border:1px solid #dfe1e2;font:13px 'Public Sans',Arial;color:#1b1b1b"><b>${d.name}</b><br/><span style="color:#565c65">${d.label}</span></div>`}
+                onPointClick={(d: any) => selectFacility(d.facility_id)}
+                onPointHover={(d: any) => { if (d) { window.clearTimeout(resumeTimer.current); setRotate(false); } else if (!userLocked.current) pauseThenResume(); }}
+                ringsData={rings}
+                ringColor={(d: any) => (t: number) => d.hot ? `rgba(181,9,9,${1 - t})` : `rgba(255,255,255,${0.9 * (1 - t)})`}
+                ringMaxRadius={(d: any) => (d.hot ? 4.5 : 1.8)}
+                ringPropagationSpeed={reduced ? 0 : 1.4}
+                ringRepeatPeriod={(d: any) => (d.hot ? 1100 : 2200)}
+              />
+            )}
+          </div>
+          <p className="mx-auto mt-2 max-w-2xl text-right text-[10px] uppercase tracking-[0.16em] text-muted">Earth imagery: NASA Blue Marble</p>
         </div>
       </section>
 
