@@ -367,17 +367,17 @@ export default function Landing() {
         <div className="absolute inset-0 bg-primary-darker/90" aria-hidden />
         <SiteHeader overlay hideWordmark right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white">Data sources</button>} />
 
-        <div className="relative mx-auto w-full max-w-6xl px-6 py-14">
-          <h1 className="fade-in text-center text-6xl font-bold leading-[0.95] tracking-tight text-white sm:text-8xl">
+        <div className="relative mx-auto w-full max-w-5xl px-6 py-10">
+          <h1 className="fade-in text-center text-6xl font-bold leading-[0.95] tracking-tight text-white sm:text-7xl">
             Save the North
           </h1>
 
-          <div className="mt-12 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-14">
-            <div className="fade-in text-center lg:text-left" style={{ animationDelay: "0.25s" }}>
-              <p className="text-2xl leading-snug text-white/85 sm:text-3xl">
+          <div className="mt-6 flex flex-col items-center gap-8 sm:mt-8 lg:flex-row lg:justify-between lg:gap-12">
+            <div className="fade-in max-w-lg text-center lg:text-left" style={{ animationDelay: "0.25s" }}>
+              <p className="text-2xl leading-tight text-white/85 sm:whitespace-nowrap">
                 Agentic analysis of factory emissions
               </p>
-              <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
+              <div className="mt-5 flex flex-wrap justify-center gap-x-7 gap-y-3 lg:justify-start">
                 <button className="btn-hero" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
                   Assess a facility
                 </button>
@@ -387,7 +387,7 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="fade-in mx-auto w-full max-w-[340px] lg:max-w-none" style={{ animationDelay: "0.4s" }}>
+            <div className="fade-in w-full max-w-[300px] flex-none sm:max-w-[340px]" style={{ animationDelay: "0.4s" }}>
               <HeroGlobe facilities={facilities} focus={sel} reduced={reduced}
                 onPick={(id) => assess(facilities.find((x) => x.facility_id === id))}
                 onHover={() => {}} />

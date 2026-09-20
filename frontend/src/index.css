@@ -17,7 +17,7 @@ body {
   .btn-dark { @apply inline-flex items-center justify-center gap-2 bg-accent px-6 py-3 text-[15px] font-bold text-page transition-colors hover:bg-accent-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-rule disabled:text-muted; }
   .btn-light { @apply inline-flex items-center justify-center gap-2 border-2 border-accent bg-page px-6 py-3 text-[15px] font-bold text-accent transition-colors hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2; }
   /* hero pair: one style for both actions, legible over the photograph */
-  .btn-hero { @apply inline-flex items-center justify-center gap-2 border-2 border-white/70 px-6 py-3 text-[14px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:border-white hover:bg-white hover:text-primary-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-white; }
+  .btn-hero { @apply inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.12em] text-white underline decoration-white/50 underline-offset-[6px] transition-colors hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white; }
   .input { @apply w-full border border-muted bg-page px-3 py-2.5 text-[15px] text-ink placeholder-muted outline-none focus:border-accent focus:ring-1 focus:ring-accent; }
   .label { @apply text-[13px] font-bold text-ink; }
   /* small-caps section label with a leading rule */
