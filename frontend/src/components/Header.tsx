@@ -15,13 +15,12 @@ export function useHealth(pollMs = 8000) {
   return h;
 }
 
-/** Site header: one solid blue bar across the top of every page. `hideWordmark` is for the
- *  landing page, where the hero already carries the name. */
+/** Site header: a solid blue bar on the inner pages; over the landing hero (`overlay`) the bar
+ *  itself is dropped and only the mark and links float on the photograph. */
 export function SiteHeader({ right, overlay = false, hideWordmark = false }: { right?: ReactNode; overlay?: boolean; hideWordmark?: boolean }) {
-  void overlay; // the bar is solid everywhere now
   return (
-    <div className="sticky top-0 z-30">
-      <header className="border-b-[3px] border-primary-dark bg-accent text-white">
+    <div className={overlay ? "absolute inset-x-0 top-0 z-30" : "sticky top-0 z-30"}>
+      <header className={overlay ? "text-white" : "border-b-[3px] border-primary-dark bg-accent text-white"}>
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
           <Link to="/" className="flex items-center gap-3 text-white" aria-label="Save the North — home">
             <Logo size={34} spin={false} />
