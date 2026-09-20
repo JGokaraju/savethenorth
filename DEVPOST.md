@@ -110,13 +110,19 @@ A typical run is **32 tool calls and 7 multimodal readings in about three minute
 
 **Determinism is a feature you have to build.** Fixed Monte Carlo seeds, cached embeddings and rerank responses, a replayable run log, and a demo mode that works with no API keys at all — that's what makes this demonstrable under conference wifi, and it's also what makes the science reproducible.
 
-> *(Team note for the OpenAI submission: add your own concrete Codex example here — the specific feature, bug or refactor where it changed the outcome, and how. We've left this for you rather than inventing one.)*
+**How Codex helped us build it.**
+
+_______________________________________________________________________
+
+_______________________________________________________________________
+
+_______________________________________________________________________
 
 ## 🔜 The future
 
 - **Wire the retrieval layer to Elasticsearch properly.** The hybrid pattern is already in place — BM25 + dense + RRF + rerank — but running it in-process means we don't get aggregations, ES|QL, or geo and time-series queries over a corpus of many facilities. With Elasticsearch as the context layer, the same agent could screen a whole basin and rank *facilities*, not just evidence within one run.
 - **Close the loop on action.** Today the agent produces a report. The natural next step is for it to draft the regulator's information request, attach the evidence zip, and file it — with a human approving before anything leaves the building.
-- **Add the missing modality.** OMNI's speech capability is a real fit for field use: an inspector standing at a fence line asking "what am I looking at, and what did this operator report last quarter?" and getting an answer back, hands-free. Vision and language are working; audio is the obvious extension.
+- **Field mode: the inspector's point of view, spoken.** The natural third modality for this problem is an inspector standing at the fence line, phone in hand, asking out loud "what am I looking at, and what did this operator report last quarter?" — with OMNI taking the live camera view and the spoken question together and answering hands-free, against the same evidence ledger the desk analysis uses. Vision and language already run through OMNI in every assessment; wiring the audio channel into the same client and surfacing it as one more tool in the trace is the next build.
 - **Scale past one plume.** Automatic EMIT and Sentinel-5P granule ingestion, so every overpass of every monitored site is screened, and only the exceedances surface. Our annualisation is currently illustrative because we only have a handful of overpasses; with a real detection history it becomes a defensible annual estimate.
 - **Verify the physics constants.** α and β in the effective-wind parameterisation are flagged as needing verification against an EMIT-specific calibration, and a controlled-release comparison would tighten the uncertainty band substantially.
 - **More rules, more jurisdictions.** The regulatory layer is a small declarative rule set. Adding another state — or the EU methane regulation — is mostly a matter of writing the rules down.
