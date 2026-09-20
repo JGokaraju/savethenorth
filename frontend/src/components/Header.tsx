@@ -15,19 +15,21 @@ export function useHealth(pollMs = 8000) {
   return h;
 }
 
-/** Site header. `overlay` floats it above a hero image; otherwise it sits on the page background. */
+/** Site header: one solid blue bar across the top of every page. `hideWordmark` is for the
+ *  landing page, where the hero already carries the name. */
 export function SiteHeader({ right, overlay = false, hideWordmark = false }: { right?: ReactNode; overlay?: boolean; hideWordmark?: boolean }) {
+  void overlay; // the bar is solid everywhere now
   return (
-    <div className={overlay ? "absolute inset-x-0 top-0 z-30" : "sticky top-0 z-30 bg-page"}>
-      <header className={overlay ? "border-b border-white/25" : "border-b-[3px] border-primary-dark bg-page"}>
+    <div className="sticky top-0 z-30">
+      <header className="border-b-[3px] border-primary-dark bg-accent text-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
-          <Link to="/" className={`flex items-center gap-3 ${overlay ? "text-white" : "text-ink"}`} aria-label="Save the North — home">
-            <Logo size={34} />
+          <Link to="/" className="flex items-center gap-3 text-white" aria-label="Save the North — home">
+            <Logo size={34} spin={false} />
             <span className="leading-none">
               {!hideWordmark && <span className="block text-xl font-bold tracking-tight">Save the North</span>}
             </span>
           </Link>
-          <div className={`flex items-center gap-5 text-[14px] font-semibold ${overlay ? "text-white/90" : "text-accent"}`}>{right}</div>
+          <div className="flex items-center gap-5 text-[14px] font-semibold text-white">{right}</div>
         </div>
       </header>
     </div>

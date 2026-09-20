@@ -361,13 +361,13 @@ export default function Landing() {
 
   return (
     <div>
-      {/* ------------------------------------------------------------------ hero */}
-      <section id="hero" className="relative flex min-h-[calc(100vh-40px)] flex-col justify-center overflow-hidden">
-        <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-primary-darker/90" aria-hidden />
-        <SiteHeader overlay hideWordmark right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white">Data sources</button>} />
+      <SiteHeader hideWordmark right={<button onClick={() => setShowDs(true)} className="underline underline-offset-2 hover:text-white/80">Data sources</button>} />
 
-        <div className="relative mx-auto w-full max-w-5xl px-6 py-10">
+      {/* ------------------------------------------------------------------ hero */}
+      <section id="hero" className="relative flex min-h-[calc(100vh-61px)] flex-col justify-center overflow-hidden">
+        <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-primary-darker/90" aria-hidden />
+        <div className="relative mx-auto w-full max-w-5xl px-6 pb-12 pt-10 sm:pt-14">
           <h1 className="fade-in text-center text-6xl font-bold leading-[0.95] tracking-tight text-white sm:text-7xl">
             Save the North
           </h1>

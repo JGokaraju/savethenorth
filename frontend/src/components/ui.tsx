@@ -78,9 +78,9 @@ export function ModeToggle({ mode, setMode, liveAvailable }: { mode: RunMode; se
   );
 }
 
-export function Logo({ size = 32, speed = 18 }: { size?: number; speed?: number }) {
+export function Logo({ size = 32, speed = 18, spin = true }: { size?: number; speed?: number; spin?: boolean }) {
   return (
-    <span aria-hidden className="globe-mark inline-block shrink-0 select-none rounded-full"
+    <span aria-hidden className={`globe-mark inline-block shrink-0 select-none rounded-full ${spin ? "" : "globe-still"}`}
       style={{ width: size, height: size, ["--globe-w" as string]: `${size * 2}px`, animationDuration: `${speed}s` }} />
   );
 }

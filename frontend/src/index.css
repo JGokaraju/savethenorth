@@ -43,6 +43,7 @@ body {
     inset calc(var(--globe-w) * -0.09) calc(var(--globe-w) * -0.05) calc(var(--globe-w) * 0.12) rgba(0, 0, 0, 0.55),
     inset calc(var(--globe-w) * 0.03) calc(var(--globe-w) * 0.02) calc(var(--globe-w) * 0.06) rgba(255, 255, 255, 0.3);
 }
+.globe-still { animation: none; }
 @keyframes globe-spin { from { background-position: 0 0, 0 0; } to { background-position: calc(-1 * var(--globe-w)) 0, 0 0; } }
 
 /* slow drift on hero photography */
