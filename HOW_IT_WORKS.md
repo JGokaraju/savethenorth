@@ -403,15 +403,32 @@ In the UI, clicking a headline number highlights the ledger entries behind it.
   for that hour, and the component is within 1 km of the source.
 - **"Exceeds the threshold."** Across the whole plausible wind range (1–12 m/s) and all five mask
   thresholds, the rate stays two orders of magnitude above 100 kg/h. For the conclusion to flip, the
-  estimate would have to be wrong by a factor of ~230.
+  estimate would have to be wrong by a factor of ~230. The most conservative variant in the table
+  below still sits **69×** above the threshold.
 
 **What is uncertain:**
 
 - **The value itself.** The stated p5–p95 of 15.0–29.1 t/h reflects wind, mask and retrieval noise —
-  but *not* the choice of parameterisation. Alternative effective-wind and air-density conventions
-  give roughly **20–56 t/h** for the same scene. The published interval is therefore too narrow as a
-  statement about the true rate; it is an interval conditional on the Varon log-form with α = 1.1,
-  β = 0.6.
+  but *not* the choice of parameterisation. Recomputing the same scene under other published
+  conventions gives:
+
+  | Variant | Q (t/h) |
+  |---|---|
+  | Baseline (log U_eff, L = √A, n_air at 92 kPa / 305 K), k = 2.5 | 23.4 |
+  | α, β −20% / +20% | 18.7 / 28.1 |
+  | U10 ∓1σ (2.94 / 5.46 m/s) | 19.2 / 26.5 |
+  | Mask k = 1.5 / k = 4.0 | 24.2 / 22.0 |
+  | Linear U_eff (0.33·U10 + 0.45) | 19.7 |
+  | U_eff = 0.7·U10 | 31.6 |
+  | U_eff = U10 (no attenuation) | 45.1 |
+  | n_air at 101.3 kPa / 288 K | 27.3 |
+  | L = downwind extent (4.83 km) instead of √A | 6.9 |
+
+  So: **±30% statistical**, **19.7–45.1 t/h (factor 2.3)** once the effective-wind and density
+  conventions are allowed to vary, and **6.9–45.1 t/h (factor 6.5)** if the plume length scale is
+  also changed — though using the downwind extent in place of √A is arguably a different method
+  rather than a different parameter. The published p5–p95 is therefore an interval *conditional on*
+  the Varon log-form with α = 1.1, β = 0.6, not a statement about the true rate.
 - **α and β** are not calibrated for EMIT. This is the single largest systematic.
 - **"No matching report."** True of the records we hold — two STEERS incidents. An incident
   mentioned in our own notes (452090, Red Lake) was not in the provided export. The correct reading
@@ -423,7 +440,8 @@ In the UI, clicking a headline number highlights the ledger entries behind it.
 
 **The honest summary:** the *decision* — this facility released methane far beyond the codified
 threshold on this date, and no matching report exists in the available records — is robust to every
-sensitivity we tested. The *number* is good to roughly a factor of two, and the report says so.
+sensitivity we tested; the weakest variant is still 69× the threshold. The *number* is good to about
+a factor of two, and the report says so.
 
 ---
 
