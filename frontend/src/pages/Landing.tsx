@@ -365,32 +365,31 @@ export default function Landing() {
 
       {/* ------------------------------------------------------------------ hero */}
       <section id="hero" className="relative flex min-h-[calc(100vh-61px)] flex-col justify-center overflow-hidden">
-        <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-primary-darker/90" aria-hidden />
+        <img src="/landing-bg.jpg" alt="" aria-hidden className="slow-zoom absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-primary-darker/55" aria-hidden />
         <div className="relative mx-auto w-full max-w-5xl px-6 pb-12 pt-10 sm:pt-14">
           <h1 className="fade-in text-center text-6xl font-bold leading-[0.95] tracking-tight text-white sm:text-7xl">
             Save the North
           </h1>
 
-          <div className="mt-6 flex flex-col items-center gap-8 sm:mt-8 lg:flex-row lg:justify-between lg:gap-12">
-            <div className="fade-in max-w-lg text-center lg:text-left" style={{ animationDelay: "0.25s" }}>
-              <p className="text-2xl leading-tight text-white/85 sm:whitespace-nowrap">
-                Agentic analysis of factory emissions
-              </p>
-              <div className="mt-5 flex flex-wrap justify-center gap-x-7 gap-y-3 lg:justify-start">
-                <button className="btn-hero" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
-                  Assess a facility
-                </button>
-                <button className="btn-hero" onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}>
-                  How the data is collected
-                </button>
-              </div>
-            </div>
+          <div className="mt-6 grid items-center gap-8 sm:mt-8 lg:grid-cols-[minmax(0,1fr)_320px_minmax(0,1fr)] lg:gap-12">
+            <p className="fade-in text-center text-2xl leading-tight text-white lg:text-right" style={{ animationDelay: "0.25s" }}>
+              Agentic analysis of<br className="hidden lg:inline" /> factory emissions
+            </p>
 
-            <div className="fade-in w-full max-w-[300px] flex-none sm:max-w-[340px]" style={{ animationDelay: "0.4s" }}>
+            <div className="fade-in mx-auto w-[260px] sm:w-[320px]" style={{ animationDelay: "0.4s" }}>
               <HeroGlobe facilities={facilities} focus={sel} reduced={reduced}
                 onPick={(id) => assess(facilities.find((x) => x.facility_id === id))}
                 onHover={() => {}} />
+            </div>
+
+            <div className="fade-in flex flex-col items-center gap-4 lg:items-start" style={{ animationDelay: "0.55s" }}>
+              <button className="btn-hero" onClick={() => document.getElementById("assess")?.scrollIntoView({ behavior: "smooth" })}>
+                Assess a facility
+              </button>
+              <button className="btn-hero" onClick={() => document.getElementById("data")?.scrollIntoView({ behavior: "smooth" })}>
+                How the data is collected
+              </button>
             </div>
           </div>
         </div>
